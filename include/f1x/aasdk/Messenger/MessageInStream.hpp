@@ -37,7 +37,7 @@ public:
     MessageInStream(boost::asio::io_service& ioService, transport::ITransport::Pointer transport, ICryptor::Pointer cryptor);
 
     void startReceive(ReceivePromise::Pointer promise) override;
-    void registerRandomCollector(ReceivePromise::Pointer promise) override;
+
 private:
     using std::enable_shared_from_this<MessageInStream>::shared_from_this;
 
@@ -49,16 +49,8 @@ private:
     transport::ITransport::Pointer transport_;
     ICryptor::Pointer cryptor_;
     FrameType recentFrameType_;
-    ChannelId originalFrameChannelId;
-    ChannelId currentFrameChannelId;
     ReceivePromise::Pointer promise_;
-    ReceivePromise::Pointer randomPromise_;
     Message::Pointer message_;
-    Message::Pointer newChannelMessage_;
-    ChannelId channelId_;
-    common::DataConstBuffer frameHeaderBuffer;
-
-    std::map<int, Message::Pointer> unfinishedMessage_;
 };
 
 }

@@ -19,7 +19,6 @@
 #include <boost/endian/conversion.hpp>
 #include <f1x/aasdk/Error/Error.hpp>
 #include <f1x/aasdk/Messenger/Messenger.hpp>
-#include <f1x/aasdk/Common/Log.hpp>
 
 namespace f1x
 {
@@ -53,11 +52,6 @@ void Messenger::enqueueReceive(ChannelId channelId, ReceivePromise::Pointer prom
                 auto inStreamPromise = ReceivePromise::defer(receiveStrand_);
                 inStreamPromise->then(std::bind(&Messenger::inStreamMessageHandler, this->shared_from_this(), std::placeholders::_1),
                                      std::bind(&Messenger::rejectReceivePromiseQueue, this->shared_from_this(), std::placeholders::_1));
-
-                auto randomInStreamPromise = ReceivePromise::defer(receiveStrand_);
-                randomInStreamPromise->then(std::bind(&Messenger::randomInStreamMessageHandler, this->shared_from_this(), std::placeholders::_1),
-                        std::bind(&Messenger::randomRejectInStreamPromiseHandler, this->shared_from_this(), std::placeholders::_1));
-                messageInStream_->registerRandomCollector(std::move(randomInStreamPromise));
                 messageInStream_->startReceive(std::move(inStreamPromise));
             }
         }
@@ -76,39 +70,9 @@ void Messenger::enqueueSend(Message::Pointer message, SendPromise::Pointer promi
     });
 }
 
-void Messenger::randomInStreamMessageHandler(Message::Pointer message) {
-    //channelReceiveMessageQueue_.push(std::move(message));
-
-    AASDK_LOG(error) << "[Messenger] randomInStreamMessageHandler";
-
-    auto randomInStreamPromise = ReceivePromise::defer(receiveStrand_);
-    randomInStreamPromise->then(std::bind(&Messenger::randomInStreamMessageHandler, this->shared_from_this(), std::placeholders::_1),
-                                std::bind(&Messenger::randomRejectInStreamPromiseHandler, this->shared_from_this(), std::placeholders::_1));
-
-    messageInStream_->registerRandomCollector(std::move(randomInStreamPromise));
-
-
-}
-
-void Messenger::randomRejectInStreamPromiseHandler(const error::Error& e) {
-    AASDK_LOG(error) << "[Messenger] randomRejectInStreamPromiseHandler ";
-
-    auto randomInStreamPromise = ReceivePromise::defer(receiveStrand_);
-    randomInStreamPromise->then(std::bind(&Messenger::randomInStreamMessageHandler, this->shared_from_this(), std::placeholders::_1),
-                                std::bind(&Messenger::randomRejectInStreamPromiseHandler, this->shared_from_this(), std::placeholders::_1));
-
-    messageInStream_->registerRandomCollector(std::move(randomInStreamPromise));
-}
-
 void Messenger::inStreamMessageHandler(Message::Pointer message)
 {
     auto channelId = message->getChannelId();
-
-    auto randomInStreamPromise = ReceivePromise::defer(receiveStrand_);
-    randomInStreamPromise->then(std::bind(&Messenger::randomInStreamMessageHandler, this->shared_from_this(), std::placeholders::_1),
-                                std::bind(&Messenger::randomRejectInStreamPromiseHandler, this->shared_from_this(), std::placeholders::_1));
-
-    messageInStream_->registerRandomCollector(std::move(randomInStreamPromise));
 
     if(channelReceivePromiseQueue_.isPending(channelId))
     {
@@ -124,7 +88,6 @@ void Messenger::inStreamMessageHandler(Message::Pointer message)
         auto inStreamPromise = ReceivePromise::defer(receiveStrand_);
         inStreamPromise->then(std::bind(&Messenger::inStreamMessageHandler, this->shared_from_this(), std::placeholders::_1),
                              std::bind(&Messenger::rejectReceivePromiseQueue, this->shared_from_this(), std::placeholders::_1));
-
         messageInStream_->startReceive(std::move(inStreamPromise));
     }
 }

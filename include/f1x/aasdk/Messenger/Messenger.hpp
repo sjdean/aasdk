@@ -45,8 +45,6 @@ private:
     using std::enable_shared_from_this<Messenger>::shared_from_this;
     typedef std::list<std::pair<Message::Pointer, SendPromise::Pointer>> ChannelSendQueue;
     void doSend();
-    void randomInStreamMessageHandler(Message::Pointer message);
-    void randomRejectInStreamPromiseHandler(const error::Error& e);
     void inStreamMessageHandler(Message::Pointer message);
     void outStreamMessageHandler(ChannelSendQueue::iterator queueElement);
     void rejectReceivePromiseQueue(const error::Error& e);
@@ -60,9 +58,6 @@ private:
     ChannelReceivePromiseQueue channelReceivePromiseQueue_;
     ChannelReceiveMessageQueue channelReceiveMessageQueue_;
     ChannelSendQueue channelSendPromiseQueue_;
-
-    int qId_;
-    int isM_;
 };
 
 }

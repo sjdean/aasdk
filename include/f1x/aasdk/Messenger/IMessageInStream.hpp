@@ -37,7 +37,6 @@ public:
     virtual ~IMessageInStream() = default;
 
     virtual void startReceive(ReceivePromise::Pointer promise) = 0;
-    virtual void registerRandomCollector(ReceivePromise::Pointer promise) = 0;
 };
 
 }
