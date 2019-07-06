@@ -38,6 +38,7 @@ message ChannelDescriptor
     AVInputChannel av_input_channel = 5;
     BluetoothChannel bluetooth_channel = 6;
     NavigationChannel navigation_channel = 8;
+    MediaPlayBackChannel mediainfo_channel = 9;
     VendorExtensionChannel vendor_extension_channel = 12;
     WifiChannel wifi_channel=16;
 }
