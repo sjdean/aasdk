@@ -25,6 +25,7 @@ import "AVInputChannelData.proto";
 import "BluetoothChannelData.proto";
 import "NavigationChannelData.proto";
 import "VendorExtensionChannelData.proto";
+import "WifiChannelData.proto";
 
 package f1x.aasdk.proto.data;
 
@@ -38,4 +39,5 @@ message ChannelDescriptor
     BluetoothChannel bluetooth_channel = 6;
     NavigationChannel navigation_channel = 8;
     VendorExtensionChannel vendor_extension_channel = 12;
+    WifiChannel wifi_channel=16;
 }
