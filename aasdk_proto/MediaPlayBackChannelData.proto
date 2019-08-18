@@ -15,13 +15,11 @@
 *  along with aasdk. If not, see <http://www.gnu.org/licenses/>.
 */
 
- syntax="proto3";
+syntax="proto3";
 
- option optimize_for=SPEED;
+package f1x.aasdk.proto.data;
 
- package f1x.aasdk.proto.data;
-
- message WifiChannel
+message MediaPlayBackChannel
 {
-    string ssid = 1;
+    uint32 enabled = 1;
 }
