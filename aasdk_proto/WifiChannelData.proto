@@ -15,11 +15,13 @@
 *  along with aasdk. If not, see <http://www.gnu.org/licenses/>.
 */
 
-syntax="proto3";
+syntax="proto2";
+
+option optimize_for=SPEED;
 
 package f1x.aasdk.proto.data;
 
 message WifiChannel
 {
-    string ssid = 1;
+    required string ssid = 1;
 }

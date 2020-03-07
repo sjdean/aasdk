@@ -16,7 +16,7 @@
 *  along with aasdk. If not, see <http://www.gnu.org/licenses/>.
 */
 
-syntax="proto3";
+syntax="proto2";
 
 package f1x.aasdk.proto.enums;
 
@@ -24,7 +24,7 @@ message Status
 {
     enum Enum
     {
-	OK = 0;
+	    OK = 0;
         FAIL = 1;
     }
 }

@@ -16,7 +16,7 @@
 *  along with aasdk. If not, see <http://www.gnu.org/licenses/>.
 */
 
-syntax="proto3";
+syntax="proto2";
 
 package f1x.aasdk.proto.ids;
 
@@ -25,7 +25,7 @@ message AVChannelMessage
     enum Enum
     {
         AV_MEDIA_WITH_TIMESTAMP_INDICATION = 0x0000;
-	AV_MEDIA_INDICATION = 0x0001;
+    	AV_MEDIA_INDICATION = 0x0001;
         SETUP_REQUEST = 0x8000;
         START_INDICATION = 0x8001;
         STOP_INDICATION = 0x8002;
