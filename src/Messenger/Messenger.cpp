@@ -52,7 +52,7 @@ void Messenger::enqueueReceive(ChannelId channelId, ReceivePromise::Pointer prom
                 auto inStreamPromise = ReceivePromise::defer(receiveStrand_);
                 inStreamPromise->then(std::bind(&Messenger::inStreamMessageHandler, this->shared_from_this(), std::placeholders::_1),
                                      std::bind(&Messenger::rejectReceivePromiseQueue, this->shared_from_this(), std::placeholders::_1));
-                messageInStream_->startReceive(std::move(inStreamPromise));
+                messageInStream_->startReceive(channelId, std::move(inStreamPromise));
             }
         }
     });
@@ -88,7 +88,7 @@ void Messenger::inStreamMessageHandler(Message::Pointer message)
         auto inStreamPromise = ReceivePromise::defer(receiveStrand_);
         inStreamPromise->then(std::bind(&Messenger::inStreamMessageHandler, this->shared_from_this(), std::placeholders::_1),
                              std::bind(&Messenger::rejectReceivePromiseQueue, this->shared_from_this(), std::placeholders::_1));
-        messageInStream_->startReceive(std::move(inStreamPromise));
+        messageInStream_->startReceive(std::move(inStreamPromise), channelId, 2);
     }
 }
 

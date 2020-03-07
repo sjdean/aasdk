@@ -34,8 +34,10 @@ MessageInStream::MessageInStream(boost::asio::io_service& ioService, transport::
 
 }
 
-void MessageInStream::startReceive(ReceivePromise::Pointer promise)
+void MessageInStream::startReceive(ReceivePromise::Pointer promise, ChannelId channelId, int calledFromFunction)
 {
+    calledFromFunction_ = calledFromFunction;
+    channelId_ = channelId;
     strand_.dispatch([this, self = this->shared_from_this(), promise = std::move(promise)]() mutable {
         if(promise_ == nullptr)
         {
@@ -131,6 +133,7 @@ void MessageInStream::receiveFramePayloadHandler(const common::DataConstBuffer& 
         message_->insertPayload(buffer);
     }
 
+    // TODO: Do we need to check on anything else here?
     if(recentFrameType_ == FrameType::BULK || recentFrameType_ == FrameType::LAST)
     {
         promise_->resolve(std::move(message_));
