@@ -48,8 +48,8 @@ void MessageInStream::startReceive(ReceivePromise::Pointer promise, ChannelId ch
 
             auto transportPromise = transport::ITransport::ReceivePromise::defer(strand_);
             transportPromise->then(
-                [this, self = this->shared_from_this()](common::Data data, int lqid, int lism) mutable {
-                    this->receiveFrameHeaderHandler(common::DataConstBuffer(data), lqid, lism);
+                [this, self = this->shared_from_this()](common::Data data, int iQid, int iIsm) mutable {
+                    this->receiveFrameHeaderHandler(common::DataConstBuffer(data), iQid, iIsm);
                 },
                 [this, self = this->shared_from_this()](const error::Error& e) mutable {
                     promise_->reject(e);
@@ -103,8 +103,8 @@ void MessageInStream::receiveFrameHeaderHandler(const common::DataConstBuffer& b
 
     auto transportPromise = transport::ITransport::ReceivePromise::defer(strand_);
     transportPromise->then(
-        [this, self = this->shared_from_this()](common::Data data, int lqid, int lism) mutable {
-            this->receiveFrameSizeHandler(common::DataConstBuffer(data), lqid, lism);
+        [this, self = this->shared_from_this()](common::Data data, int iQid, int iIsm) mutable {
+            this->receiveFrameSizeHandler(common::DataConstBuffer(data), iQid, iIsm);
         },
         [this, self = this->shared_from_this()](const error::Error& e) mutable {
             message_.reset();
@@ -119,8 +119,8 @@ void MessageInStream::receiveFrameSizeHandler(const common::DataConstBuffer& buf
 {
     auto transportPromise = transport::ITransport::ReceivePromise::defer(strand_);
     transportPromise->then(
-        [this, self = this->shared_from_this()](common::Data data) mutable {
-            this->receiveFramePayloadHandler(common::DataConstBuffer(data));
+        [this, self = this->shared_from_this()](common::Data data, int iQid, int iIsm) mutable {
+            this->receiveFramePayloadHandler(common::DataConstBuffer(data), iQid, iIsm);
         },
         [this, self = this->shared_from_this()](const error::Error& e) mutable {
             message_.reset();
@@ -156,6 +156,9 @@ void MessageInStream::receiveFramePayloadHandler(const common::DataConstBuffer& 
     // TODO: Do we need to check on anything else here?
     if(recentFrameType_ == FrameType::BULK || recentFrameType_ == FrameType::LAST)
     {
+        AASDK_LOG(error) << "[MessageInStream] Resolving QueueId " << qid;
+        AASDK_LOG(error) << "[MessageInStream] Resolving ISM Id " << ism;
+
         promise_->resolve(std::move(message_));
         message_.reset();
         promise_.reset();
@@ -164,8 +167,8 @@ void MessageInStream::receiveFramePayloadHandler(const common::DataConstBuffer& 
     {
         auto transportPromise = transport::ITransport::ReceivePromise::defer(strand_);
         transportPromise->then(
-            [this, self = this->shared_from_this()](common::Data data, int lqid, int lism) mutable {
-                this->receiveFrameHeaderHandler(common::DataConstBuffer(data), lqid, lism);
+            [this, self = this->shared_from_this()](common::Data data, int iQid, int iIsm) mutable {
+                this->receiveFrameHeaderHandler(common::DataConstBuffer(data), iQid, iIsm);
             },
             [this, self = this->shared_from_this()](const error::Error& e) mutable {
                 message_.reset();
