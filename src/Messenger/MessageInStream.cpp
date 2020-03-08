@@ -75,9 +75,6 @@ void MessageInStream::receiveFrameHeaderHandler(const common::DataConstBuffer& b
     {
         message_ = std::make_shared<Message>(frameHeader.getChannelId(), frameHeader.getEncryptionType(), frameHeader.getMessageType());
     }
-    else
-    {
-    }
 
     if(message_->getChannelId() != frameHeader.getChannelId())
     {
