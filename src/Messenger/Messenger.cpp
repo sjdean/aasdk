@@ -48,7 +48,7 @@ void Messenger::enqueueReceive(ChannelId channelId, ReceivePromise::Pointer prom
     receiveStrand_.dispatch([this, self = this->shared_from_this(), channelId, promise = std::move(promise)]() mutable {
         if(!channelReceiveMessageQueue_.empty(channelId))
         {
-            AASDK_LOG(error) << "[Messenger] Queue Not Empty. Popping. "
+            AASDK_LOG(error) << "[Messenger] Queue Not Empty. Popping. ";
             promise->resolve(std::move(channelReceiveMessageQueue_.pop(channelId)));
         }
         else
