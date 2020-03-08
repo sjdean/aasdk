@@ -80,6 +80,11 @@ void MessageInStream::receiveFrameHeaderHandler(const common::DataConstBuffer& b
     {
         AASDK_LOG(error) << "[MessageInStream] Message Channel: " << message_->getChannelId();
         AASDK_LOG(error) << "[MessageInStream] Message Type: " << message_->getType();
+
+        AASDK_LOG(error) << "[MessageInStream] Last Frame Header Type: " << frameHeader.getType();
+        AASDK_LOG(error) << "[MessageInStream] Last Frame Channel: " << frameHeader.getChannelId();
+        AASDK_LOG(error) << "[MessageInStream] LAst Frame Type: " << frameHeader.getMessageType();
+
         message_.reset();
         promise_->reject(error::Error(error::ErrorCode::MESSENGER_INTERTWINED_CHANNELS));
         promise_.reset();
@@ -88,6 +93,7 @@ void MessageInStream::receiveFrameHeaderHandler(const common::DataConstBuffer& b
         //message_ = std::make_shared<Message>(frameHeader.getChannelId(), frameHeader.getEncryptionType(), frameHeader.getMessageType());
    }
 
+    lastFrame_ = frameHeader;
     recentFrameType_ = frameHeader.getType();
     const size_t frameSize = FrameSize::getSizeOf(frameHeader.getType() == FrameType::FIRST ? FrameSizeType::EXTENDED : FrameSizeType::SHORT);
 

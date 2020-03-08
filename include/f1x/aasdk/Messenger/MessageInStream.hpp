@@ -54,6 +54,7 @@ private:
     ChannelId channelId_;
     int calledFromFunction_;
     bool videoOnly_;
+    FrameHeader lastFrame_;
 };
 
 }
