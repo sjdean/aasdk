@@ -56,6 +56,8 @@ private:
     ChannelId channelId_;
     int calledFromFunction_;
     bool videoOnly_;
+    int qid);
+    int ism_;
 };
 
 }

@@ -38,7 +38,8 @@ MessageInStream::MessageInStream(boost::asio::io_service& ioService, transport::
 void MessageInStream::startReceive(ReceivePromise::Pointer promise, ChannelId channelId, int calledFromFunction, int qid, int ism)
 {
     AASDK_LOG(error) << "[MessageInStream] start receive called";
-
+    qid_ = qid;
+    ism_ = ism;
     calledFromFunction_ = calledFromFunction;
     channelId_ = channelId;
     strand_.dispatch([this, self = this->shared_from_this(), promise = std::move(promise)]() mutable {
@@ -48,8 +49,8 @@ void MessageInStream::startReceive(ReceivePromise::Pointer promise, ChannelId ch
 
             auto transportPromise = transport::ITransport::ReceivePromise::defer(strand_);
             transportPromise->then(
-                [this, self = this->shared_from_this()](common::Data data, int iQid, int iIsm) mutable {
-                    this->receiveFrameHeaderHandler(common::DataConstBuffer(data), iQid, iIsm);
+                [this, self = this->shared_from_this()](common::Data data) mutable {
+                    this->receiveFrameHeaderHandler(common::DataConstBuffer(data));
                 },
                 [this, self = this->shared_from_this()](const error::Error& e) mutable {
                     promise_->reject(e);
@@ -65,10 +66,10 @@ void MessageInStream::startReceive(ReceivePromise::Pointer promise, ChannelId ch
     });
 }
 
-void MessageInStream::receiveFrameHeaderHandler(const common::DataConstBuffer& buffer, int qid, int ism)
+void MessageInStream::receiveFrameHeaderHandler(const common::DataConstBuffer& buffer)
 {
-    AASDK_LOG(error) << "[MessageInStream] Queue Id " << qid;
-    AASDK_LOG(error) << "[MessageInStream] ISM Id " << ism;
+    AASDK_LOG(error) << "[MessageInStream] Queue Id " << qid_;
+    AASDK_LOG(error) << "[MessageInStream] ISM Id " << ism_;
 
     FrameHeader frameHeader(buffer);
     AASDK_LOG(error) << "[MessageInStream] Frame Header Type: " << (int) frameHeader.getType();
@@ -103,8 +104,8 @@ void MessageInStream::receiveFrameHeaderHandler(const common::DataConstBuffer& b
 
     auto transportPromise = transport::ITransport::ReceivePromise::defer(strand_);
     transportPromise->then(
-        [this, self = this->shared_from_this()](common::Data data, int iQid, int iIsm) mutable {
-            this->receiveFrameSizeHandler(common::DataConstBuffer(data), iQid, iIsm);
+        [this, self = this->shared_from_this()](common::Data data) mutable {
+            this->receiveFrameSizeHandler(common::DataConstBuffer(data));
         },
         [this, self = this->shared_from_this()](const error::Error& e) mutable {
             message_.reset();
@@ -115,12 +116,12 @@ void MessageInStream::receiveFrameHeaderHandler(const common::DataConstBuffer& b
     transport_->receive(frameSize, std::move(transportPromise));
 }
 
-void MessageInStream::receiveFrameSizeHandler(const common::DataConstBuffer& buffer, int qid, int ism)
+void MessageInStream::receiveFrameSizeHandler(const common::DataConstBuffer& buffer)
 {
     auto transportPromise = transport::ITransport::ReceivePromise::defer(strand_);
     transportPromise->then(
-        [this, self = this->shared_from_this()](common::Data data, int iQid, int iIsm) mutable {
-            this->receiveFramePayloadHandler(common::DataConstBuffer(data), iQid, iIsm);
+        [this, self = this->shared_from_this()](common::Data data) mutable {
+            this->receiveFramePayloadHandler(common::DataConstBuffer(data));
         },
         [this, self = this->shared_from_this()](const error::Error& e) mutable {
             message_.reset();
@@ -132,7 +133,7 @@ void MessageInStream::receiveFrameSizeHandler(const common::DataConstBuffer& buf
     transport_->receive(frameSize.getSize(), std::move(transportPromise));
 }
 
-void MessageInStream::receiveFramePayloadHandler(const common::DataConstBuffer& buffer, int qid, int ism)
+void MessageInStream::receiveFramePayloadHandler(const common::DataConstBuffer& buffer)
 {   
     if(message_->getEncryptionType() == EncryptionType::ENCRYPTED)
     {
@@ -156,8 +157,8 @@ void MessageInStream::receiveFramePayloadHandler(const common::DataConstBuffer& 
     // TODO: Do we need to check on anything else here?
     if(recentFrameType_ == FrameType::BULK || recentFrameType_ == FrameType::LAST)
     {
-        AASDK_LOG(error) << "[MessageInStream] Resolving QueueId " << qid;
-        AASDK_LOG(error) << "[MessageInStream] Resolving ISM Id " << ism;
+        AASDK_LOG(error) << "[MessageInStream] Resolving QueueId " << qid_;
+        AASDK_LOG(error) << "[MessageInStream] Resolving ISM Id " << ism_;
 
         promise_->resolve(std::move(message_));
         message_.reset();
@@ -167,8 +168,8 @@ void MessageInStream::receiveFramePayloadHandler(const common::DataConstBuffer& 
     {
         auto transportPromise = transport::ITransport::ReceivePromise::defer(strand_);
         transportPromise->then(
-            [this, self = this->shared_from_this()](common::Data data, int iQid, int iIsm) mutable {
-                this->receiveFrameHeaderHandler(common::DataConstBuffer(data), iQid, iIsm);
+            [this, self = this->shared_from_this()](common::Data data) mutable {
+                this->receiveFrameHeaderHandler(common::DataConstBuffer(data));
             },
             [this, self = this->shared_from_this()](const error::Error& e) mutable {
                 message_.reset();
