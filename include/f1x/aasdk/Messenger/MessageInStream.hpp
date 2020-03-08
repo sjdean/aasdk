@@ -49,12 +49,13 @@ private:
     transport::ITransport::Pointer transport_;
     ICryptor::Pointer cryptor_;
     FrameType recentFrameType_;
+    ChannelId recentFrameChannelId_;
+    MessageType recentFrameMessageType_;
     ReceivePromise::Pointer promise_;
     Message::Pointer message_;
     ChannelId channelId_;
     int calledFromFunction_;
     bool videoOnly_;
-    FrameHeader lastFrame_;
 };
 
 }
