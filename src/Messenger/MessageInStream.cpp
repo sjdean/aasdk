@@ -137,6 +137,7 @@ void MessageInStream::receiveFramePayloadHandler(const common::DataConstBuffer& 
     if(recentFrameType_ == FrameType::BULK || recentFrameType_ == FrameType::LAST)
     {
         promise_->resolve(std::move(message_));
+        message_.reset();
         promise_.reset();
     }
     else
