@@ -34,7 +34,7 @@ namespace messenger
 class MessageInStream: public IMessageInStream, public std::enable_shared_from_this<MessageInStream>, boost::noncopyable
 {
 public:
-    MessageInStream(boost::asio::io_service& ioService, transport::ITransport::Pointer transport, ICryptor::Pointer cryptor);
+    MessageInStream(boost::asio::io_service& ioService, transport::ITransport::Pointer transport, ICryptor::Pointer cryptor, bool videoOnly);
 
     void startReceive(ReceivePromise::Pointer promise, ChannelId channelId, int calledFromFunction) override;
 
@@ -53,6 +53,7 @@ private:
     Message::Pointer message_;
     ChannelId channelId_;
     int calledFromFunction_;
+    bool videoOnly_;
 };
 
 }
