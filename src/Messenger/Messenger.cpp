@@ -49,6 +49,7 @@ void Messenger::enqueueReceive(ChannelId channelId, ReceivePromise::Pointer prom
 
             if(channelReceivePromiseQueue_.size() == 1)
             {
+                AASDK_LOG(error) << "[Messenger] Calling startReceive from enqueueReceive on channel " << (int) channelId;
                 auto inStreamPromise = ReceivePromise::defer(receiveStrand_);
                 inStreamPromise->then(std::bind(&Messenger::inStreamMessageHandler, this->shared_from_this(), std::placeholders::_1),
                                      std::bind(&Messenger::rejectReceivePromiseQueue, this->shared_from_this(), std::placeholders::_1));
@@ -85,6 +86,7 @@ void Messenger::inStreamMessageHandler(Message::Pointer message)
 
     if(!channelReceivePromiseQueue_.empty())
     {
+        AASDK_LOG(error) << "[Messenger] Calling startReceive from inStreamMessageHandler on channel " << (int) channelId;
         auto inStreamPromise = ReceivePromise::defer(receiveStrand_);
         inStreamPromise->then(std::bind(&Messenger::inStreamMessageHandler, this->shared_from_this(), std::placeholders::_1),
                              std::bind(&Messenger::rejectReceivePromiseQueue, this->shared_from_this(), std::placeholders::_1));

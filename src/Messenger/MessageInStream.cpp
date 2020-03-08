@@ -36,6 +36,8 @@ MessageInStream::MessageInStream(boost::asio::io_service& ioService, transport::
 
 void MessageInStream::startReceive(ReceivePromise::Pointer promise, ChannelId channelId, int calledFromFunction)
 {
+    AASDK_LOG(error) << "[MessageInStream] start receive called";
+
     calledFromFunction_ = calledFromFunction;
     channelId_ = channelId;
     strand_.dispatch([this, self = this->shared_from_this(), promise = std::move(promise)]() mutable {
@@ -65,17 +67,28 @@ void MessageInStream::startReceive(ReceivePromise::Pointer promise, ChannelId ch
 void MessageInStream::receiveFrameHeaderHandler(const common::DataConstBuffer& buffer)
 {
     FrameHeader frameHeader(buffer);
+    AASDK_LOG(error) << "[MessageInStream] Frame Header Type: " << frameHeader.getType();
+    AASDK_LOG(error) << "[MessageInStream] Frame Channel: " << frameHeader.getChannelId();
+    AASDK_LOG(error) << "[MessageInStream] Frame Type: " << frameHeader.getMessageType();
 
     if(message_ == nullptr)
     {
         message_ = std::make_shared<Message>(frameHeader.getChannelId(), frameHeader.getEncryptionType(), frameHeader.getMessageType());
     }
+    else
+    {
+    }
+
     if(message_->getChannelId() != frameHeader.getChannelId())
     {
-        message_ = std::make_shared<Message>(frameHeader.getChannelId(), frameHeader.getEncryptionType(), frameHeader.getMessageType());
-        //promise_->reject(error::Error(error::ErrorCode::MESSENGER_INTERTWINED_CHANNELS));
-        //promise_.reset();
-        //return;
+        AASDK_LOG(error) << "[MessageInStream] Message Channel: " << message_->getChannelId();
+        AASDK_LOG(error) << "[MessageInStream] Message Type: " << message_->getType();
+        message_.reset();
+        promise_->reject(error::Error(error::ErrorCode::MESSENGER_INTERTWINED_CHANNELS));
+        promise_.reset();
+        return;
+
+        //message_ = std::make_shared<Message>(frameHeader.getChannelId(), frameHeader.getEncryptionType(), frameHeader.getMessageType());
    }
 
     recentFrameType_ = frameHeader.getType();
