@@ -70,12 +70,13 @@ void MessageInStream::receiveFrameHeaderHandler(const common::DataConstBuffer& b
     {
         message_ = std::make_shared<Message>(frameHeader.getChannelId(), frameHeader.getEncryptionType(), frameHeader.getMessageType());
     }
-
-    if (frameHeader.getChannelId() != channelId_) {
-        promise_->reject(error::Error(error::ErrorCode::MESSENGER_INTERTWINED_CHANNELS));
-        promise_.reset();
-        return;
-       }
+    if(message_->getChannelId() != frameHeader.getChannelId())
+    {
+        message_ = std::make_shared<Message>(frameHeader.getChannelId(), frameHeader.getEncryptionType(), frameHeader.getMessageType());
+        //promise_->reject(error::Error(error::ErrorCode::MESSENGER_INTERTWINED_CHANNELS));
+        //promise_.reset();
+        //return;
+   }
 
     recentFrameType_ = frameHeader.getType();
     const size_t frameSize = FrameSize::getSizeOf(frameHeader.getType() == FrameType::FIRST ? FrameSizeType::EXTENDED : FrameSizeType::SHORT);
