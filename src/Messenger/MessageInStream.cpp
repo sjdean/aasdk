@@ -68,9 +68,9 @@ void MessageInStream::startReceive(ReceivePromise::Pointer promise, ChannelId ch
 void MessageInStream::receiveFrameHeaderHandler(const common::DataConstBuffer& buffer)
 {
     FrameHeader frameHeader(buffer);
-    AASDK_LOG(error) << "[MessageInStream] Frame Header Type: " << frameHeader.getType();
-    AASDK_LOG(error) << "[MessageInStream] Frame Channel: " << frameHeader.getChannelId();
-    AASDK_LOG(error) << "[MessageInStream] Frame Type: " << frameHeader.getMessageType();
+    AASDK_LOG(error) << "[MessageInStream] Frame Header Type: " << (int) frameHeader.getType();
+    AASDK_LOG(error) << "[MessageInStream] Frame Channel: " << (int) frameHeader.getChannelId();
+    AASDK_LOG(error) << "[MessageInStream] Frame Type: " << (int) frameHeader.getMessageType();
 
     if(message_ == nullptr)
     {
@@ -79,12 +79,12 @@ void MessageInStream::receiveFrameHeaderHandler(const common::DataConstBuffer& b
 
     if(message_->getChannelId() != frameHeader.getChannelId())
     {
-        AASDK_LOG(error) << "[MessageInStream] Message Channel: " << message_->getChannelId();
-        AASDK_LOG(error) << "[MessageInStream] Message Type: " << message_->getType();
+        AASDK_LOG(error) << "[MessageInStream] Message Channel: " << (int) message_->getChannelId();
+        AASDK_LOG(error) << "[MessageInStream] Message Type: " << (int) message_->getType();
 
-        AASDK_LOG(error) << "[MessageInStream] Last Frame Header Type: " << frameHeader.getType();
-        AASDK_LOG(error) << "[MessageInStream] Last Frame Channel: " << frameHeader.getChannelId();
-        AASDK_LOG(error) << "[MessageInStream] LAst Frame Type: " << frameHeader.getMessageType();
+        AASDK_LOG(error) << "[MessageInStream] Last Frame Header Type: " << (int) frameHeader.getType();
+        AASDK_LOG(error) << "[MessageInStream] Last Frame Channel: " << (int) frameHeader.getChannelId();
+        AASDK_LOG(error) << "[MessageInStream] LAst Frame Type: " << (int) frameHeader.getMessageType();
 
         message_.reset();
         promise_->reject(error::Error(error::ErrorCode::MESSENGER_INTERTWINED_CHANNELS));
