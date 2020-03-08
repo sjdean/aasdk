@@ -36,14 +36,14 @@ class MessageInStream: public IMessageInStream, public std::enable_shared_from_t
 public:
     MessageInStream(boost::asio::io_service& ioService, transport::ITransport::Pointer transport, ICryptor::Pointer cryptor);
 
-    void startReceive(ReceivePromise::Pointer promise, ChannelId channelId, int calledFromFunction) override;
+    void startReceive(ReceivePromise::Pointer promise, ChannelId channelId, int calledFromFunction, int qid, int ism) override;
 
 private:
     using std::enable_shared_from_this<MessageInStream>::shared_from_this;
 
-    void receiveFrameHeaderHandler(const common::DataConstBuffer& buffer);
-    void receiveFrameSizeHandler(const common::DataConstBuffer& buffer);
-    void receiveFramePayloadHandler(const common::DataConstBuffer& buffer);
+    void receiveFrameHeaderHandler(const common::DataConstBuffer& buffer, int qid, int ism);
+    void receiveFrameSizeHandler(const common::DataConstBuffer& buffer, int qid, int ism);
+    void receiveFramePayloadHandler(const common::DataConstBuffer& buffer, int qid, int ism);
 
     boost::asio::io_service::strand strand_;
     transport::ITransport::Pointer transport_;

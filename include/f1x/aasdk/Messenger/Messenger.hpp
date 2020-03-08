@@ -58,6 +58,9 @@ private:
     ChannelReceivePromiseQueue channelReceivePromiseQueue_;
     ChannelReceiveMessageQueue channelReceiveMessageQueue_;
     ChannelSendQueue channelSendPromiseQueue_;
+
+    int qId_;
+    int isM_;
 };
 
 }

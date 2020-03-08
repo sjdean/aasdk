@@ -34,27 +34,36 @@ Messenger::Messenger(boost::asio::io_service& ioService, IMessageInStream::Point
     , messageInStream_(std::move(messageInStream))
     , messageOutStream_(std::move(messageOutStream))
 {
-
+    qId_ = 0;
+    isM_ = 0;
 }
 
 void Messenger::enqueueReceive(ChannelId channelId, ReceivePromise::Pointer promise)
 {
+    qId_++;
+    isM_ = 0;
+
+    AASDK_LOG(error) << "[Messenger] enqueueReceive Id " << qId_;
+
     receiveStrand_.dispatch([this, self = this->shared_from_this(), channelId, promise = std::move(promise)]() mutable {
         if(!channelReceiveMessageQueue_.empty(channelId))
         {
+            AASDK_LOG(error) << "[Messenger] Queue Not Empty. Popping. "
             promise->resolve(std::move(channelReceiveMessageQueue_.pop(channelId)));
         }
         else
         {
+            AASDK_LOG(error) << "[Messenger] Queue Empty. Pushing. ";
             channelReceivePromiseQueue_.push(channelId, std::move(promise));
 
             if(channelReceivePromiseQueue_.size() == 1)
             {
+                AASDK_LOG(error) << "[Messenger] Queue Size One. ";
                 AASDK_LOG(error) << "[Messenger] Calling startReceive from enqueueReceive on channel " << (int) channelId;
                 auto inStreamPromise = ReceivePromise::defer(receiveStrand_);
                 inStreamPromise->then(std::bind(&Messenger::inStreamMessageHandler, this->shared_from_this(), std::placeholders::_1),
                                      std::bind(&Messenger::rejectReceivePromiseQueue, this->shared_from_this(), std::placeholders::_1));
-                messageInStream_->startReceive(std::move(inStreamPromise), channelId, 1);
+                messageInStream_->startReceive(std::move(inStreamPromise), channelId, 1, qId_, isM_);
             }
         }
     });
@@ -76,12 +85,18 @@ void Messenger::inStreamMessageHandler(Message::Pointer message)
 {
     auto channelId = message->getChannelId();
 
+    isM_++;
+    AASDK_LOG(error) << "[Messenger] inStreamMessageHandler. " << qId_;
+    AASDK_LOG(error) << "[Messenger] inStreamMessageHandler. " << isM_;
+
     if(channelReceivePromiseQueue_.isPending(channelId))
     {
+        AASDK_LOG(error) << "[Messenger] inStreamMessageHandler Popping ";
         channelReceivePromiseQueue_.pop(channelId)->resolve(std::move(message));
     }
     else
     {
+        AASDK_LOG(error) << "[Messenger] inStreamMessageHandler Pushing ";
         channelReceiveMessageQueue_.push(std::move(message));
     }
 
@@ -91,7 +106,7 @@ void Messenger::inStreamMessageHandler(Message::Pointer message)
         auto inStreamPromise = ReceivePromise::defer(receiveStrand_);
         inStreamPromise->then(std::bind(&Messenger::inStreamMessageHandler, this->shared_from_this(), std::placeholders::_1),
                              std::bind(&Messenger::rejectReceivePromiseQueue, this->shared_from_this(), std::placeholders::_1));
-        messageInStream_->startReceive(std::move(inStreamPromise), channelId, 2);
+        messageInStream_->startReceive(std::move(inStreamPromise), channelId, 2, qId_, isM_);
     }
 }
 
@@ -118,6 +133,8 @@ void Messenger::outStreamMessageHandler(ChannelSendQueue::iterator queueElement)
 
 void Messenger::rejectReceivePromiseQueue(const error::Error& e)
 {
+    AASDK_LOG(error) << "[Messenger] Rejecting Promise. " << qId_;
+    AASDK_LOG(error) << "[Messenger] Rejecting Promise. " << isM_;
     while(!channelReceivePromiseQueue_.empty())
     {
         channelReceivePromiseQueue_.pop()->reject(e);

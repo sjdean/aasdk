@@ -36,7 +36,7 @@ public:
     IMessageInStream() = default;
     virtual ~IMessageInStream() = default;
 
-    virtual void startReceive(ReceivePromise::Pointer promise, ChannelId channelId, int calledFromFunction) = 0;
+    virtual void startReceive(ReceivePromise::Pointer promise, ChannelId channelId, int calledFromFunction, int qid, int ism) = 0;
 };
 
 }
