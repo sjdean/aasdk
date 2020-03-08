@@ -43,7 +43,7 @@ public:
 
 private:
     boost::circular_buffer<common::Data::value_type> data_;
-    static constexpr common::Data::size_type cChunkSize = 16384;
+    static constexpr common::Data::size_type cChunkSize = 32768;
 };
 
 }
