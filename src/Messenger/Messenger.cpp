@@ -19,6 +19,7 @@
 #include <boost/endian/conversion.hpp>
 #include <f1x/aasdk/Error/Error.hpp>
 #include <f1x/aasdk/Messenger/Messenger.hpp>
+#include <f1x/aasdk/Common/Log.hpp>
 
 namespace f1x
 {
