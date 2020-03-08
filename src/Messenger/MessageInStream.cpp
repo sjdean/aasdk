@@ -26,11 +26,10 @@ namespace aasdk
 namespace messenger
 {
 
-MessageInStream::MessageInStream(boost::asio::io_service& ioService, transport::ITransport::Pointer transport, ICryptor::Pointer cryptor, bool videoOnly)
+MessageInStream::MessageInStream(boost::asio::io_service& ioService, transport::ITransport::Pointer transport, ICryptor::Pointer cryptor)
     : strand_(ioService)
     , transport_(std::move(transport))
     , cryptor_(std::move(cryptor))
-    , videoOnly_(std::move(videoOnly))
 {
 
 }
@@ -66,16 +65,6 @@ void MessageInStream::startReceive(ReceivePromise::Pointer promise, ChannelId ch
 void MessageInStream::receiveFrameHeaderHandler(const common::DataConstBuffer& buffer)
 {
     FrameHeader frameHeader(buffer);
-
-    if (videoOnly_) {
-        if (frameHeader.getChannelId() != ChannelId::VIDEO) {
-            return;
-        }
-    } else {
-        if (frameHeader.getChannelId() == ChannelId::VIDEO) {
-            return;
-        }
-    }
 
     if(message_ == nullptr)
     {

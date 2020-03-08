@@ -36,8 +36,7 @@ namespace messenger
 class Messenger: public IMessenger, public std::enable_shared_from_this<Messenger>, boost::noncopyable
 {
 public:
-    Messenger(boost::asio::io_service& ioService, IMessageInStream::Pointer messageInStream, IMessageOutStream::Pointer messageOutStream,
-              bool videoOnly);
+    Messenger(boost::asio::io_service& ioService, IMessageInStream::Pointer messageInStream, IMessageOutStream::Pointer messageOutStream);
     void enqueueReceive(ChannelId channelId, ReceivePromise::Pointer promise) override;
     void enqueueSend(Message::Pointer message, SendPromise::Pointer promise) override;
     void stop() override;
@@ -59,7 +58,6 @@ private:
     ChannelReceivePromiseQueue channelReceivePromiseQueue_;
     ChannelReceiveMessageQueue channelReceiveMessageQueue_;
     ChannelSendQueue channelSendPromiseQueue_;
-    bool videoOnly_;
 };
 
 }

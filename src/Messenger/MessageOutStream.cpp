@@ -27,13 +27,12 @@ namespace aasdk
 namespace messenger
 {
 
-MessageOutStream::MessageOutStream(boost::asio::io_service& ioService, transport::ITransport::Pointer transport, ICryptor::Pointer cryptor, bool videoOnly)
+MessageOutStream::MessageOutStream(boost::asio::io_service& ioService, transport::ITransport::Pointer transport, ICryptor::Pointer cryptor)
     : strand_(ioService)
     , transport_(std::move(transport))
     , cryptor_(std::move(cryptor))
     , offset_(0)
     , remainingSize_(0)
-    , videoOnly_(std::move(videoOnly))
 {
 
 }
