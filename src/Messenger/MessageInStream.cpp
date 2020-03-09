@@ -92,8 +92,8 @@ void MessageInStream::receiveFrameHeaderHandler(const common::DataConstBuffer& b
         AASDK_LOG(error) << "[MessageInStream] Last Frame Header Type: " << (int) recentFrameType_;
         AASDK_LOG(error) << "[MessageInStream] Last Frame Channel: " << (int) recentFrameChannelId_;
 
-        //ignoreFrame = true;
-        return;
+        ignoreFrame = true;
+        //return;
         //message_ = std::make_shared<Message>(frameHeader.getChannelId(), frameHeader.getEncryptionType(), frameHeader.getMessageType());
    }
 
