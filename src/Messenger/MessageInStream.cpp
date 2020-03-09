@@ -76,8 +76,6 @@ void MessageInStream::receiveFrameHeaderHandler(const common::DataConstBuffer& b
     AASDK_LOG(error) << "[MessageInStream] Queue Id " << qid_;
     AASDK_LOG(error) << "[MessageInStream] ISM Id " << ism_;
 
-    AASDK_LOG(error) << "[MessageInStream] frameHeader " << std::to_string(buffer.size);
-
     FrameHeader frameHeader(buffer);
     AASDK_LOG(error) << "[MessageInStream] Frame Header Type: " << (int) frameHeader.getType();
     AASDK_LOG(error) << "[MessageInStream] Frame Channel: " << (int) frameHeader.getChannelId();
@@ -106,8 +104,13 @@ void MessageInStream::receiveFrameHeaderHandler(const common::DataConstBuffer& b
     recentFrameChannelId_ = frameHeader.getChannelId();
 
     const size_t frameSize = FrameSize::getSizeOf(frameHeader.getType() == FrameType::FIRST ? FrameSizeType::EXTENDED : FrameSizeType::SHORT);
-    AASDK_LOG(error) << "[MessageInStream] frameHeader " << std::to_string(buffer.size);
     AASDK_LOG(error) << "[MessageInStream] frameHeaderSize " << (int) frameSize;
+
+    FrameSize totalSize(buffer);
+
+    if (frameHeader.getType() == FrameType::FIRST) {
+        AASDK_LOG(error) << "[MessageInStream] Total FrameSize " << (int) totalSize.getTotalSize();
+    }
 
     auto transportPromise = transport::ITransport::ReceivePromise::defer(strand_);
     transportPromise->then(
@@ -137,15 +140,12 @@ void MessageInStream::receiveFrameSizeHandler(const common::DataConstBuffer& buf
         });
 
     FrameSize frameSize(buffer);
-    AASDK_LOG(error) << "[MessageInStream] Frame " << std::to_string(buffer.size);
     AASDK_LOG(error) << "[MessageInStream] FrameSize " << (int) frameSize.getSize();
     transport_->receive(frameSize.getSize(), std::move(transportPromise));
 }
 
 void MessageInStream::receiveFramePayloadHandler(const common::DataConstBuffer& buffer)
 {
-    AASDK_LOG(error) << "[MessageInStream] frame " << std::to_string(buffer.size);
-
     if(message_->getEncryptionType() == EncryptionType::ENCRYPTED)
     {
         try

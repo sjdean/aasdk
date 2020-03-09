@@ -80,6 +80,12 @@ size_t FrameSize::getSize() const
     return frameSize_;
 }
 
+size_t FrameSize::getTotalSize() const
+{
+    return totalSize_;
+}
+
+
 size_t FrameSize::getSizeOf(FrameSizeType type)
 {
     return type == FrameSizeType::EXTENDED ? 6 : 2;
