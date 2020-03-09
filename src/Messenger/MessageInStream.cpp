@@ -80,6 +80,16 @@ void MessageInStream::receiveFrameHeaderHandler(const common::DataConstBuffer& b
     AASDK_LOG(error) << "[MessageInStream] Frame Header Type: " << (int) frameHeader.getType();
     AASDK_LOG(error) << "[MessageInStream] Frame Channel: " << (int) frameHeader.getChannelId();
 
+    const size_t frameSize = FrameSize::getSizeOf(frameHeader.getType() == FrameType::FIRST ? FrameSizeType::EXTENDED : FrameSizeType::SHORT);
+    AASDK_LOG(error) << "[MessageInStream] frameHeaderSize " << (int) frameSize;
+
+    FrameSize totalSize(buffer);
+
+    if (frameHeader.getType() == FrameType::FIRST) {
+        AASDK_LOG(error) << "[MessageInStream] Total FrameSize " << (int) totalSize.getTotalSize();
+    }
+
+
     if(message_ == nullptr)
     {
         message_ = std::make_shared<Message>(frameHeader.getChannelId(), frameHeader.getEncryptionType(), frameHeader.getMessageType());
@@ -102,15 +112,6 @@ void MessageInStream::receiveFrameHeaderHandler(const common::DataConstBuffer& b
     recentFrameType_ = frameHeader.getType();
     recentFrameMessageType_ = frameHeader.getMessageType();
     recentFrameChannelId_ = frameHeader.getChannelId();
-
-    const size_t frameSize = FrameSize::getSizeOf(frameHeader.getType() == FrameType::FIRST ? FrameSizeType::EXTENDED : FrameSizeType::SHORT);
-    AASDK_LOG(error) << "[MessageInStream] frameHeaderSize " << (int) frameSize;
-
-    FrameSize totalSize(buffer);
-
-    if (frameHeader.getType() == FrameType::FIRST) {
-        AASDK_LOG(error) << "[MessageInStream] Total FrameSize " << (int) totalSize.getTotalSize();
-    }
 
     auto transportPromise = transport::ITransport::ReceivePromise::defer(strand_);
     transportPromise->then(
