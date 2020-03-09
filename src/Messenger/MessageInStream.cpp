@@ -59,6 +59,7 @@ void MessageInStream::startReceive(ReceivePromise::Pointer promise, ChannelId ch
                     promise_.reset();
                 });
 
+            AASDK_LOG(error) << "[MessageInStream] FrameHeader::getSizeOf() " << (int) FrameHeader::getSizeOf();
             transport_->receive(FrameHeader::getSizeOf(), std::move(transportPromise));
         }
         else
@@ -92,9 +93,10 @@ void MessageInStream::receiveFrameHeaderHandler(const common::DataConstBuffer& b
         AASDK_LOG(error) << "[MessageInStream] Last Frame Header Type: " << (int) recentFrameType_;
         AASDK_LOG(error) << "[MessageInStream] Last Frame Channel: " << (int) recentFrameChannelId_;
 
-        //ignoreFrame = true;
-        //return;
-        //message_ = std::make_shared<Message>(frameHeader.getChannelId(), frameHeader.getEncryptionType(), frameHeader.getMessageType());
+        message_.reset();
+        promise_->reject(error::Error(error::ErrorCode::MESSENGER_INTERTWINED_CHANNELS));
+        promise_.reset();
+        return;
    }
 
     recentFrameType_ = frameHeader.getType();
@@ -102,6 +104,7 @@ void MessageInStream::receiveFrameHeaderHandler(const common::DataConstBuffer& b
     recentFrameChannelId_ = frameHeader.getChannelId();
 
     const size_t frameSize = FrameSize::getSizeOf(frameHeader.getType() == FrameType::FIRST ? FrameSizeType::EXTENDED : FrameSizeType::SHORT);
+    AASDK_LOG(error) << "[MessageInStream] frameHeaderSize " << (int) frameSize;
 
     auto transportPromise = transport::ITransport::ReceivePromise::defer(strand_);
     transportPromise->then(
@@ -131,6 +134,7 @@ void MessageInStream::receiveFrameSizeHandler(const common::DataConstBuffer& buf
         });
 
     FrameSize frameSize(buffer);
+    AASDK_LOG(error) << "[MessageInStream] FrameSize " << (int) frameSize.getSize();
     transport_->receive(frameSize.getSize(), std::move(transportPromise));
 }
 
