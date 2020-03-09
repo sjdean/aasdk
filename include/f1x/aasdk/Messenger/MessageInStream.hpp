@@ -58,6 +58,7 @@ private:
     bool videoOnly_;
     int qid_;
     int ism_;
+    bool ignoreFrame;
 };
 
 }

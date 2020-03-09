@@ -37,7 +37,9 @@ MessageInStream::MessageInStream(boost::asio::io_service& ioService, transport::
 
 void MessageInStream::startReceive(ReceivePromise::Pointer promise, ChannelId channelId, int calledFromFunction, int qid, int ism)
 {
-    AASDK_LOG(error) << "[MessageInStream] start receive called";
+    AASDK_LOG(error) << "[MessageInStream] start receive called on queue " << qid;
+    AASDK_LOG(error) << "[MessageInStream] start receive called on ism " << ism;
+
     qid_ = qid;
     ism_ = ism;
     calledFromFunction_ = calledFromFunction;
@@ -68,6 +70,8 @@ void MessageInStream::startReceive(ReceivePromise::Pointer promise, ChannelId ch
 
 void MessageInStream::receiveFrameHeaderHandler(const common::DataConstBuffer& buffer)
 {
+    ignoreFrame = false;
+
     AASDK_LOG(error) << "[MessageInStream] Queue Id " << qid_;
     AASDK_LOG(error) << "[MessageInStream] ISM Id " << ism_;
 
@@ -88,11 +92,8 @@ void MessageInStream::receiveFrameHeaderHandler(const common::DataConstBuffer& b
         AASDK_LOG(error) << "[MessageInStream] Last Frame Header Type: " << (int) recentFrameType_;
         AASDK_LOG(error) << "[MessageInStream] Last Frame Channel: " << (int) recentFrameChannelId_;
 
-        message_.reset();
-        promise_->reject(error::Error(error::ErrorCode::MESSENGER_INTERTWINED_CHANNELS));
-        promise_.reset();
+        //ignoreFrame = true;
         return;
-
         //message_ = std::make_shared<Message>(frameHeader.getChannelId(), frameHeader.getEncryptionType(), frameHeader.getMessageType());
    }
 
@@ -151,7 +152,9 @@ void MessageInStream::receiveFramePayloadHandler(const common::DataConstBuffer& 
     }
     else
     {
-        message_->insertPayload(buffer);
+        if (!ignoreFrame) {
+            message_->insertPayload(buffer);
+        }
     }
 
     // TODO: Do we need to check on anything else here?

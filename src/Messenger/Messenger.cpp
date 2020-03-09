@@ -44,6 +44,7 @@ void Messenger::enqueueReceive(ChannelId channelId, ReceivePromise::Pointer prom
     isM_ = 0;
 
     AASDK_LOG(error) << "[Messenger] enqueueReceive Id " << qId_;
+    AASDK_LOG(error) << "[Messenger] enqueueReceive Channel " << (int) channelId;
 
     receiveStrand_.dispatch([this, self = this->shared_from_this(), channelId, promise = std::move(promise)]() mutable {
         if(!channelReceiveMessageQueue_.empty(channelId))
@@ -53,7 +54,7 @@ void Messenger::enqueueReceive(ChannelId channelId, ReceivePromise::Pointer prom
         }
         else
         {
-            AASDK_LOG(error) << "[Messenger] Queue Empty. Pushing. ";
+            AASDK_LOG(error) << "[Messenger] Queue Empty. Pushing. " << (int) channelReceivePromiseQueue_.size();
             channelReceivePromiseQueue_.push(channelId, std::move(promise));
 
             if(channelReceivePromiseQueue_.size() == 1)
