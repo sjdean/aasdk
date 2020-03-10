@@ -59,7 +59,6 @@ void MessageInStream::startReceive(ReceivePromise::Pointer promise, ChannelId ch
                     promise_.reset();
                 });
 
-            AASDK_LOG(error) << "[MessageInStream] FrameHeader::getSizeOf() " << (int) FrameHeader::getSizeOf();
             transport_->receive(FrameHeader::getSizeOf(), std::move(transportPromise));
         }
         else
@@ -73,23 +72,18 @@ void MessageInStream::receiveFrameHeaderHandler(const common::DataConstBuffer& b
 {
     ignoreFrame = false;
 
-    AASDK_LOG(error) << "[MessageInStream] Queue Id " << qid_;
-    AASDK_LOG(error) << "[MessageInStream] ISM Id " << ism_;
+    AASDK_LOG(error) << "[MessageInStream::receiveFrameHeaderHandler] Queue Id" << qid_;
+    AASDK_LOG(error) << "[MessageInStream::receiveFrameHeaderHandler] inStreamMessage Id " << ism_;
 
     FrameHeader frameHeader(buffer);
-    AASDK_LOG(error) << "[MessageInStream] Frame Header Type: " << (int) frameHeader.getType();
-    AASDK_LOG(error) << "[MessageInStream] Frame Channel: " << (int) frameHeader.getChannelId();
-    AASDK_LOG(error) << "[MessageInStream] receiveFrameHeaderHandler buffer " << buffer.cdata;
-
     const size_t frameSize = FrameSize::getSizeOf(frameHeader.getType() == FrameType::FIRST ? FrameSizeType::EXTENDED : FrameSizeType::SHORT);
-    AASDK_LOG(error) << "[MessageInStream] frameHeaderSize " << (int) frameSize;
 
-    FrameSize totalSize(buffer);
+    AASDK_LOG(error) << "[MessageInStream::receiveFrameSizeHandler] Buffer Size" << buffer.size;
+    AASDK_LOG(error) << "[MessageInStream::receiveFrameHeaderHandler] Frame Channel: " << (int) frameHeader.getChannelId();
+    AASDK_LOG(error) << "[MessageInStream::receiveFrameHeaderHandler] Frame Header Type: " << (int) frameHeader.getType();
+    AASDK_LOG(error) << "[MessageInStream::receiveFrameHeaderHandler] Frame Message Type: " << (int) frameHeader.getMessageType();
 
-    if (frameHeader.getType() == FrameType::FIRST) {
-        AASDK_LOG(error) << "[MessageInStream] Total FrameSize " << (int) totalSize.getTotalSize();
-    }
-
+    AASDK_LOG(error) << "[MessageInStream::receiveFrameHeaderHandler] Buffer Contents " << common::dump(buffer);
 
     if(message_ == nullptr)
     {
@@ -98,11 +92,8 @@ void MessageInStream::receiveFrameHeaderHandler(const common::DataConstBuffer& b
 
     if(message_->getChannelId() != frameHeader.getChannelId())
     {
-        AASDK_LOG(error) << "[MessageInStream] Message Channel: " << (int) message_->getChannelId();
-        AASDK_LOG(error) << "[MessageInStream] Message Type: " << (int) message_->getType();
-
-        AASDK_LOG(error) << "[MessageInStream] Last Frame Header Type: " << (int) recentFrameType_;
-        AASDK_LOG(error) << "[MessageInStream] Last Frame Channel: " << (int) recentFrameChannelId_;
+        AASDK_LOG(error) << "[MessageInStream::receiveFrameHeaderHandler] Last Frame Header Type: " << (int) recentFrameType_;
+        AASDK_LOG(error) << "[MessageInStream::receiveFrameHeaderHandler] Last Frame Channel: " << (int) recentFrameChannelId_;
 
         message_.reset();
         promise_->reject(error::Error(error::ErrorCode::MESSENGER_INTERTWINED_CHANNELS));
@@ -130,7 +121,12 @@ void MessageInStream::receiveFrameHeaderHandler(const common::DataConstBuffer& b
 
 void MessageInStream::receiveFrameSizeHandler(const common::DataConstBuffer& buffer)
 {
-    AASDK_LOG(error) << "[MessageInStream] receiveFrameSizeHandler buffer " << buffer.cdata;
+    FrameSize frameSize(buffer);
+    AASDK_LOG(error) << "[MessageInStream::receiveFrameSizeHandler] Buffer Size" << buffer.size;
+    AASDK_LOG(error) << "[MessageInStream::receiveFrameSizeHandler] Frame Size " << (int) frameSize.getSize();
+    AASDK_LOG(error) << "[MessageInStream::receiveFrameSizeHandler] Total Frame Size " << (int) frameSize.getTotalSize();
+    AASDK_LOG(error) << "[MessageInStream::receiveFrameSizeHandler] Buffer Contents" << common::dump(buffer);
+
     auto transportPromise = transport::ITransport::ReceivePromise::defer(strand_);
     transportPromise->then(
         [this, self = this->shared_from_this()](common::Data data) mutable {
@@ -142,14 +138,13 @@ void MessageInStream::receiveFrameSizeHandler(const common::DataConstBuffer& buf
             promise_.reset();
         });
 
-    FrameSize frameSize(buffer);
-    AASDK_LOG(error) << "[MessageInStream] FrameSize " << (int) frameSize.getSize();
     transport_->receive(frameSize.getSize(), std::move(transportPromise));
 }
 
 void MessageInStream::receiveFramePayloadHandler(const common::DataConstBuffer& buffer)
 {
-    AASDK_LOG(error) << "[MessageInStream] receiveFramePayloadHandler buffer " << buffer.cdata;
+    AASDK_LOG(error) << "[MessageInStream::receiveFramePayloadHandler] Buffer Size" << buffer.size;
+    AASDK_LOG(error) << "[MessageInStream::receiveFramePayloadHandler] Buffer Contents" << common::dump(buffer);
     if(message_->getEncryptionType() == EncryptionType::ENCRYPTED)
     {
         try
@@ -201,3 +196,7 @@ void MessageInStream::receiveFramePayloadHandler(const common::DataConstBuffer& 
 }
 }
 }
+
+
+
+
