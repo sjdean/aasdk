@@ -83,7 +83,7 @@ void MessageInStream::receiveFrameHeaderHandler(const common::DataConstBuffer& b
     AASDK_LOG(error) << "[MessageInStream::receiveFrameHeaderHandler] Frame Header Type: " << (int) frameHeader.getType();
     AASDK_LOG(error) << "[MessageInStream::receiveFrameHeaderHandler] Frame Message Type: " << (int) frameHeader.getMessageType();
 
-    AASDK_LOG(error) << "[MessageInStream::receiveFrameHeaderHandler] Buffer Contents " << common::dump(buffer);
+    //AASDK_LOG(error) << "[MessageInStream::receiveFrameHeaderHandler] Buffer Contents " << common::dump(buffer);
 
     if(message_ == nullptr)
     {
@@ -125,7 +125,7 @@ void MessageInStream::receiveFrameSizeHandler(const common::DataConstBuffer& buf
     AASDK_LOG(error) << "[MessageInStream::receiveFrameSizeHandler] Buffer Size" << buffer.size;
     AASDK_LOG(error) << "[MessageInStream::receiveFrameSizeHandler] Frame Size " << (int) frameSize.getSize();
     AASDK_LOG(error) << "[MessageInStream::receiveFrameSizeHandler] Total Frame Size " << (int) frameSize.getTotalSize();
-    AASDK_LOG(error) << "[MessageInStream::receiveFrameSizeHandler] Buffer Contents" << common::dump(buffer);
+    //AASDK_LOG(error) << "[MessageInStream::receiveFrameSizeHandler] Buffer Contents" << common::dump(buffer);
 
     auto transportPromise = transport::ITransport::ReceivePromise::defer(strand_);
     transportPromise->then(
@@ -144,7 +144,7 @@ void MessageInStream::receiveFrameSizeHandler(const common::DataConstBuffer& buf
 void MessageInStream::receiveFramePayloadHandler(const common::DataConstBuffer& buffer)
 {
     AASDK_LOG(error) << "[MessageInStream::receiveFramePayloadHandler] Buffer Size" << buffer.size;
-    AASDK_LOG(error) << "[MessageInStream::receiveFramePayloadHandler] Buffer Contents" << common::dump(buffer);
+    //AASDK_LOG(error) << "[MessageInStream::receiveFramePayloadHandler] Buffer Contents" << common::dump(buffer);
     if(message_->getEncryptionType() == EncryptionType::ENCRYPTED)
     {
         try
