@@ -46,7 +46,7 @@ private:
     typedef std::list<std::pair<Message::Pointer, SendPromise::Pointer>> ChannelSendQueue;
     void doSend();
     void randomInStreamMessageHandler(Message::Pointer message);
-    void randomRejectInStreamPromiseHandler(Message::Pointer message);
+    void randomRejectInStreamPromiseHandler(const error::Error& e);
     void inStreamMessageHandler(Message::Pointer message);
     void outStreamMessageHandler(ChannelSendQueue::iterator queueElement);
     void rejectReceivePromiseQueue(const error::Error& e);

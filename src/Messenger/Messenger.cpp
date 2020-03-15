@@ -86,7 +86,7 @@ void Messenger::randomInStreamMessageHandler(Message::Pointer message) {
     messageInStream_->registerRandomCollector(std::move(randomInStreamPromise));
 }
 
-void Messenger::randomRejectInStreamPromiseHandler(Message::Pointer message) {
+void Messenger::randomRejectInStreamPromiseHandler(const error::Error& e) {
     auto randomInStreamPromise = ReceivePromise::defer(receiveStrand_);
     randomInStreamPromise->then(std::bind(&Messenger::randomInStreamMessageHandler, this->shared_from_this(), std::placeholders::_1),
                                 std::bind(&Messenger::randomRejectInStreamPromiseHandler, this->shared_from_this(), std::placeholders::_1));
