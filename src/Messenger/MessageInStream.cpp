@@ -141,35 +141,36 @@ void MessageInStream::receiveFramePayloadHandler(const common::DataConstBuffer& 
             // Store the Old Message
             unfinishedMessage_[(int) originalFrameChannelId] = std::move(message_);
 
+            // Create a new Message...
+            auto newChannelMessage = std::make_shared<Message>(frameHeader.getChannelId(), frameHeader.getEncryptionType(), frameHeader.getMessageType());;
+
             // Try and see if there is a message for the current channel...
             auto unfinishedMessage = unfinishedMessage_.find((int) currentFrameChannelId);
 
             // If there isn't...
             if (unfinishedMessage == unfinishedMessage_.end()) {
-                // And this is the first... (or a bulk message)
-                if ((frameHeader.getType() == FrameType::FIRST) || (frameHeader.getType() == FrameType::BULK)) {
-                    // Then we will start a new message...
-                    unfinishedMessage = std::make_shared<Message>(frameHeader.getChannelId(), frameHeader.getEncryptionType(), frameHeader.getMessageType());
-                } else {
-                    // Can't do anything with this
+                // Ignore if this is the last or a middle message.
+                if ((frameHeader.getType() == FrameType::MIDDLE) || (frameHeader.getType() == FrameType::LAST)) {
                     bypass = true;
+                } else {
+                    newChannelMessage = unfinishedMessage->second;
                 }
             } else {
                 // If there is a message... but this is a first frame (or bulk) then we'll discard what we've got and start again...
                 if ((frameHeader.getType() == FrameType::FIRST) || (frameHeader.getType() == FrameType::BULK)) {
-                    unfinishedMessage = std::make_shared<Message>(frameHeader.getChannelId(), frameHeader.getEncryptionType(), frameHeader.getMessageType());
+                    newChannelMessage = std::make_shared<Message>(frameHeader.getChannelId(), frameHeader.getEncryptionType(), frameHeader.getMessageType());
                 }
             }
 
             if (!bypass) {
                 // Copy Contents to our unfinishedMessage
-                unfinishedMessage->insertPayload(buffer);
+                newChannelMessage->insertPayload(buffer);
                 if(recentFrameType_ == FrameType::BULK || recentFrameType_ == FrameType::LAST) {
                     // If we can send this back, then we'll do it here...
-                    randomPromise_->resolve(std::move(unfinishedMessage));
+                    randomPromise_->resolve(std::move(newChannelMessage));
                 } else {
                     // Otherwise we'll put it back in its box.
-                    unfinishedMessage_[(int) currentFrameChannelId] = std::move(unfinishedMessage);
+                    unfinishedMessage_[(int) currentFrameChannelId] = std::move(newChannelMessage);
                 }
             }
         }
