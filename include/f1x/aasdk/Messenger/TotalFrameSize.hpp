@@ -18,28 +18,35 @@
 
 #pragma once
 
-#include <memory>
-#include <f1x/aasdk/Messenger/Promise.hpp>
+#include <f1x/aasdk/Common/Data.hpp>
+#include <f1x/aasdk/Messenger/FrameSizeType.hpp>
 
 namespace f1x
 {
-namespace aasdk
-{
-namespace messenger
-{
+    namespace aasdk
+    {
+        namespace messenger
+        {
 
-class IMessageInStream
-{
-public:
-    typedef std::shared_ptr<IMessageInStream> Pointer;
+            class FrameSize
+            {
+            public:
+                FrameSize(size_t frameSize, size_t totalSize);
+                FrameSize(size_t frameSize);
+                FrameSize(const common::DataConstBuffer& buffer);
 
-    IMessageInStream() = default;
-    virtual ~IMessageInStream() = default;
+                common::Data getData() const;
+                size_t getSize() const;
+                size_t getTotalSize() const;
 
-    virtual void startReceive(ReceivePromise::Pointer promise) = 0;
-    virtual void registerRandomCollector(ReceivePromise::Pointer promise) = 0;
-};
+                static size_t getSizeOf(FrameSizeType type);
 
-}
-}
+            private:
+                FrameSizeType frameSizeType_;
+                size_t frameSize_;
+                size_t totalSize_;
+            };
+
+        }
+    }
 }
