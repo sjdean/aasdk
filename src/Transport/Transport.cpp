@@ -30,7 +30,7 @@ Transport::Transport(boost::asio::io_service& ioService)
     , sendStrand_(ioService)
 {}
 
-void Transport::receive(size_t size, ReceivePromise::Pointer promise, FrameHeader frameHeader)
+void Transport::receive(size_t size, ReceivePromise::Pointer promise)
 {
     receiveStrand_.dispatch([this, self = this->shared_from_this(), size, promise = std::move(promise)]() mutable {
         receiveQueue_.emplace_back(std::make_pair(size, std::move(promise)));
