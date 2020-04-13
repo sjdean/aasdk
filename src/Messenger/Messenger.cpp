@@ -77,16 +77,22 @@ void Messenger::enqueueSend(Message::Pointer message, SendPromise::Pointer promi
 }
 
 void Messenger::randomInStreamMessageHandler(Message::Pointer message) {
-    channelReceiveMessageQueue_.push(std::move(message));
+    //channelReceiveMessageQueue_.push(std::move(message));
+
+    AASDK_LOG(error) << "[Messenger] randomInStreamMessageHandler";
 
     auto randomInStreamPromise = ReceivePromise::defer(receiveStrand_);
     randomInStreamPromise->then(std::bind(&Messenger::randomInStreamMessageHandler, this->shared_from_this(), std::placeholders::_1),
                                 std::bind(&Messenger::randomRejectInStreamPromiseHandler, this->shared_from_this(), std::placeholders::_1));
 
     messageInStream_->registerRandomCollector(std::move(randomInStreamPromise));
+
+
 }
 
 void Messenger::randomRejectInStreamPromiseHandler(const error::Error& e) {
+    AASDK_LOG(error) << "[Messenger] randomRejectInStreamPromiseHandler ";
+
     auto randomInStreamPromise = ReceivePromise::defer(receiveStrand_);
     randomInStreamPromise->then(std::bind(&Messenger::randomInStreamMessageHandler, this->shared_from_this(), std::placeholders::_1),
                                 std::bind(&Messenger::randomRejectInStreamPromiseHandler, this->shared_from_this(), std::placeholders::_1));

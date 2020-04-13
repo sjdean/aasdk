@@ -62,6 +62,7 @@ void MessageInStream::startReceive(ReceivePromise::Pointer promise)
 }
 
 void MessageInStream::registerRandomCollector(ReceivePromise::Pointer promise) {
+    AASDK_LOG(error) << "[MessageInStream] Registering Promise";
     randomPromise_ = std::move(promise);
 }
 
@@ -120,6 +121,7 @@ void MessageInStream::receiveFramePayloadHandler(const common::DataConstBuffer& 
 {
     if(message_->getEncryptionType() == EncryptionType::ENCRYPTED)
     {
+        AASDK_LOG(error) << "[MessageInStream] Message is Encrypted";
         try
         {
             cryptor_->decrypt(message_->getPayload(), buffer);
@@ -134,50 +136,81 @@ void MessageInStream::receiveFramePayloadHandler(const common::DataConstBuffer& 
     }
     else
     {
-        if (originalFrameChannelId != currentFrameChannelId) {
-            bool bypass = false;
-            FrameHeader frameHeader(frameHeaderBuffer);
+        if (originalFrameChannelId == currentFrameChannelId) {
+            message_->insertPayload(buffer);
+        } else {
+            if (originalFrameChannelId != currentFrameChannelId) {
+                bool bypass = false;
+                AASDK_LOG(error) << "[MessageInStream] Original Frame does Not Match Current Frame";
+                FrameHeader frameHeader(frameHeaderBuffer);
 
-            // Store the Old Message
-            unfinishedMessage_[(int) originalFrameChannelId] = std::move(message_);
+                // Store the Old Message
+                unfinishedMessage_[(int) originalFrameChannelId] = std::move(message_);
 
-            // Create a new Message...
-            auto newChannelMessage = std::make_shared<Message>(frameHeader.getChannelId(), frameHeader.getEncryptionType(), frameHeader.getMessageType());;
+                // Create a new Message...
+                auto newChannelMessage = std::make_shared<Message>(frameHeader.getChannelId(),
+                                                                   frameHeader.getEncryptionType(),
+                                                                   frameHeader.getMessageType());;
 
-            // Try and see if there is a message for the current channel...
-            auto unfinishedMessage = unfinishedMessage_.find((int) currentFrameChannelId);
+                // Try and see if there is a message for the current channel...
+                auto unfinishedMessage = unfinishedMessage_.find((int) currentFrameChannelId);
 
-            // If there isn't...
-            if (unfinishedMessage == unfinishedMessage_.end()) {
-                // Ignore if this is the last or a middle message.
-                if ((frameHeader.getType() == FrameType::MIDDLE) || (frameHeader.getType() == FrameType::LAST)) {
-                    bypass = true;
+                // If there isn't...
+                if (unfinishedMessage == unfinishedMessage_.end()) {
+                    AASDK_LOG(error) << "[MessageInStream] No Prior Message...";
+                    // Ignore if this is the last or a middle message.
+                    if ((frameHeader.getType() == FrameType::MIDDLE) || (frameHeader.getType() == FrameType::LAST)) {
+                        AASDK_LOG(error) << "[MessageInStream] But it is a Middle or Last?";
+                        bypass = true;
+                    } else {
+                        AASDK_LOG(error) << "[MessageInStream] This is a First Message. We can process.";
+                        newChannelMessage = unfinishedMessage->second;
+                    }
                 } else {
-                    newChannelMessage = unfinishedMessage->second;
+                    AASDK_LOG(error) << "[MessageInStream] There is a Prior Message";
+                    // If there is a message... but this is a first frame (or bulk) then we'll discard what we've got and start again...
+                    if ((frameHeader.getType() == FrameType::FIRST) || (frameHeader.getType() == FrameType::BULK)) {
+                        AASDK_LOG(error) << "[MessageInStream] First or Bulk - Will Process";
+                        newChannelMessage = std::make_shared<Message>(frameHeader.getChannelId(),
+                                                                      frameHeader.getEncryptionType(),
+                                                                      frameHeader.getMessageType());
+                    } else {
+                        AASDK_LOG(error) << "[MessageInStream] This is a Middle or Last, but we have no first. Ignore.";
+                        bypass = true;
+                    }
                 }
-            } else {
-                // If there is a message... but this is a first frame (or bulk) then we'll discard what we've got and start again...
-                if ((frameHeader.getType() == FrameType::FIRST) || (frameHeader.getType() == FrameType::BULK)) {
-                    newChannelMessage = std::make_shared<Message>(frameHeader.getChannelId(), frameHeader.getEncryptionType(), frameHeader.getMessageType());
+
+                if (!bypass) {
+                    // Copy Contents to our unfinishedMessage
+                    AASDK_LOG(error) << "[MessageInStream] Copy in Message";
+                    newChannelMessage->insertPayload(buffer);
+                    if (recentFrameType_ == FrameType::BULK || recentFrameType_ == FrameType::LAST) {
+                        // If we can send this back, then we'll do it here...
+                        AASDK_LOG(error) << "[MessageInStream] Resolving Random Promise";
+                        randomPromise_->resolve(std::move(newChannelMessage));
+                    } else {
+                        AASDK_LOG(error) << "[MessageInStream] Cannot Process yet. Store back for safe keeping.";
+                        // Otherwise we'll put it back in its box.
+                        unfinishedMessage_[(int) currentFrameChannelId] = std::move(newChannelMessage);
+                    }
                 }
             }
+            auto transportPromise = transport::ITransport::ReceivePromise::defer(strand_);
+            transportPromise->then(
+                    [this, self = this->shared_from_this()](common::Data data) mutable {
+                        this->receiveFrameHeaderHandler(common::DataConstBuffer(data));
+                    },
+                    [this, self = this->shared_from_this()](const error::Error &e) mutable {
+                        message_.reset();
+                        promise_->reject(e);
+                        promise_.reset();
+                    });
 
-            if (!bypass) {
-                // Copy Contents to our unfinishedMessage
-                newChannelMessage->insertPayload(buffer);
-                if(recentFrameType_ == FrameType::BULK || recentFrameType_ == FrameType::LAST) {
-                    // If we can send this back, then we'll do it here...
-                    randomPromise_->resolve(std::move(newChannelMessage));
-                } else {
-                    // Otherwise we'll put it back in its box.
-                    unfinishedMessage_[(int) currentFrameChannelId] = std::move(newChannelMessage);
-                }
-            }
+            transport_->receive(FrameHeader::getSizeOf(), std::move(transportPromise));
         }
     }
 
     if (originalFrameChannelId == currentFrameChannelId) {
-        message_->insertPayload(buffer);
         if (recentFrameType_ == FrameType::BULK || recentFrameType_ == FrameType::LAST) {
             promise_->resolve(std::move(message_));
             message_.reset();
