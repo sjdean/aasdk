@@ -63,17 +63,11 @@ namespace f1x
             void MessageInStream::receiveFrameHeaderHandler(const common::DataConstBuffer& buffer)
             {
                 FrameHeader frameHeader(buffer);
+                currentChannelId_ = frameHeader.getChannelId();
 
                 if(message_ == nullptr)
                 {
                     message_ = std::make_shared<Message>(frameHeader.getChannelId(), frameHeader.getEncryptionType(), frameHeader.getMessageType());
-                }
-                else if(message_->getChannelId() != frameHeader.getChannelId())
-                {
-                    message_.reset();
-                    promise_->reject(error::Error(error::ErrorCode::MESSENGER_INTERTWINED_CHANNELS));
-                    promise_.reset();
-                    return;
                 }
 
                 recentFrameType_ = frameHeader.getType();
@@ -131,19 +125,16 @@ namespace f1x
                     message_->insertPayload(buffer);
                 }
 
-                if(recentFrameType_ == FrameType::BULK || recentFrameType_ == FrameType::LAST)
-                {
+                if ((recentFrameType_ == FrameType::BULK || recentFrameType_ == FrameType::LAST) && (message_->getChannelId() == currentChannelId_)) {
                     promise_->resolve(std::move(message_));
                     promise_.reset();
-                }
-                else
-                {
+                } else {
                     auto transportPromise = transport::ITransport::ReceivePromise::defer(strand_);
                     transportPromise->then(
                             [this, self = this->shared_from_this()](common::Data data) mutable {
                                 this->receiveFrameHeaderHandler(common::DataConstBuffer(data));
                             },
-                            [this, self = this->shared_from_this()](const error::Error& e) mutable {
+                            [this, self = this->shared_from_this()](const error::Error &e) mutable {
                                 message_.reset();
                                 promise_->reject(e);
                                 promise_.reset();
@@ -152,7 +143,6 @@ namespace f1x
                     transport_->receive(FrameHeader::getSizeOf(), std::move(transportPromise));
                 }
             }
-
         }
     }
 }

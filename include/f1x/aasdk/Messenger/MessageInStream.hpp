@@ -51,6 +51,7 @@ private:
     FrameType recentFrameType_;
     ReceivePromise::Pointer promise_;
     Message::Pointer message_;
+    ChannelId currentChannelId_;
 };
 
 }
