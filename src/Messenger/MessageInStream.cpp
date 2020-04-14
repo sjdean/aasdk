@@ -125,37 +125,71 @@ namespace f1x
                  * Otherwise just iunsert the buffer
                  */
 
+                bool hasInterleavedMessage = false;
                 bool promiseResolved = false;
 
-                // Only Read Message Details if the Channel Matches
-                if (message_->getChannelId() == currentChannelId_) {
-                    if(message_->getEncryptionType() == EncryptionType::ENCRYPTED)
-                    {
-                        try
-                        {
-                            cryptor_->decrypt(message_->getPayload(), buffer);
-                        }
-                        catch(const error::Error& e)
-                        {
-                            message_.reset();
-                            promise_->reject(e);
-                            promise_.reset();
-                            return;
-                        }
-                    }
-                    else
-                    {
-                        message_->insertPayload(buffer);
-                    }
+                if (originalChannelId_ != currentChannelId_) {
+                    // Store Old Message for Safe Keeping
+                    messageInProgress_[(int) originalChannelId_] = std::move(message_);
 
-                    if ((recentFrameType_ == FrameType::BULK || recentFrameType_ == FrameType::LAST)) {
-                        promiseResolved = true;
-                        promise_->resolve(std::move(message_));
-                        promise_.reset();
+                    if (recentFrameType_ == FrameType::FIRST || recentFrameType_ == FrameType::BULK) {
+                        // Create a New Message. If we had data, then it will be lost, because that's how FIRST and BULK FRAMES work.
+                        message_ = std::make_shared<Message>(frameHeader_.getChannelId(), frameHeader_.getEncryptionType(), frameHeader_.getMessageType());
+                        hasInterleavedMessage = true;
+                    } else {
+                        // If this however is a MIDDLE or LAST message, then try to find any existing messages.
+                        auto interleavedMessage = messageInProgress_.find((int) currentChannelId_);
+                        if (interleavedMessage != messageInProgress_.end()) {
+                            // If it's not first or bulk, then it's middle or last...
+                            hasInterleavedMessage = true;
+                            message_ = std::move(interleavedMessage->second);
+                        }
                     }
                 }
 
-                // Keep Receiving While not promiseResolved
+                // Process the message as normal...
+                if(message_->getEncryptionType() == EncryptionType::ENCRYPTED)
+                {
+                    try
+                    {
+                        cryptor_->decrypt(message_->getPayload(), buffer);
+                    }
+                    catch(const error::Error& e)
+                    {
+                        message_.reset();
+                        promise_->reject(e);
+                        promise_.reset();
+                        return;
+                    }
+                }
+                else
+                {
+                    message_->insertPayload(buffer);
+                }
+
+                // Resolve Promises As Necessary
+                if ((recentFrameType_ == FrameType::BULK || recentFrameType_ == FrameType::LAST)) {
+                    if (originalChannelId_ == currentChannelId_) {
+                        promiseResolved = true;
+                        promise_->resolve(std::move(message_));
+                        promise_.reset();
+                    } else {
+                        if (hasInterleavedMessage) {
+                            // TODO: Send Back Temporary Message
+                        }
+                    }
+                }
+
+                // Reset Message
+                if (hasInterleavedMessage) {
+                    // Reset Message
+                    auto originalMessage = messageInProgress_.find((int) originalChannelId);
+                    if (originalMessage != messageInProgress_.end()) {
+                        message_ = std::move(originalMessage->second);
+                    }
+                }
+
+                // Then receive next header...
                 if (!promiseResolved) {
                     auto transportPromise = transport::ITransport::ReceivePromise::defer(strand_);
                     transportPromise->then(

@@ -52,6 +52,9 @@ private:
     ReceivePromise::Pointer promise_;
     Message::Pointer message_;
     ChannelId currentChannelId_;
+    ChannelId originalChannelId_;
+    std::map<int, Message::Pointer> messageInProgress_;
+    common::DataConstBuffer frameHeader_;
 };
 
 }
