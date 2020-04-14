@@ -152,7 +152,7 @@ namespace f1x
                     }
                 }*/
 
-                if (originalChannelId_ = currentChannelId_) {
+                if (originalChannelId_ == currentChannelId_) {
                     // Process the message as normal...
                     if (message_->getEncryptionType() == EncryptionType::ENCRYPTED) {
                         try {
