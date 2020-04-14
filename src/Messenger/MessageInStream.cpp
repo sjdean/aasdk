@@ -62,6 +62,7 @@ namespace f1x
 
             void MessageInStream::receiveFrameHeaderHandler(const common::DataConstBuffer& buffer)
             {
+                frameHeaderBuffer_ = buffer;
                 FrameHeader frameHeader(buffer);
                 currentChannelId_ = frameHeader.getChannelId();
 
@@ -69,6 +70,7 @@ namespace f1x
                 {
                     message_ = std::make_shared<Message>(frameHeader.getChannelId(), frameHeader.getEncryptionType(), frameHeader.getMessageType());
                     originalChannelId_ = frameHeader.getChannelId();
+
                 }
 
                 recentFrameType_ = frameHeader.getType();
@@ -107,6 +109,8 @@ namespace f1x
 
             void MessageInStream::receiveFramePayloadHandler(const common::DataConstBuffer& buffer)
             {
+                FrameHeader frameHeader(frameHeaderBuffer_);
+
                 /*
                  * If the Current Channel does not match the Expected Channel, then store the currentBuffer away for the old channel and start a new buffer for the new channel
                  *
@@ -135,7 +139,7 @@ namespace f1x
 
                     if (recentFrameType_ == FrameType::FIRST || recentFrameType_ == FrameType::BULK) {
                         // Create a New Message. If we had data, then it will be lost, because that's how FIRST and BULK FRAMES work.
-                        message_ = std::make_shared<Message>(frameHeader_.getChannelId(), frameHeader_.getEncryptionType(), frameHeader_.getMessageType());
+                        message_ = std::make_shared<Message>(frameHeader.getChannelId(), frameHeader.getEncryptionType(), frameHeader.getMessageType());
                         hasInterleavedMessage = true;
                     } else {
                         // If this however is a MIDDLE or LAST message, then try to find any existing messages.
@@ -184,7 +188,7 @@ namespace f1x
                 // Reset Message
                 if (hasInterleavedMessage) {
                     // Reset Message
-                    auto originalMessage = messageInProgress_.find((int) originalChannelId);
+                    auto originalMessage = messageInProgress_.find((int) originalChannelId_);
                     if (originalMessage != messageInProgress_.end()) {
                         message_ = std::move(originalMessage->second);
                     }

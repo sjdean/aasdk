@@ -54,7 +54,7 @@ private:
     ChannelId currentChannelId_;
     ChannelId originalChannelId_;
     std::map<int, Message::Pointer> messageInProgress_;
-    common::DataConstBuffer frameHeader_;
+    common::DataConstBuffer frameHeaderBuffer_;
 };
 
 }
