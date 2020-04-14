@@ -133,7 +133,7 @@ namespace f1x
                 bool hasInterleavedMessage = false;
                 bool promiseResolved = false;
 
-                if (originalChannelId_ != currentChannelId_) {
+                /*if (originalChannelId_ != currentChannelId_) {
                     // Store Old Message for Safe Keeping
                     messageInProgress_[(int) originalChannelId_] = std::move(message_);
 
@@ -150,49 +150,46 @@ namespace f1x
                             message_ = std::move(interleavedMessage->second);
                         }
                     }
-                }
+                }*/
 
-                // Process the message as normal...
-                if(message_->getEncryptionType() == EncryptionType::ENCRYPTED)
-                {
-                    try
-                    {
-                        cryptor_->decrypt(message_->getPayload(), buffer);
-                    }
-                    catch(const error::Error& e)
-                    {
-                        message_.reset();
-                        promise_->reject(e);
-                        promise_.reset();
-                        return;
-                    }
-                }
-                else
-                {
-                    message_->insertPayload(buffer);
-                }
-
-                // Resolve Promises As Necessary
-                if ((recentFrameType_ == FrameType::BULK || recentFrameType_ == FrameType::LAST)) {
-                    if (originalChannelId_ == currentChannelId_) {
-                        promiseResolved = true;
-                        promise_->resolve(std::move(message_));
-                        promise_.reset();
+                if (originalChannelId_ = currentChannelId_) {
+                    // Process the message as normal...
+                    if (message_->getEncryptionType() == EncryptionType::ENCRYPTED) {
+                        try {
+                            cryptor_->decrypt(message_->getPayload(), buffer);
+                        }
+                        catch (const error::Error &e) {
+                            message_.reset();
+                            promise_->reject(e);
+                            promise_.reset();
+                            return;
+                        }
                     } else {
-                        if (hasInterleavedMessage) {
-                            // TODO: Send Back Temporary Message
+                        message_->insertPayload(buffer);
+                    }
+
+                    // Resolve Promises As Necessary
+                    if ((recentFrameType_ == FrameType::BULK || recentFrameType_ == FrameType::LAST)) {
+                        if (originalChannelId_ == currentChannelId_) {
+                            promiseResolved = true;
+                            promise_->resolve(std::move(message_));
+                            promise_.reset();
+                        } else {
+                            if (hasInterleavedMessage) {
+                                // TODO: Send Back Temporary Message
+                            }
                         }
                     }
                 }
 
                 // Reset Message
-                if (hasInterleavedMessage) {
+                /*if (hasInterleavedMessage) {
                     // Reset Message
                     auto originalMessage = messageInProgress_.find((int) originalChannelId_);
                     if (originalMessage != messageInProgress_.end()) {
                         message_ = std::move(originalMessage->second);
                     }
-                }
+                }*/
 
                 // Then receive next header...
                 if (!promiseResolved) {
