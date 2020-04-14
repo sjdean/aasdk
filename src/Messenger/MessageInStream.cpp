@@ -68,6 +68,7 @@ namespace f1x
                 if(message_ == nullptr)
                 {
                     message_ = std::make_shared<Message>(frameHeader.getChannelId(), frameHeader.getEncryptionType(), frameHeader.getMessageType());
+                    originalChannelId_ = frameHeader.getChannelId();
                 }
 
                 recentFrameType_ = frameHeader.getType();
