@@ -106,29 +106,57 @@ namespace f1x
 
             void MessageInStream::receiveFramePayloadHandler(const common::DataConstBuffer& buffer)
             {
-                if(message_->getEncryptionType() == EncryptionType::ENCRYPTED)
-                {
-                    try
+                /*
+                 * If the Current Channel does not match the Expected Channel, then store the currentBuffer away for the old channel and start a new buffer for the new channel
+                 *
+                 * Find a buffer for the Current Channel
+                 *
+                 * If we have a buffer, then move in data to our currentBuffer
+                 *
+                 * If we don't have a buffer and we're on a new channel, then start a start a new currentBuffer
+                 *
+                 * If it's the first frame, clear currentBuffer
+                 *
+                 * if it's not the first frame but the size of currentBuffer is zero, then we cannot process
+                 *
+                 * Reserve space according to frame len or total size
+                 *
+                 * If it's encrupted, read the bytes to an appropriate location
+                 * Otherwise just iunsert the buffer
+                 */
+
+                bool promiseResolved = false;
+
+                // Only Read Message Details if the Channel Matches
+                if (message_->getChannelId() == currentChannelId_) {
+                    if(message_->getEncryptionType() == EncryptionType::ENCRYPTED)
                     {
-                        cryptor_->decrypt(message_->getPayload(), buffer);
+                        try
+                        {
+                            cryptor_->decrypt(message_->getPayload(), buffer);
+                        }
+                        catch(const error::Error& e)
+                        {
+                            message_.reset();
+                            promise_->reject(e);
+                            promise_.reset();
+                            return;
+                        }
                     }
-                    catch(const error::Error& e)
+                    else
                     {
-                        message_.reset();
-                        promise_->reject(e);
+                        message_->insertPayload(buffer);
+                    }
+
+                    if ((recentFrameType_ == FrameType::BULK || recentFrameType_ == FrameType::LAST)) {
+                        promiseResolved = true;
+                        promise_->resolve(std::move(message_));
                         promise_.reset();
-                        return;
                     }
-                }
-                else
-                {
-                    message_->insertPayload(buffer);
                 }
 
-                if ((recentFrameType_ == FrameType::BULK || recentFrameType_ == FrameType::LAST) && (message_->getChannelId() == currentChannelId_)) {
-                    promise_->resolve(std::move(message_));
-                    promise_.reset();
-                } else {
+                // Keep Receiving While not promiseResolved
+                if (!promiseResolved) {
                     auto transportPromise = transport::ITransport::ReceivePromise::defer(strand_);
                     transportPromise->then(
                             [this, self = this->shared_from_this()](common::Data data) mutable {
