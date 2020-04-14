@@ -18,6 +18,7 @@
 
 #include <f1x/aasdk/Messenger/MessageInStream.hpp>
 #include <f1x/aasdk/Error/Error.hpp>
+#include <f1x/aasdk/Common/Log.hpp>
 
 namespace f1x
 {
@@ -156,6 +157,7 @@ namespace f1x
                     // Process the message as normal...
                     if (message_->getEncryptionType() == EncryptionType::ENCRYPTED) {
                         try {
+                            AASDK_LOG(error) << "[MessageInStream] decrypting buffer contents to message: " << (int) currentChannelId_;
                             cryptor_->decrypt(message_->getPayload(), buffer);
                         }
                         catch (const error::Error &e) {
