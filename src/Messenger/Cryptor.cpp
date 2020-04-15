@@ -20,6 +20,7 @@
 #include <functional>
 #include <f1x/aasdk/Messenger/Cryptor.hpp>
 #include <f1x/aasdk/Error/Error.hpp>
+#include <f1x/aasdk/Common/Log.hpp>
 
 namespace f1x
 {
@@ -183,6 +184,17 @@ size_t Cryptor::decrypt(common::Data& output, const common::DataConstBuffer& buf
 {
     std::lock_guard<decltype(mutex_)> lock(mutex_);
 
+    /*
+     * Assume we've read 2000 bytes - output = 2000, buffer = 500.
+     * beginOffset = 2000
+     * output.resize(2001)
+     * availableBytes = 1
+     * totalReadSize = 0
+     * currentBuffer = DataBuffer(output, 0 + 2000)
+     * 2001 > 2000 ? 0 : offset
+     * readSize = ssl,
+     */
+
     this->write(buffer);
     const size_t beginOffset = output.size();
     output.resize(beginOffset + 1);
@@ -193,6 +205,13 @@ size_t Cryptor::decrypt(common::Data& output, const common::DataConstBuffer& buf
     while(availableBytes > 0)
     {
         const auto& currentBuffer = common::DataBuffer(output, totalReadSize + beginOffset);
+
+        AASDK_LOG(error) << "[Cryptor] output size " << (int) output.size();
+        AASDK_LOG(error) << "[Cryptor] totalReadSize " << (int) totalReadSize;
+        AASDK_LOG(error) << "[Cryptor] beginOffset " << (int) beginOffset;
+
+        AASDK_LOG(error) << "[Cryptor] currentBuffer size " << (int) currentBuffer.size;
+
         auto readSize = sslWrapper_->sslRead(ssl_, currentBuffer.data, currentBuffer.size);
 
         if(readSize <= 0)
