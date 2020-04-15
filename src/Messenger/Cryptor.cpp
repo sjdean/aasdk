@@ -214,9 +214,9 @@ size_t Cryptor::decrypt(common::Data& output, const common::DataConstBuffer& buf
         throw error::Error(error::ErrorCode::SSL_READ, sslWrapper_->getError(ssl_, readSize));
     }
 
-    totalReadSize += readSize;
 
-    return totalReadSize;
+
+    return readSize;
 }
 
 common::Data Cryptor::readHandshakeBuffer()
