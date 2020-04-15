@@ -189,6 +189,7 @@ namespace f1x
                         promise_->resolve(std::move(message_));
                         promise_.reset();
                     } else {
+                        AASDK_LOG(error) << "[MessageInStream] 1234 ";
                         if (hasInterleavedMessage) {
                             AASDK_LOG(error) << "[MessageInStream] Interleaved. Not doing anything (yet). ";
                             // TODO: Send Back Temporary Message
@@ -196,6 +197,7 @@ namespace f1x
                     }
                 }
 
+                AASDK_LOG(error) << "[MessageInStream] 1235 ";
                 // Reset Message
                 if (originalChannelId_ != currentChannelId_) {
                     // Reset Message
@@ -207,8 +209,11 @@ namespace f1x
                     }
                 }
 
+                AASDK_LOG(error) << "[MessageInStream] 1236 ";
+
                 // Then receive next header...
                 if (!promiseResolved) {
+                    AASDK_LOG(error) << "[MessageInStream] 1237 ";
                     auto transportPromise = transport::ITransport::ReceivePromise::defer(strand_);
                     transportPromise->then(
                             [this, self = this->shared_from_this()](common::Data data) mutable {
@@ -219,7 +224,7 @@ namespace f1x
                                 promise_->reject(e);
                                 promise_.reset();
                             });
-
+                    AASDK_LOG(error) << "[MessageInStream] 1238 ";
                     transport_->receive(FrameHeader::getSizeOf(), std::move(transportPromise));
                 }
             }
