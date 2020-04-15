@@ -109,7 +109,7 @@ namespace f1x
                         });
 
                 FrameSize frameSize(buffer);
-                frameSize_ = frameSize;
+                frameSize_ = (int) frameSize.getSize();
                 AASDK_LOG(error) << "[MessageInStream] Frame Size: " << (int) frameSize.getSize();
                 AASDK_LOG(error) << "[MessageInStream] Total Size: " << (int) frameSize.getTotalSize();
                 transport_->receive(frameSize.getSize(), std::move(transportPromise));
