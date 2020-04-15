@@ -196,25 +196,23 @@ size_t Cryptor::decrypt(common::Data& output, const common::DataConstBuffer& buf
      */
 
     this->write(buffer);
+    AASDK_LOG(error) << "[Cryptor] output size " << (int) output.size();
     const size_t beginOffset = output.size();
+    AASDK_LOG(error) << "[Cryptor] length " << length;
     output.resize(beginOffset + length);
+    AASDK_LOG(error) << "[Cryptor] output resized to " << (int) output.size();
 
     const auto& currentBuffer = common::DataBuffer(output, beginOffset + length);
-
-    AASDK_LOG(error) << "[Cryptor] output size " << (int) output.size();
-    AASDK_LOG(error) << "[Cryptor] totalReadSize " << length;
-    AASDK_LOG(error) << "[Cryptor] beginOffset " << (int) beginOffset;
 
     AASDK_LOG(error) << "[Cryptor] currentBuffer size " << (int) currentBuffer.size;
 
     auto readSize = sslWrapper_->sslRead(ssl_, currentBuffer.data, length);
+    AASDK_LOG(error) << "[Cryptor] readSize " << (int) readSize;
 
     if(readSize <= 0)
     {
         throw error::Error(error::ErrorCode::SSL_READ, sslWrapper_->getError(ssl_, readSize));
     }
-
-
 
     return readSize;
 }
