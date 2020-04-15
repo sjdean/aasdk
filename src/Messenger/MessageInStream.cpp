@@ -109,7 +109,7 @@ namespace f1x
                         });
 
                 FrameSize frameSize(buffer);
-                frameSizeBuffer_ = buffer;
+                frameSize_ = frameSize;
                 AASDK_LOG(error) << "[MessageInStream] Frame Size: " << (int) frameSize.getSize();
                 AASDK_LOG(error) << "[MessageInStream] Total Size: " << (int) frameSize.getTotalSize();
                 transport_->receive(frameSize.getSize(), std::move(transportPromise));
@@ -118,7 +118,6 @@ namespace f1x
             void MessageInStream::receiveFramePayloadHandler(const common::DataConstBuffer& buffer)
             {
                 FrameHeader frameHeader(frameHeaderBuffer_);
-                FrameSize frameSize(frameSizeBuffer_);
 
                 /*
                  * If the Current Channel does not match the Expected Channel, then store the currentBuffer away for the old channel and start a new buffer for the new channel
@@ -169,7 +168,7 @@ namespace f1x
                 if (message_->getEncryptionType() == EncryptionType::ENCRYPTED) {
                     try {
                         AASDK_LOG(error) << "[MessageInStream] decrypting buffer contents to message: " << (int) currentChannelId_;
-                        cryptor_->decrypt(message_->getPayload(), buffer, frameSize.getSize()-29);
+                        cryptor_->decrypt(message_->getPayload(), buffer, frameSize_.getSize()-29);
                     }
                     catch (const error::Error &e) {
                         message_.reset();
