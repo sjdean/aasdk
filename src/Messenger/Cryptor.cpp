@@ -180,7 +180,7 @@ size_t Cryptor::encrypt(common::Data& output, const common::DataConstBuffer& buf
     return this->read(output);
 }
 
-size_t Cryptor::decrypt(common::Data& output, const common::DataConstBuffer& buffer)
+size_t Cryptor::decrypt(common::Data& output, const common::DataConstBuffer& buffer, int length)
 {
     std::lock_guard<decltype(mutex_)> lock(mutex_);
 
@@ -197,32 +197,24 @@ size_t Cryptor::decrypt(common::Data& output, const common::DataConstBuffer& buf
 
     this->write(buffer);
     const size_t beginOffset = output.size();
-    output.resize(beginOffset + 1);
+    output.resize(beginOffset + length);
 
-    size_t availableBytes = 1;
-    size_t totalReadSize = 0;
+    const auto& currentBuffer = common::DataBuffer(output, beginOffset + length);
 
-    while(availableBytes > 0)
+    AASDK_LOG(error) << "[Cryptor] output size " << (int) output.size();
+    AASDK_LOG(error) << "[Cryptor] totalReadSize " << length;
+    AASDK_LOG(error) << "[Cryptor] beginOffset " << (int) beginOffset;
+
+    AASDK_LOG(error) << "[Cryptor] currentBuffer size " << (int) currentBuffer.size;
+
+    auto readSize = sslWrapper_->sslRead(ssl_, currentBuffer.data, length);
+
+    if(readSize <= 0)
     {
-        const auto& currentBuffer = common::DataBuffer(output, totalReadSize + beginOffset);
-
-        AASDK_LOG(error) << "[Cryptor] output size " << (int) output.size();
-        AASDK_LOG(error) << "[Cryptor] totalReadSize " << (int) totalReadSize;
-        AASDK_LOG(error) << "[Cryptor] beginOffset " << (int) beginOffset;
-
-        AASDK_LOG(error) << "[Cryptor] currentBuffer size " << (int) currentBuffer.size;
-
-        auto readSize = sslWrapper_->sslRead(ssl_, currentBuffer.data, currentBuffer.size);
-
-        if(readSize <= 0)
-        {
-            throw error::Error(error::ErrorCode::SSL_READ, sslWrapper_->getError(ssl_, readSize));
-        }
-
-        totalReadSize += readSize;
-        availableBytes = sslWrapper_->getAvailableBytes(ssl_);
-        output.resize(output.size() + availableBytes);
+        throw error::Error(error::ErrorCode::SSL_READ, sslWrapper_->getError(ssl_, readSize));
     }
+
+    totalReadSize += readSize;
 
     return totalReadSize;
 }
