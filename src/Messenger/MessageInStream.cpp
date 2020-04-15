@@ -141,21 +141,21 @@ namespace f1x
                 bool promiseResolved = false;
 
                 if (originalChannelId_ != currentChannelId_) {
-                    AASDK_LOG(error) << "[MessageInStream] Storing original message. "
+                    AASDK_LOG(error) << "[MessageInStream] Storing original message. ";
                     // Store Old Message for Safe Keeping
                     messageInProgress_[(int) originalChannelId_] = std::move(message_);
 
                     if (recentFrameType_ == FrameType::FIRST || recentFrameType_ == FrameType::BULK) {
-                        AASDK_LOG(error) << "[MessageInStream] First or Bulk. Creating New Message. "
+                        AASDK_LOG(error) << "[MessageInStream] First or Bulk. Creating New Message. ";
                         // Create a New Message. If we had data, then it will be lost, because that's how FIRST and BULK FRAMES work.
                         message_ = std::make_shared<Message>(frameHeader.getChannelId(), frameHeader.getEncryptionType(), frameHeader.getMessageType());
                         hasInterleavedMessage = true;
                     } else {
-                        AASDK_LOG(error) << "[MessageInStream] Middle or Last. Finding Existing Message. "
+                        AASDK_LOG(error) << "[MessageInStream] Middle or Last. Finding Existing Message. ";
                         // If this however is a MIDDLE or LAST message, then try to find any existing messages.
                         auto interleavedMessage = messageInProgress_.find((int) currentChannelId_);
                         if (interleavedMessage != messageInProgress_.end()) {
-                            AASDK_LOG(error) << "[MessageInStream] Found Message. "
+                            AASDK_LOG(error) << "[MessageInStream] Found Message. ";
                             // If it's not first or bulk, then it's middle or last...
                             hasInterleavedMessage = true;
                             message_ = std::move(interleavedMessage->second);
@@ -181,15 +181,15 @@ namespace f1x
 
                 // Resolve Promises As Necessary
                 if ((recentFrameType_ == FrameType::BULK || recentFrameType_ == FrameType::LAST)) {
-                    AASDK_LOG(error) << "[MessageInStream] Bulk or Last. "
+                    AASDK_LOG(error) << "[MessageInStream] Bulk or Last. ";
                     if (originalChannelId_ == currentChannelId_) {
-                        AASDK_LOG(error) << "[MessageInStream] Channel Match. Resolving Message. "
+                        AASDK_LOG(error) << "[MessageInStream] Channel Match. Resolving Message. ";
                         promiseResolved = true;
                         promise_->resolve(std::move(message_));
                         promise_.reset();
                     } else {
                         if (hasInterleavedMessage) {
-                            AASDK_LOG(error) << "[MessageInStream] Interleaved. Not doing anything (yet). "
+                            AASDK_LOG(error) << "[MessageInStream] Interleaved. Not doing anything (yet). ";
                             // TODO: Send Back Temporary Message
                         }
                     }
@@ -198,10 +198,10 @@ namespace f1x
                 // Reset Message
                 if (originalChannelId_ != currentChannelId_) {
                     // Reset Message
-                    AASDK_LOG(error) << "[MessageInStream] Loading Message from Original Channel Id. "
+                    AASDK_LOG(error) << "[MessageInStream] Loading Message from Original Channel Id. ";
                     auto originalMessage = messageInProgress_.find((int) originalChannelId_);
                     if (originalMessage != messageInProgress_.end()) {
-                        AASDK_LOG(error) << "[MessageInStream] Found original message. "
+                        AASDK_LOG(error) << "[MessageInStream] Found original message. ";
                         message_ = std::move(originalMessage->second);
                     }
                 }
