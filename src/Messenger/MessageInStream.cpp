@@ -169,7 +169,7 @@ namespace f1x
                 if (message_->getEncryptionType() == EncryptionType::ENCRYPTED) {
                     try {
                         AASDK_LOG(error) << "[MessageInStream] decrypting buffer contents to message: " << (int) currentChannelId_;
-                        cryptor_->decrypt(message_->getPayload(), buffer, frameSize.getSize() - 29);
+                        cryptor_->decrypt(message_->getPayload(), buffer, frameSize.getSize());
                     }
                     catch (const error::Error &e) {
                         message_.reset();
