@@ -203,10 +203,10 @@ namespace f1x
                 AASDK_LOG(error) << "[Cryptor] current output size " << (int) output.size();
                 const size_t beginOffset = output.size();
 
-                output.resize(beginOffset + 1);
+                output.resize(beginOffset + length);
                 AASDK_LOG(error) << "[Cryptor] resized output to " << (int) output.size();
 
-                size_t availableBytes = 1;
+                size_t availableBytes = length;
                 size_t totalReadSize = 0;
 
                 while(availableBytes > 0)
@@ -290,6 +290,7 @@ namespace f1x
                     }
 
                     totalWrittenBytes += writeSize;
+                    AASDK_LOG(error) << "[Cryptor] totalWrittenBytes " << (int) totalWrittenBytes;
                 }
             }
 
