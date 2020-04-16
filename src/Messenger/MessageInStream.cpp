@@ -141,6 +141,11 @@ namespace f1x
                 bool hasInterleavedMessage = false;
                 bool promiseResolved = false;
 
+                if (buffer.size != frameSize_) {
+                    AASDK_LOG(error) << "[MessageInStream] Expected Frame Size: " << frameSize_;
+                    AASDK_LOG(error) << "[MessageInStream] Received Frame Size: " << buffer.size;
+                }
+
                 if (originalChannelId_ != currentChannelId_) {
                     AASDK_LOG(error) << "[MessageInStream] Storing original message. ";
                     // Store Old Message for Safe Keeping

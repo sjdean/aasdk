@@ -31,7 +31,7 @@ namespace f1x
 
             Cryptor::Cryptor(transport::ISSLWrapper::Pointer sslWrapper)
                     : sslWrapper_(std::move(sslWrapper))
-                    , maxBufferSize_(1024 * 20)
+                    , maxBufferSize_(1024 * 16)
                     , certificate_(nullptr)
                     , privateKey_(nullptr)
                     , context_(nullptr)
