@@ -36,8 +36,8 @@ SSLWrapper::SSLWrapper()
     SSL_library_init();
     SSL_load_error_strings();
     ERR_load_BIO_strings();
+    ERR_load_ERR_strings();
     ERR_load_crypto_strings();
-    ERR_load_SSL_string();
     OpenSSL_add_all_algorithms();
 }
 
@@ -191,7 +191,7 @@ int SSLWrapper::sslWrite(SSL *ssl, const void *buf, int num)
 
 int SSLWrapper::getError(SSL* ssl, int returnCode)
 {
-    while (err = ERR_get_error()) {
+    while (auto err = ERR_get_error()) {
         AASDK_LOG(error) << "[SSLWrapper] SSL Error " << ERR_error_string(err, NULL));
     }
     return SSL_get_error(ssl, returnCode);
