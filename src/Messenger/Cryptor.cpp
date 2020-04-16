@@ -203,7 +203,8 @@ namespace f1x
                 AASDK_LOG(error) << "[Cryptor] current output size " << (int) output.size();
                 const size_t beginOffset = output.size();
 
-                output.resize(beginOffset + length);
+                size_t requestedReadBytes = length > 2048 ? 2048 : length;
+                output.resize(beginOffset + requestedReadBytes);
                 AASDK_LOG(error) << "[Cryptor] resized output to " << (int) output.size();
 
                 size_t availableBytes = length;
@@ -211,9 +212,10 @@ namespace f1x
 
                 while(availableBytes > 0)
                 {
+
                     AASDK_LOG(error) << "[Cryptor] beginOffset " << (int) beginOffset;
 
-                    const auto& currentBuffer = common::DataBuffer(output, totalReadSize + beginOffset);
+                    const auto& currentBuffer = common::DataBuffer(output, requestedReadBytes + beginOffset);
 
                     AASDK_LOG(error) << "[Cryptor] currentBuffer size " << (int) currentBuffer.size;
 
@@ -227,6 +229,8 @@ namespace f1x
 
                     totalReadSize += readSize;
                     availableBytes = sslWrapper_->getAvailableBytes(ssl_);
+                    size_t requestedReadBytes = availableBytes > 2048 ? 2048 : availableBytes;
+
                     AASDK_LOG(error) << "[Cryptor] totalReadSize " << (int) totalReadSize;
                     AASDK_LOG(error) << "[Cryptor] available bytes " << (int) availableBytes;
                     output.resize(output.size() + availableBytes);
