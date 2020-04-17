@@ -61,7 +61,7 @@ namespace f1x
                 });
             }
 
-            void MessageInStream::setRandomHHandler(ReceivePromise::Pointer promise)
+            void MessageInStream::setRandomHandler(ReceivePromise::Pointer promise)
             {
                 randomPromise_ = std::move(promise);
             }
