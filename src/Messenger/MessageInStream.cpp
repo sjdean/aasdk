@@ -68,11 +68,6 @@ namespace f1x
                 encryptionType_ = frameHeader.getEncryptionType();
                 messageType_ = frameHeader.getMessageType();
 
-                AASDK_LOG(error) << "[MessageInStream] Channel Id: " << (int) frameHeader.getChannelId();
-                AASDK_LOG(error) << "[MessageInStream] Encryption Type: " << (int) frameHeader.getEncryptionType();
-                AASDK_LOG(error) << "[MessageInStream] Frame Type: " << (int) frameHeader.getType();
-                AASDK_LOG(error) << "[MessageInStream] Message Type: " << (int) frameHeader.getMessageType();
-
                 if(message_ == nullptr)
                 {
                     message_ = std::make_shared<Message>(frameHeader.getChannelId(), frameHeader.getEncryptionType(), frameHeader.getMessageType());
@@ -81,7 +76,7 @@ namespace f1x
 
                 recentFrameType_ = frameHeader.getType();
                 const size_t frameSize = FrameSize::getSizeOf(frameHeader.getType() == FrameType::FIRST ? FrameSizeType::EXTENDED : FrameSizeType::SHORT);
-                AASDK_LOG(error) << "[MessageInStream] Frame Size: " << (int) frameSize;
+
                 auto transportPromise = transport::ITransport::ReceivePromise::defer(strand_);
                 transportPromise->then(
                         [this, self = this->shared_from_this()](common::Data data) mutable {
@@ -111,8 +106,6 @@ namespace f1x
 
                 FrameSize frameSize(buffer);
                 frameSize_ = (int) frameSize.getSize();
-                AASDK_LOG(error) << "[MessageInStream] Frame Size: " << (int) frameSize.getSize();
-                AASDK_LOG(error) << "[MessageInStream] Total Size: " << (int) frameSize.getTotalSize();
                 transport_->receive(frameSize.getSize(), std::move(transportPromise));
             }
 
@@ -122,6 +115,7 @@ namespace f1x
                 bool promiseResolved = false;
 
                 if (originalChannelId_ != currentChannelId_) {
+                    AASDK_LOG(error) << "[MessageInStream] Interleaved ";
                     AASDK_LOG(error) << "[MessageInStream] Channel Id: " << (int) currentChannelId_;
                     AASDK_LOG(error) << "[MessageInStream] Encryption Type: " << (int) encryptionType_;
                     AASDK_LOG(error) << "[MessageInStream] Frame Type: " << (int) recentFrameType_;
@@ -149,12 +143,9 @@ namespace f1x
                     }
                 }
 
-                AASDK_LOG(error) << "[MessageInStream] Message Encryption Type: " << (int) message_->getEncryptionType();
-
                 // Process the message as normal...
                 if (message_->getEncryptionType() == EncryptionType::ENCRYPTED) {
                     try {
-                        AASDK_LOG(error) << "[MessageInStream] decrypting buffer contents to message: " << (int) currentChannelId_;
                         cryptor_->decrypt(message_->getPayload(), buffer, frameSize_ - 29);
                     }
                     catch (const error::Error &e) {
@@ -164,15 +155,12 @@ namespace f1x
                         return;
                     }
                 } else {
-                    AASDK_LOG(error) << "[MessageInStream] Not Encrypted " << (int) currentChannelId_;
                     message_->insertPayload(buffer);
                 }
 
                 // Resolve Promises As Necessary
                 if ((recentFrameType_ == FrameType::BULK || recentFrameType_ == FrameType::LAST)) {
-                    AASDK_LOG(error) << "[MessageInStream] Bulk or Last. ";
                     if (originalChannelId_ == currentChannelId_) {
-                        AASDK_LOG(error) << "[MessageInStream] Channel Match. Resolving Message. ";
                         promiseResolved = true;
                         promise_->resolve(std::move(message_));
                         promise_.reset();

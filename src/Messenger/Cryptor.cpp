@@ -281,7 +281,6 @@ namespace f1x
                     }
 
                     totalWrittenBytes += writeSize;
-                    AASDK_LOG(error) << "[Cryptor] totalWrittenBytes " << (int) totalWrittenBytes;
                 }
             }
 
