@@ -119,33 +119,9 @@ namespace f1x
             {
                 FrameHeader frameHeader(frameHeaderBuffer_);
 
-                /*
-                 * If the Current Channel does not match the Expected Channel, then store the currentBuffer away for the old channel and start a new buffer for the new channel
-                 *
-                 * Find a buffer for the Current Channel
-                 *
-                 * If we have a buffer, then move in data to our currentBuffer
-                 *
-                 * If we don't have a buffer and we're on a new channel, then start a start a new currentBuffer
-                 *
-                 * If it's the first frame, clear currentBuffer
-                 *
-                 * if it's not the first frame but the size of currentBuffer is zero, then we cannot process
-                 *
-                 * Reserve space according to frame len or total size
-                 *
-                 * If it's encrupted, read the bytes to an appropriate location
-                 * Otherwise just iunsert the buffer
-                 */
-
                 bool hasInterleavedMessage = false;
                 bool promiseResolved = false;
-
-                if (buffer.size != frameSize_) {
-                    AASDK_LOG(error) << "[MessageInStream] Expected Frame Size: " << frameSize_;
-                    AASDK_LOG(error) << "[MessageInStream] Received Frame Size: " << buffer.size;
-                }
-
+/*
                 if (originalChannelId_ != currentChannelId_) {
                     AASDK_LOG(error) << "[MessageInStream] Storing original message. ";
                     // Store Old Message for Safe Keeping
@@ -168,43 +144,46 @@ namespace f1x
                         }
                     }
                 }
+*/
 
-                // Process the message as normal...
-                if (message_->getEncryptionType() == EncryptionType::ENCRYPTED) {
-                    try {
-                        AASDK_LOG(error) << "[MessageInStream] decrypting buffer contents to message: " << (int) currentChannelId_;
-                        cryptor_->decrypt(message_->getPayload(), buffer, frameSize_ - 29);
+                if (originalChannelId_ == currentChannelId_) {
+                    // Process the message as normal...
+                    if (message_->getEncryptionType() == EncryptionType::ENCRYPTED) {
+                        try {
+                            AASDK_LOG(error) << "[MessageInStream] decrypting buffer contents to message: " << (int) currentChannelId_;
+                            cryptor_->decrypt(message_->getPayload(), buffer, frameSize_ - 29);
+                        }
+                        catch (const error::Error &e) {
+                            message_.reset();
+                            promise_->reject(e);
+                            promise_.reset();
+                            return;
+                        }
+                    } else {
+                        message_->insertPayload(buffer);
                     }
-                    catch (const error::Error &e) {
-                        message_.reset();
-                        promise_->reject(e);
-                        promise_.reset();
-                        return;
-                    }
-                } else {
-                    message_->insertPayload(buffer);
                 }
 
-                // Resolve Promises As Necessary
-                if ((recentFrameType_ == FrameType::BULK || recentFrameType_ == FrameType::LAST)) {
-                    AASDK_LOG(error) << "[MessageInStream] Bulk or Last. ";
+//                // Resolve Promises As Necessary
+ //               if ((recentFrameType_ == FrameType::BULK || recentFrameType_ == FrameType::LAST)) {
+ //                   AASDK_LOG(error) << "[MessageInStream] Bulk or Last. ";
                     if (originalChannelId_ == currentChannelId_) {
                         AASDK_LOG(error) << "[MessageInStream] Channel Match. Resolving Message. ";
                         promiseResolved = true;
                         promise_->resolve(std::move(message_));
                         promise_.reset();
-                    } else {
-                        AASDK_LOG(error) << "[MessageInStream] 1234 ";
-                        if (hasInterleavedMessage) {
-                            AASDK_LOG(error) << "[MessageInStream] Interleaved. Not doing anything (yet). ";
-                            // TODO: Send Back Temporary Message
-                        }
-                    }
-                }
+//                    } else {
+//                        AASDK_LOG(error) << "[MessageInStream] 1234 ";
+ //                       if (hasInterleavedMessage) {
+  //                          AASDK_LOG(error) << "[MessageInStream] Interleaved. Not doing anything (yet). ";
+   //                         // TODO: Send Back Temporary Message
+    //                    }
+     //               }
+     //           }
 
                 AASDK_LOG(error) << "[MessageInStream] 1235 ";
                 // Reset Message
-                if (originalChannelId_ != currentChannelId_) {
+       /*         if (originalChannelId_ != currentChannelId_) {
                     // Reset Message
                     AASDK_LOG(error) << "[MessageInStream] Loading Message from Original Channel Id. ";
                     auto originalMessage = messageInProgress_.find((int) originalChannelId_);
@@ -215,7 +194,8 @@ namespace f1x
                 }
 
                 AASDK_LOG(error) << "[MessageInStream] 1236 ";
-
+*?
+        */
                 // Then receive next header...
                 if (!promiseResolved) {
                     AASDK_LOG(error) << "[MessageInStream] 1237 ";
