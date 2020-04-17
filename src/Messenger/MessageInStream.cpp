@@ -149,7 +149,7 @@ namespace f1x
                     }
                 }
 
-                AASDK_LOG(error) << "[MessageInStream] Message Encryption Type: " << (int) message_.getEncryptionType();
+                AASDK_LOG(error) << "[MessageInStream] Message Encryption Type: " << (int) message_->getEncryptionType();
 
                 // Process the message as normal...
                 if (message_->getEncryptionType() == EncryptionType::ENCRYPTED) {
