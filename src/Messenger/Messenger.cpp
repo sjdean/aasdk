@@ -57,7 +57,7 @@ void Messenger::enqueueReceive(ChannelId channelId, ReceivePromise::Pointer prom
                 auto randomInStreamPromise = ReceivePromise::defer(receiveStrand_);
                 randomInStreamPromise->then(std::bind(&Messenger::randomInStreamMessageHandler, this->shared_from_this(), std::placeholders::_1),
                                       std::bind(&Messenger::randomRejectReceivePromiseQueue, this->shared_from_this(), std::placeholders::_1));
-                randomInStreamPromise->setRandomHandler(std::move(randomInStreamPromise));
+                messageInStream_->setRandomHandler(std::move(randomInStreamPromise));
 
             }
         }
