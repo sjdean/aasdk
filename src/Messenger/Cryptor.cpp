@@ -194,7 +194,7 @@ namespace f1x
                 size_t totalReadSize = 0;                                                                               // Initialise
                 size_t availableBytes = length;
                 size_t readBytes = (length - totalReadSize) > 2048 ? 2048 : length - totalReadSize;                     // Calculate How many Bytes to Read
-                output.resize(output.size() readBytes);                                                                 // Resize Output to match the bytes we want to read
+                output.resize(output.size() + readBytes);                                                                 // Resize Output to match the bytes we want to read
 
                 AASDK_LOG(error) << "[Cryptor]  readBytes " << (int) readBytes;
                 AASDK_LOG(error) << "[Cryptor]  Resized Output " << (int) output.size();
