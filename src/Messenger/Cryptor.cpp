@@ -210,7 +210,6 @@ namespace f1x
                     const auto& currentBuffer = common::DataBuffer(output, beginOffset + totalReadSize);                // Create Buffer from output, starting from offset + total read
 
                     auto readSize = sslWrapper_->sslRead(ssl_, currentBuffer.data, currentBuffer.size);
-                    AASDK_LOG(error) << "[Cryptor]  readSize " << (int) readSize;
 
                     if(readSize <= 0)
                     {
