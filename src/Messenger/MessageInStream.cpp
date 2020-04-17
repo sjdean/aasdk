@@ -63,9 +63,10 @@ namespace f1x
 
             void MessageInStream::receiveFrameHeaderHandler(const common::DataConstBuffer& buffer)
             {
-                frameHeaderBuffer_ = buffer;
                 FrameHeader frameHeader(buffer);
                 currentChannelId_ = frameHeader.getChannelId();
+                encryptionType_ = frameHeader.getEncryptionType();
+                messageType_ = frameHeader.getMessageType();
 
                 AASDK_LOG(error) << "[MessageInStream] Channel Id: " << (int) frameHeader.getChannelId();
                 AASDK_LOG(error) << "[MessageInStream] Encryption Type: " << (int) frameHeader.getEncryptionType();
@@ -117,16 +118,14 @@ namespace f1x
 
             void MessageInStream::receiveFramePayloadHandler(const common::DataConstBuffer& buffer)
             {
-                FrameHeader frameHeader(frameHeaderBuffer_);
-
                 bool hasInterleavedMessage = false;
                 bool promiseResolved = false;
 
                 if (originalChannelId_ != currentChannelId_) {
-                    AASDK_LOG(error) << "[MessageInStream] Channel Id: " << (int) frameHeader.getChannelId();
-                    AASDK_LOG(error) << "[MessageInStream] Encryption Type: " << (int) frameHeader.getEncryptionType();
-                    AASDK_LOG(error) << "[MessageInStream] Frame Type: " << (int) frameHeader.getType();
-                    AASDK_LOG(error) << "[MessageInStream] Message Type: " << (int) frameHeader.getMessageType();
+                    AASDK_LOG(error) << "[MessageInStream] Channel Id: " << (int) currentChannelId_;
+                    AASDK_LOG(error) << "[MessageInStream] Encryption Type: " << (int) encryptionType_;
+                    AASDK_LOG(error) << "[MessageInStream] Frame Type: " << (int) recentFrameType_;
+                    AASDK_LOG(error) << "[MessageInStream] Message Type: " << (int) messageType_;
 
                     AASDK_LOG(error) << "[MessageInStream] Storing original message. ";
                     // Store Old Message for Safe Keeping
@@ -135,7 +134,7 @@ namespace f1x
                     if (recentFrameType_ == FrameType::FIRST || recentFrameType_ == FrameType::BULK) {
                         AASDK_LOG(error) << "[MessageInStream] First or Bulk. Creating New Message. ";
                         // Create a New Message. If we had data, then it will be lost, because that's how FIRST and BULK FRAMES work.
-                        message_ = std::make_shared<Message>(frameHeader.getChannelId(), frameHeader.getEncryptionType(), frameHeader.getMessageType());
+                        message_ = std::make_shared<Message>(currentChannelId_, encryptionType_, messageType_);
                         hasInterleavedMessage = true;
                     } else {
                         AASDK_LOG(error) << "[MessageInStream] Middle or Last. Finding Existing Message. ";
