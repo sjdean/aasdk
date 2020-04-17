@@ -164,22 +164,22 @@ namespace f1x
                     }
                 }
 
-//                // Resolve Promises As Necessary
- //               if ((recentFrameType_ == FrameType::BULK || recentFrameType_ == FrameType::LAST)) {
- //                   AASDK_LOG(error) << "[MessageInStream] Bulk or Last. ";
+                // Resolve Promises As Necessary
+                if ((recentFrameType_ == FrameType::BULK || recentFrameType_ == FrameType::LAST)) {
+                    AASDK_LOG(error) << "[MessageInStream] Bulk or Last. ";
                     if (originalChannelId_ == currentChannelId_) {
                         AASDK_LOG(error) << "[MessageInStream] Channel Match. Resolving Message. ";
                         promiseResolved = true;
                         promise_->resolve(std::move(message_));
                         promise_.reset();
-//                    } else {
-//                        AASDK_LOG(error) << "[MessageInStream] 1234 ";
- //                       if (hasInterleavedMessage) {
-  //                          AASDK_LOG(error) << "[MessageInStream] Interleaved. Not doing anything (yet). ";
-   //                         // TODO: Send Back Temporary Message
-    //                    }
-     //               }
-     //           }
+                    } else {
+                        AASDK_LOG(error) << "[MessageInStream] 1234 ";
+                        if (hasInterleavedMessage) {
+                            AASDK_LOG(error) << "[MessageInStream] Interleaved. Not doing anything (yet). ";
+                            // TODO: Send Back Temporary Message
+                        }
+                    }
+                }
 
                 AASDK_LOG(error) << "[MessageInStream] 1235 ";
                 // Reset Message
@@ -194,7 +194,6 @@ namespace f1x
                 }
 
                 AASDK_LOG(error) << "[MessageInStream] 1236 ";
-*?
         */
                 // Then receive next header...
                 if (!promiseResolved) {
