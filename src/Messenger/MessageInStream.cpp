@@ -123,6 +123,11 @@ namespace f1x
                 bool promiseResolved = false;
 
                 if (originalChannelId_ != currentChannelId_) {
+                    AASDK_LOG(error) << "[MessageInStream] Channel Id: " << (int) frameHeader.getChannelId();
+                    AASDK_LOG(error) << "[MessageInStream] Encryption Type: " << (int) frameHeader.getEncryptionType();
+                    AASDK_LOG(error) << "[MessageInStream] Frame Type: " << (int) frameHeader.getType();
+                    AASDK_LOG(error) << "[MessageInStream] Message Type: " << (int) frameHeader.getMessageType();
+
                     AASDK_LOG(error) << "[MessageInStream] Storing original message. ";
                     // Store Old Message for Safe Keeping
                     messageInProgress_[(int) originalChannelId_] = std::move(message_);
@@ -144,6 +149,8 @@ namespace f1x
                         }
                     }
                 }
+
+                AASDK_LOG(error) << "[MessageInStream] Message Encryption Type: " << (int) message_.getEncryptionType();
 
                 // Process the message as normal...
                 if (message_->getEncryptionType() == EncryptionType::ENCRYPTED) {
