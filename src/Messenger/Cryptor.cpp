@@ -182,43 +182,33 @@ namespace f1x
 
             size_t Cryptor::decrypt(common::Data& output, const common::DataConstBuffer& buffer, int length)
             {
-                AASDK_LOG(error) << "[Cryptor] Expect to Read " << (int) length;
-                AASDK_LOG(error) << "[Cryptor] Buffer Length " << (int) buffer.size;
-
                 std::lock_guard<decltype(mutex_)> lock(mutex_);
 
-                /*
-                 * Assume we've read 2000 bytes - output = 2000, buffer = 500.
-                 * beginOffset = 2000
-                 * output.resize(2001)
-                 * availableBytes = 1
-                 * totalReadSize = 0
-                 * currentBuffer = DataBuffer(output, 0 + 2000)
-                 * 2001 > 2000 ? 0 : offset
-                 * readSize = ssl,
-                 */
+                this->write(buffer);                                                                                    // We write our Encrypted Frame Buffer
+                const size_t beginOffset = output.size();                                                               // We beginOffset at the size of the current message data
 
-                this->write(buffer);
-
-                AASDK_LOG(error) << "[Cryptor] current output size " << (int) output.size();
-                const size_t beginOffset = output.size();
-
-                output.resize(beginOffset + length);
-                AASDK_LOG(error) << "[Cryptor] resized output to " << (int) output.size();
-
+                size_t totalReadSize = 0;                                                                               // Initialise
                 size_t availableBytes = length;
-                size_t totalReadSize = 0;
+                size_t readBytes = (length - totalReadSize) > 2048 ? 2048 : length - totalReadSize;                     // Calculate How many Bytes to Read
+                output.resize(output.size() readBytes);                                                                 // Resize Output to match the bytes we want to read
 
-                while(availableBytes > 0)
+                while(readBytes > 0)
                 {
-                    AASDK_LOG(error) << "[Cryptor] beginOffset " << (int) beginOffset;
+                    /*
+                     * This line is almost non-sensical. The idea is to create a buffer from output that is big enough
+                     * to contain the bytes we want to read. However at this point, total read size is 0, and begin
+                     * Offset is just the end of the incoming message buffer.
+                     *
+                     * The "size" of constant buffer is calculated during buffer creation where if the offset (zero)
+                     * is less than or equal to _size (output.size) then make the size = _size - offset, or output size
+                     * minus zero. Which is just output size.
+                     *
+                     * Second iteration through we would have an offset of 1, but the size of the output has been
+                     * expanded to allow for the bytes we want to read. So, it's still eg 10,001 less 0 + 1 = 10,000
+                     */
 
-                    const auto& currentBuffer = common::DataBuffer(output, totalReadSize + beginOffset);
-
-                    AASDK_LOG(error) << "[Cryptor] currentBuffer size " << (int) currentBuffer.size;
-
+                    const auto& currentBuffer = common::DataBuffer(output, beginOffset + totalReadSize);                // Create Buffer from output, starting from offset + total read
                     auto readSize = sslWrapper_->sslRead(ssl_, currentBuffer.data, currentBuffer.size);
-                    AASDK_LOG(error) << "[Cryptor] readSize " << (int) readSize;
 
                     if(readSize <= 0)
                     {
@@ -227,11 +217,10 @@ namespace f1x
 
                     totalReadSize += readSize;
                     availableBytes = sslWrapper_->getAvailableBytes(ssl_);
-                    AASDK_LOG(error) << "[Cryptor] totalReadSize " << (int) totalReadSize;
-                    AASDK_LOG(error) << "[Cryptor] available bytes " << (int) availableBytes;
-                    output.resize(output.size() + availableBytes);
+                    readBytes = (length - totalReadSize) > 2048 ? 2048 : length - totalReadSize;
+                    output.resize(output.size() + readBytes);
                 }
-                AASDK_LOG(error) << "[Cryptor] totalReadSize " << (int) totalReadSize;
+
                 return totalReadSize;
             }
 
