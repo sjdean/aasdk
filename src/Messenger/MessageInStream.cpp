@@ -121,7 +121,7 @@ namespace f1x
 
                 bool hasInterleavedMessage = false;
                 bool promiseResolved = false;
-/*
+
                 if (originalChannelId_ != currentChannelId_) {
                     AASDK_LOG(error) << "[MessageInStream] Storing original message. ";
                     // Store Old Message for Safe Keeping
@@ -144,24 +144,22 @@ namespace f1x
                         }
                     }
                 }
-*/
 
-                if (originalChannelId_ == currentChannelId_) {
-                    // Process the message as normal...
-                    if (message_->getEncryptionType() == EncryptionType::ENCRYPTED) {
-                        try {
-                            AASDK_LOG(error) << "[MessageInStream] decrypting buffer contents to message: " << (int) currentChannelId_;
-                            cryptor_->decrypt(message_->getPayload(), buffer, frameSize_ - 29);
-                        }
-                        catch (const error::Error &e) {
-                            message_.reset();
-                            promise_->reject(e);
-                            promise_.reset();
-                            return;
-                        }
-                    } else {
-                        message_->insertPayload(buffer);
+                // Process the message as normal...
+                if (message_->getEncryptionType() == EncryptionType::ENCRYPTED) {
+                    try {
+                        AASDK_LOG(error) << "[MessageInStream] decrypting buffer contents to message: " << (int) currentChannelId_;
+                        cryptor_->decrypt(message_->getPayload(), buffer, frameSize_ - 29);
                     }
+                    catch (const error::Error &e) {
+                        message_.reset();
+                        promise_->reject(e);
+                        promise_.reset();
+                        return;
+                    }
+                } else {
+                    AASDK_LOG(error) << "[MessageInStream] Not Encrypted " << (int) currentChannelId_;
+                    message_->insertPayload(buffer);
                 }
 
                 // Resolve Promises As Necessary
@@ -173,7 +171,6 @@ namespace f1x
                         promise_->resolve(std::move(message_));
                         promise_.reset();
                     } else {
-                        AASDK_LOG(error) << "[MessageInStream] 1234 ";
                         if (hasInterleavedMessage) {
                             AASDK_LOG(error) << "[MessageInStream] Interleaved. Not doing anything (yet). ";
                             // TODO: Send Back Temporary Message
@@ -181,9 +178,8 @@ namespace f1x
                     }
                 }
 
-                AASDK_LOG(error) << "[MessageInStream] 1235 ";
                 // Reset Message
-       /*         if (originalChannelId_ != currentChannelId_) {
+                if (originalChannelId_ != currentChannelId_) {
                     // Reset Message
                     AASDK_LOG(error) << "[MessageInStream] Loading Message from Original Channel Id. ";
                     auto originalMessage = messageInProgress_.find((int) originalChannelId_);
@@ -193,11 +189,8 @@ namespace f1x
                     }
                 }
 
-                AASDK_LOG(error) << "[MessageInStream] 1236 ";
-        */
                 // Then receive next header...
                 if (!promiseResolved) {
-                    AASDK_LOG(error) << "[MessageInStream] 1237 ";
                     auto transportPromise = transport::ITransport::ReceivePromise::defer(strand_);
                     transportPromise->then(
                             [this, self = this->shared_from_this()](common::Data data) mutable {
@@ -208,7 +201,6 @@ namespace f1x
                                 promise_->reject(e);
                                 promise_.reset();
                             });
-                    AASDK_LOG(error) << "[MessageInStream] 1238 ";
                     transport_->receive(FrameHeader::getSizeOf(), std::move(transportPromise));
                 }
             }
