@@ -46,8 +46,10 @@ private:
     typedef std::list<std::pair<Message::Pointer, SendPromise::Pointer>> ChannelSendQueue;
     void doSend();
     void inStreamMessageHandler(Message::Pointer message);
+    void randomInStreamMessageHandler(Message::Pointer message);
     void outStreamMessageHandler(ChannelSendQueue::iterator queueElement);
     void rejectReceivePromiseQueue(const error::Error& e);
+    void randomRejectReceivePromiseQueue(const error::Error& e);
     void rejectSendPromiseQueue(const error::Error& e);
 
     boost::asio::io_service::strand receiveStrand_;

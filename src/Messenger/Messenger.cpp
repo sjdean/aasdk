@@ -53,6 +53,12 @@ void Messenger::enqueueReceive(ChannelId channelId, ReceivePromise::Pointer prom
                 inStreamPromise->then(std::bind(&Messenger::inStreamMessageHandler, this->shared_from_this(), std::placeholders::_1),
                                      std::bind(&Messenger::rejectReceivePromiseQueue, this->shared_from_this(), std::placeholders::_1));
                 messageInStream_->startReceive(std::move(inStreamPromise));
+
+                auto randomInStreamPromise = ReceivePromise::defer(receiveStrand_);
+                randomInStreamPromise->then(std::bind(&Messenger::randomInStreamMessageHandler, this->shared_from_this(), std::placeholders::_1),
+                                      std::bind(&Messenger::randomRejectReceivePromiseQueue, this->shared_from_this(), std::placeholders::_1));
+                randomInStreamPromise->setRandomHandler(std::move(randomInStreamPromise));
+
             }
         }
     });
@@ -69,6 +75,8 @@ void Messenger::enqueueSend(Message::Pointer message, SendPromise::Pointer promi
         }
     });
 }
+
+
 
 void Messenger::inStreamMessageHandler(Message::Pointer message)
 {
@@ -91,6 +99,17 @@ void Messenger::inStreamMessageHandler(Message::Pointer message)
         messageInStream_->startReceive(std::move(inStreamPromise));
     }
 }
+
+    void Messenger::randomInStreamMessageHandler(Message::Pointer message)
+    {
+        channelReceiveMessageQueue_.push(std::move(message));
+
+        auto inStreamPromise = ReceivePromise::defer(receiveStrand_);
+        inStreamPromise->then(std::bind(&Messenger::randomInStreamMessageHandler, this->shared_from_this(), std::placeholders::_1),
+                              std::bind(&Messenger::randomRejectReceivePromiseQueue, this->shared_from_this(), std::placeholders::_1));
+        messageInStream_->setRandomHandler(std::move(inStreamPromise));
+    }
+
 
 void Messenger::doSend()
 {
@@ -120,6 +139,12 @@ void Messenger::rejectReceivePromiseQueue(const error::Error& e)
         channelReceivePromiseQueue_.pop()->reject(e);
     }
 }
+
+    void Messenger::randomRejectReceivePromiseQueue(const error::Error& e)
+    {
+        // Dummy
+    }
+
 
 void Messenger::rejectSendPromiseQueue(const error::Error& e)
 {

@@ -61,6 +61,12 @@ namespace f1x
                 });
             }
 
+            void MessageInStream::setRandomHHandler(ReceivePromise::Pointer promise)
+            {
+                randomPromise_ = std::move(promise);
+            }
+
+
             void MessageInStream::receiveFrameHeaderHandler(const common::DataConstBuffer& buffer)
             {
                 FrameHeader frameHeader(buffer);
@@ -167,7 +173,7 @@ namespace f1x
                     } else {
                         if (hasInterleavedMessage) {
                             AASDK_LOG(error) << "[MessageInStream] Interleaved. Not doing anything (yet). ";
-                            // TODO: Send Back Temporary Message
+                            randomPromise_->resolve(std::move(message_));
                         }
                     }
                 }
