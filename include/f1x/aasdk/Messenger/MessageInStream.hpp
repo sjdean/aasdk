@@ -60,6 +60,8 @@ private:
     int frameSize_;
     EncryptionType encryptionType_;
     MessageType messageType_;
+
+    bool hasInterleavedMessage_;
 };
 
 }
