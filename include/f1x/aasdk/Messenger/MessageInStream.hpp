@@ -41,7 +41,7 @@ public:
 
 private:
     using std::enable_shared_from_this<MessageInStream>::shared_from_this;
-
+    void MessageInStream::findExistingMessage(FrameHeader frameHeader);
     void receiveFrameHeaderHandler(const common::DataConstBuffer& buffer);
     void receiveFrameSizeHandler(const common::DataConstBuffer& buffer);
     void receiveFramePayloadHandler(const common::DataConstBuffer& buffer);
