@@ -24,12 +24,12 @@ namespace aasdk
 namespace messenger
 {
 
-void ChannelReceivePromiseQueue::push(ChannelId channelId, ReceivePromise::Pointer promise)
+void ChannelReceivePromiseQueue::push(ServiceChannelId channelId, ReceivePromise::Pointer promise)
 {
     queue_[channelId].push(std::move(promise));
 }
 
-ReceivePromise::Pointer ChannelReceivePromiseQueue::pop(ChannelId channelId)
+ReceivePromise::Pointer ChannelReceivePromiseQueue::pop(ServiceChannelId channelId)
 {
     auto& channelQueue = queue_.at(channelId);
     auto promise = std::move(channelQueue.front());
@@ -43,7 +43,7 @@ ReceivePromise::Pointer ChannelReceivePromiseQueue::pop(ChannelId channelId)
     return promise;
 }
 
-bool ChannelReceivePromiseQueue::isPending(ChannelId channelId) const
+bool ChannelReceivePromiseQueue::isPending(ServiceChannelId channelId) const
 {
     return queue_.count(channelId) > 0 && !queue_.at(channelId).empty();
 }

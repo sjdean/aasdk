@@ -21,9 +21,7 @@
 #include <aasdk/Messenger/Messenger.hpp>
 #include <aasdk/Common/Log.hpp>
 
-namespace aasdk
-{
-namespace messenger
+namespace aasdk::messenger
 {
 
 Messenger::Messenger(boost::asio::io_service& ioService, IMessageInStream::Pointer messageInStream, IMessageOutStream::Pointer messageOutStream)
@@ -39,7 +37,7 @@ void Messenger::enqueueReceive(ChannelId channelId, ReceivePromise::Pointer prom
 {
     // enqueueReceive is called from the service channel.
     receiveStrand_.dispatch([this, self = this->shared_from_this(), channelId, promise = std::move(promise)]() mutable {
-        //If there's any messages on the channel, resolve. The channel will call enqueueReceive again.
+        //If there's any messages on the service, resolve. The service will call enqueueReceive again.
         if(!channelReceiveMessageQueue_.empty(channelId))
         {
             promise->resolve(std::move(channelReceiveMessageQueue_.pop(channelId)));
@@ -142,4 +140,4 @@ void Messenger::stop()
 }
 
 }
-}
+

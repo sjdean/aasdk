@@ -20,46 +20,50 @@
 
 #include <aasdk/Error/Error.hpp>
 #include <aasdk/Common/Data.hpp>
-#include <aasdk_proto/ShutdownRequestMessage.pb.h>
-#include <aasdk_proto/ShutdownResponseMessage.pb.h>
-#include <aasdk_proto/VersionResponseStatusEnum.pb.h>
-#include <aasdk_proto/ServiceDiscoveryRequestMessage.pb.h>
-#include <aasdk_proto/AudioFocusRequestMessage.pb.h>
-#include <aasdk_proto/NavigationFocusRequestMessage.pb.h>
-#include <aasdk_proto/PingRequestMessage.pb.h>
-#include <aasdk_proto/PingResponseMessage.pb.h>
-#include <aasdk_proto/VoiceSessionRequestMessage.pb.h>
+#include <proto/channel/control/byebye/notification/ByeByeResponse.pb.h>
+#include <proto/channel/control/servicediscovery/event/ServiceDiscoveryRequest.pb.h>
+#include <proto/channel/control/focus/audio/event/AudioFocusRequest.pb.h>
+#include <proto/channel/control/focus/navigation/event/NavigationFocusRequest.pb.h>
+#include <proto/channel/control/ping/PingRequest.pb.h>
+#include <proto/channel/control/ping/PingResponse.pb.h>
+#include <proto/channel/control/voice/VoiceSessionNotification.pb.h>
 
 
 
-namespace aasdk
-{
-namespace channel
-{
-namespace control
-{
+    namespace aasdk::channel::control {
 
-class IControlServiceChannelEventHandler
-{
-public:
-    typedef std::shared_ptr<IControlServiceChannelEventHandler> Pointer;
+      class IControlServiceChannelEventHandler {
+      public:
+        typedef std::shared_ptr<IControlServiceChannelEventHandler> Pointer;
 
-    IControlServiceChannelEventHandler() = default;
-    virtual ~IControlServiceChannelEventHandler() = default;
+        IControlServiceChannelEventHandler() = default;
 
-    virtual void onVersionResponse(uint16_t majorCode, uint16_t minorCode, proto::enums::VersionResponseStatus::Enum status) = 0;
-    virtual void onHandshake(const common::DataConstBuffer& payload) = 0;
-    virtual void onServiceDiscoveryRequest(const proto::messages::ServiceDiscoveryRequest& request) = 0;
-    virtual void onAudioFocusRequest(const proto::messages::AudioFocusRequest& request) = 0;
-    virtual void onShutdownRequest(const proto::messages::ShutdownRequest& request) = 0;
-    virtual void onShutdownResponse(const proto::messages::ShutdownResponse& response) = 0;
-    virtual void onNavigationFocusRequest(const proto::messages::NavigationFocusRequest& request) = 0;
-    virtual void onPingRequest(const proto::messages::PingRequest& request) = 0;
-    virtual void onPingResponse(const proto::messages::PingResponse& response) = 0;
-    virtual void onChannelError(const error::Error& e) = 0;
-    virtual void onVoiceSessionRequest(const proto::messages::VoiceSessionRequest& request) = 0;
-};
+        virtual ~IControlServiceChannelEventHandler() = default;
 
-}
-}
-}
+        virtual void onVersionResponse(uint16_t majorCode, uint16_t minorCode,
+                                       proto::shared::MessageStatus status) = 0;
+
+        virtual void onHandshake(const common::DataConstBuffer &payload) = 0;
+
+        virtual void onServiceDiscoveryRequest(const proto::channel::control::servicediscovery::event::ServiceDiscoveryRequest &request) = 0;
+
+        virtual void onAudioFocusRequest(const proto::channel::control::focus::audio::event::AudioFocusRequest &request) = 0;
+
+        virtual void onByeByeRequest(const proto::channel::control::byebye::event::ByeByeRequest &request) = 0;
+
+        virtual void onByeByeResponse(const proto::channel::control::byebye::notification::ByeByeResponse &response) = 0;
+
+        virtual void
+        onNavigationFocusRequest(const proto::channel::control::focus::navigation::event::NavigationFocusRequest &request) = 0;
+
+        virtual void onPingRequest(const proto::channel::control::ping::PingRequest &request) = 0;
+
+        virtual void onPingResponse(const proto::channel::control::ping::PingResponse &response) = 0;
+
+        virtual void onChannelError(const error::Error &e) = 0;
+
+        virtual void onVoiceSessionRequest(const proto::channel::control::version::VoiceSessionNotification &request) = 0;
+      };
+    }
+
+

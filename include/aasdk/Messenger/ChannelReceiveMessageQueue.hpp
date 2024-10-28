@@ -33,13 +33,13 @@ class ChannelReceiveMessageQueue
 {
 public:
     void push(Message::Pointer message);
-    Message::Pointer pop(ChannelId channelId);
-    bool empty(ChannelId channelId) const;
+    Message::Pointer pop(ServiceChannelId channelId);
+    bool empty(ServiceChannelId channelId) const;
     void clear();
 
 private:
     typedef std::queue<Message::Pointer> MessageQueue;
-    std::unordered_map<ChannelId, MessageQueue> queue_;
+    std::unordered_map<ServiceChannelId, MessageQueue> queue_;
 };
 
 }

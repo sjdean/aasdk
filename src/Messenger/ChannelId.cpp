@@ -18,42 +18,28 @@
 
 #include <aasdk/Messenger/ChannelId.hpp>
 
+namespace aasdk::messenger {
 
-namespace aasdk
-{
-namespace messenger
-{
-
-std::string channelIdToString(ChannelId channelId)
-{
-    switch(channelId)
-    {
-    case ChannelId::CONTROL:
-        return "CONTROL";
-    case ChannelId::INPUT:
-        return "INPUT";
-    case ChannelId::SENSOR:
-        return "SENSOR";
-    case ChannelId::VIDEO:
+  std::string channelIdToString(ChannelId channelId) {
+    switch (channelId) {
+      case ChannelId::MICROPHONE:
+        return "MICROPHONE";
+      case ChannelId::TELEPHONY_AUDIO:
+        return "TELEPHONY_AUDIO";
+      case ChannelId::VIDEO:
         return "VIDEO";
-    case ChannelId::MEDIA_AUDIO:
+      case ChannelId::MEDIA_AUDIO:
         return "MEDIA_AUDIO";
-    case ChannelId::SPEECH_AUDIO:
+      case ChannelId::GUIDANCE_AUDIO:
         return "SPEECH_AUDIO";
-    case ChannelId::SYSTEM_AUDIO:
+      case ChannelId::SYSTEM_AUDIO:
         return "SYSTEM_AUDIO";
-    case ChannelId::AV_INPUT:
-        return "AV_INPUT";
-    case ChannelId::BLUETOOTH:
-        return "BLUETOOTH";
-    case ChannelId::NAVIGATION:
-        return "NAVIGATION";
-    case ChannelId::NONE:
+      case ChannelId::NONE:
         return "NONE";
-    default:
+      default:
         return "(null)";
     }
-}
+  }
 
 }
-}
+

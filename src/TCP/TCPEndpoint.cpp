@@ -19,9 +19,8 @@
 #include <aasdk/TCP/TCPEndpoint.hpp>
 
 
-namespace aasdk
-{
-namespace tcp
+
+namespace aasdk::tcp
 {
 
 TCPEndpoint::TCPEndpoint(ITCPWrapper& tcpWrapper, SocketPointer socket)
@@ -70,4 +69,4 @@ void TCPEndpoint::asyncOperationHandler(const boost::system::error_code& ec, siz
 }
 
 }
-}
+

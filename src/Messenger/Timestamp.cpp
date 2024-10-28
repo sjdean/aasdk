@@ -20,9 +20,8 @@
 #include <aasdk/Messenger/Timestamp.hpp>
 
 
-namespace aasdk
-{
-namespace messenger
+
+namespace aasdk::messenger
 {
 
 Timestamp::Timestamp(ValueType stamp)
@@ -50,4 +49,4 @@ Timestamp::ValueType Timestamp::getValue() const
 }
 
 }
-}
+

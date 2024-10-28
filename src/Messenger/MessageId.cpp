@@ -21,9 +21,8 @@
 #include <aasdk/Messenger/MessageId.hpp>
 
 
-namespace aasdk
-{
-namespace messenger
+
+namespace aasdk::messenger
 {
 
 MessageId::MessageId(uint16_t id):
@@ -86,4 +85,4 @@ std::ostream& operator<<(std::ostream& stream, const aasdk::messenger::MessageId
 }
 
 }
-}
+

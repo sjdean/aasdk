@@ -18,49 +18,70 @@
 
 #pragma once
 
-#include <aasdk_proto/ShutdownRequestMessage.pb.h>
-#include <aasdk_proto/ShutdownResponseMessage.pb.h>
-#include <aasdk_proto/AuthCompleteIndicationMessage.pb.h>
-#include <aasdk_proto/ServiceDiscoveryResponseMessage.pb.h>
-#include <aasdk_proto/AudioFocusResponseMessage.pb.h>
-#include <aasdk_proto/NavigationFocusResponseMessage.pb.h>
-#include <aasdk_proto/StatusEnum.pb.h>
-#include <aasdk_proto/PingRequestMessage.pb.h>
-#include <aasdk_proto/VoiceSessionRequestMessage.pb.h>
+#include <proto/channel/control/byebye/event/ByeByeRequest.pb.h>
+#include <proto/channel/control/byebye/notification//ByeByeResponse.pb.h>
+#include <proto/channel/control/auth/AuthResponse.pb.h>
+#include <proto/channel/control/servicediscovery/notification/ServiceDiscoveryResponse.pb.h>
+#include <proto/channel/control/focus/audio/notification/AudioFocusNotification.pb.h>
+#include <proto/channel/control/focus/navigation/notification/NavigationFocusNotification.pb.h>
+#include <proto/shared/MessageStatus.pb.h>
+#include <proto/channel/control/ping/PingRequest.pb.h>
+#include <proto/channel/control/ping/PingResponse.pb.h>
+#include <proto/channel/control/voice/VoiceSessionNotification.pb.h>
 #include <aasdk/Common/Data.hpp>
 #include <aasdk/Channel/Promise.hpp>
 #include <aasdk/Channel/Control/IControlServiceChannelEventHandler.hpp>
 
 
-namespace aasdk
-{
-namespace channel
-{
-namespace control
-{
+namespace aasdk::channel::control {
 
-class IControlServiceChannel
-{
-public:
+  class IControlServiceChannel {
+  public:
     typedef std::shared_ptr<IControlServiceChannel> Pointer;
 
     IControlServiceChannel() = default;
+
     virtual ~IControlServiceChannel() = default;
 
     virtual void receive(IControlServiceChannelEventHandler::Pointer eventHandler) = 0;
 
     virtual void sendVersionRequest(SendPromise::Pointer promise) = 0;
-    virtual void sendHandshake(common::Data handshakeBuffer, SendPromise::Pointer promise) = 0;
-    virtual void sendAuthComplete(const proto::messages::AuthCompleteIndication& response, SendPromise::Pointer promise) = 0;
-    virtual void sendServiceDiscoveryResponse(const proto::messages::ServiceDiscoveryResponse& response, SendPromise::Pointer promise) = 0;
-    virtual void sendAudioFocusResponse(const proto::messages::AudioFocusResponse& response, SendPromise::Pointer promise) = 0;
-    virtual void sendShutdownRequest(const proto::messages::ShutdownRequest& request, SendPromise::Pointer promise) = 0;
-    virtual void sendShutdownResponse(const proto::messages::ShutdownResponse& response, SendPromise::Pointer promise) = 0;
-    virtual void sendNavigationFocusResponse(const proto::messages::NavigationFocusResponse& response, SendPromise::Pointer promise) = 0;
-    virtual void sendPingRequest(const proto::messages::PingRequest& request, SendPromise::Pointer promise) = 0;
-    virtual void sendPingResponse(const proto::messages::PingResponse& response, SendPromise::Pointer promise) = 0;
-};
 
+    virtual void sendHandshake(common::Data handshakeBuffer, SendPromise::Pointer promise) = 0;
+
+    virtual void sendAuthComplete(const proto::channel::control::auth::AuthResponse &response,
+                                  SendPromise::Pointer promise) = 0;
+
+    virtual void sendServiceDiscoveryResponse(
+        const proto::channel::control::servicediscovery::notification::ServiceDiscoveryResponse &response,
+        SendPromise::Pointer promise) = 0;
+
+    virtual void
+    sendAudioFocusResponse(const proto::channel::control::focus::audio::notification::AudioFocusNotification &response,
+                           SendPromise::Pointer promise) = 0;
+
+    virtual void
+    sendShutdownRequest(const proto::channel::control::byebye::event::ByeByeRequest &request,
+                        SendPromise::Pointer promise) = 0;
+
+    virtual void sendShutdownResponse(const proto::channel::control::byebye::notification::ByeByeResponse &response,
+                                      SendPromise::Pointer promise) = 0;
+
+    virtual void
+    sendNavigationFocusResponse(
+        const proto::channel::control::focus::navigation::notification::NavigationFocusNotification &response,
+        SendPromise::Pointer promise) = 0;
+
+    virtual void
+    sendVoiceSessionFocusResponse(const proto::channel::control::version::VoiceSessionNotification &response,
+                                  SendPromise::Pointer promise) = 0;
+
+    virtual void
+    sendPingRequest(const proto::channel::control::ping::PingRequest &request, SendPromise::Pointer promise) = 0;
+
+    virtual void
+    sendPingResponse(const proto::channel::control::ping::PingResponse &response, SendPromise::Pointer promise) = 0;
+  };
 }
-}
-}
+
+

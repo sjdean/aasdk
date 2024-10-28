@@ -22,12 +22,10 @@
 #include <aasdk/IO/Promise.hpp>
 
 
-namespace aasdk
-{
-namespace channel
-{
+namespace aasdk {
+  namespace channel {
 
-typedef io::Promise<void> SendPromise;
+    typedef io::Promise<void> SendPromise;
 
-}
+  }
 }

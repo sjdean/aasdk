@@ -19,9 +19,8 @@
 #include <aasdk/Messenger/ChannelReceiveMessageQueue.hpp>
 
 
-namespace aasdk
-{
-namespace messenger
+
+namespace aasdk::messenger
 {
 
 void ChannelReceiveMessageQueue::push(Message::Pointer message)
@@ -37,7 +36,7 @@ void ChannelReceiveMessageQueue::push(Message::Pointer message)
     channelQueue.emplace(std::move(message));
 }
 
-Message::Pointer ChannelReceiveMessageQueue::pop(ChannelId channelId)
+Message::Pointer ChannelReceiveMessageQueue::pop(ServiceChannelId channelId)
 {
     auto& channelQueue = queue_.at(channelId);
     auto message(std::move(channelQueue.front()));
@@ -51,7 +50,7 @@ Message::Pointer ChannelReceiveMessageQueue::pop(ChannelId channelId)
     return message;
 }
 
-bool ChannelReceiveMessageQueue::empty(ChannelId channelId) const
+bool ChannelReceiveMessageQueue::empty(ServiceChannelId channelId) const
 {
     return queue_.count(channelId) == 0;
 }
@@ -62,4 +61,4 @@ void ChannelReceiveMessageQueue::clear()
 }
 
 }
-}
+

@@ -50,7 +50,7 @@ Message& Message::operator=(Message&& other)
     return *this;
 }
 
-ChannelId Message::getChannelId() const
+ServiceId Message::getChannelId() const
 {
     return channelId_;
 }

@@ -21,9 +21,8 @@
 #include <aasdk/Common/Log.hpp>
 #include <iostream>
 
-namespace aasdk
-{
-namespace messenger
+
+namespace aasdk::messenger
 {
 
 MessageInStream::MessageInStream(boost::asio::io_service& ioService, transport::ITransport::Pointer transport, ICryptor::Pointer cryptor)
@@ -178,4 +177,4 @@ void MessageInStream::receiveFramePayloadHandler(const common::DataConstBuffer& 
 }
 
 }
-}
+
