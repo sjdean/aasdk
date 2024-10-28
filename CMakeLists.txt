@@ -61,7 +61,7 @@ if(AASDK_TEST)
     include(ExternalGtest)
 endif(AASDK_TEST)
 
-add_subdirectory(aasdk_proto)
+add_subdirectory(protobuf/proto)
 
 find_package(Boost REQUIRED COMPONENTS system log OPTIONAL_COMPONENTS unit_test_framework)
 find_package(libusb-1.0 REQUIRED)
