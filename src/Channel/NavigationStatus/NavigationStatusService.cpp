@@ -16,7 +16,7 @@
 *  along with aasdk. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "proto/service/navigation/NavigationChannelMessageIds.pb.h"
+#include <aap_proto/proto/service/navigation/NavigationChannelMessageIds.pb.h>
 #include "aasdk/Channel/NavigationStatus/INavigationStatusServiceEventHandler.hpp"
 #include "aasdk/Channel/NavigationStatus/NavigationStatusService.hpp"
 #include "aasdk/Common/Log.hpp"

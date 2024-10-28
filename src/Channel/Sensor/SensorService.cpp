@@ -16,7 +16,7 @@
 *  along with aasdk. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "proto/service/sensor/SensorChannelMessageId.pb.h"
+#include <aap_proto/proto/service/sensor/SensorChannelMessageId.pb.h>
 #include <aasdk/Channel/Sensor/ISensorServiceEventHandler.hpp>
 #include <aasdk/Channel/Sensor/SensorService.hpp>
 #include "aasdk/Common/Log.hpp"

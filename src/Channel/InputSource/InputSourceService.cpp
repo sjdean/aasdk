@@ -16,7 +16,7 @@
 *  along with aasdk. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "proto/service/input/message/InputChannelMessageId.pb.h"
+#include <aap_proto/proto/service/input/message/InputChannelMessageId.pb.h>
 #include "aasdk/Channel/InputSource/InputSourceService.hpp"
 #include "aasdk/Channel/InputSource/IInputSourceServiceEventHandler.hpp"
 #include "aasdk/Common/Log.hpp"

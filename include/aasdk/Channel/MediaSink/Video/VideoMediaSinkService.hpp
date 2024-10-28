@@ -23,7 +23,7 @@
 #include "aasdk/Channel/Channel.hpp"
 #include "IVideoMediaSinkService.hpp"
 #include "aasdk/Channel/MediaSink/MediaSinkService.hpp"
-#include "proto/channel/control/focus/video/notification/VideoFocusNotification.pb.h"
+#include <aap_proto/proto/channel/control/focus/video/notification/VideoFocusNotification.pb.h>
 
 namespace aasdk::channel::mediasink::video {
 

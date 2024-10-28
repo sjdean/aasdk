@@ -9,14 +9,7 @@ set(LIBRARY_BUILD_DATE 20241028)    # Binary Release Build Date
 set(LIBRARY_BUILD_RELEASE 1)        # Binary Release Build Number (increment if released on same day)
 set(LIBRARY_BUILD_INCREMENTAL 1)    # Binary Build Version - Increment for Each Build
 
-if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
-    message("Compiling for Mac")
-    set (MAXOSX TRUE)
-    set(CMAKE_CXX_COMPILER /usr/local/bin/g++-14)
-    set(CMAKE_CXX_STANDARD 14)  # Abseil Issues without
-else()
-    set(CMAKE_CXX_STANDARD 14)
-endif()
+set(CMAKE_CXX_STANDARD 14)
 
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
@@ -67,8 +60,8 @@ install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
         FILES_MATCHING PATTERN "*.h")
 
 # Export the targets to a script
-install(EXPORT aap_protobuf_targets
-        FILE aap_protobuf_targets.cmake
+install(EXPORT aap_protobufTargets
+        FILE aap_protobufTargets.cmake
         NAMESPACE AAPProto::
         DESTINATION lib/cmake/aap_protobuf
 )
@@ -76,19 +69,19 @@ install(EXPORT aap_protobuf_targets
 # Create a Config file for FindPackage
 include(CMakePackageConfigHelpers)
 write_basic_package_version_file(
-        "${CMAKE_CURRENT_BINARY_DIR}/aap_protobuf_configversion.cmake"
+        "${CMAKE_CURRENT_BINARY_DIR}/aap_protobufConfigVersion.cmake"
         VERSION 1.0
         COMPATIBILITY AnyNewerVersion
 )
 
 configure_package_config_file(${CMAKE_CURRENT_SOURCE_DIR}/Config.cmake.in
-        "${CMAKE_CURRENT_BINARY_DIR}/aap_protobuf_config.cmake"
+        "${CMAKE_CURRENT_BINARY_DIR}/aap_protobufConfig.cmake"
         INSTALL_DESTINATION lib/cmake/aap_protobuf
 )
 
 # Install the config files
-install(FILES "${CMAKE_CURRENT_BINARY_DIR}/aap_protobuf_configversion.cmake"
-        "${CMAKE_CURRENT_BINARY_DIR}/aap_protobuf_config.cmake"
+install(FILES "${CMAKE_CURRENT_BINARY_DIR}/aap_protobufConfigVersion.cmake"
+        "${CMAKE_CURRENT_BINARY_DIR}/aap_protobufConfig.cmake"
         DESTINATION lib/cmake/aap_protobuf)
 
 

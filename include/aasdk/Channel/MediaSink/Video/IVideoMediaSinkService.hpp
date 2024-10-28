@@ -2,14 +2,14 @@
 #pragma once
 
 #include <memory>
-#include "proto/service/media/sink/message/MediaSinkChannelSetupResponse.pb.h"
-#include "proto/service/media/source/message/MediaSourceMediaAckIndication.pb.h"
-#include "proto/channel/ChannelOpenResponse.pb.h"
+#include <aap_proto/proto/service/media/sink/message/MediaSinkChannelSetupResponse.pb.h>
+#include <aap_proto/proto/service/media/source/message/MediaSourceMediaAckIndication.pb.h>
+#include <aap_proto/proto/channel/ChannelOpenResponse.pb.h>
 #include "aasdk/Messenger/ServiceId.hpp"
 #include "aasdk/Channel/Promise.hpp"
 #include "IVideoMediaSinkServiceEventHandler.hpp"
 #include "aasdk/Channel/MediaSink/IMediaSinkService.hpp"
-#include "proto/channel/control/focus/video/notification/VideoFocusNotification.pb.h"
+#include <aap_proto/proto/channel/control/focus/video/notification/VideoFocusNotification.pb.h>
 
 
 namespace aasdk::channel::mediasink::video {

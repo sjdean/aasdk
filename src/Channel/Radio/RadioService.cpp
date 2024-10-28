@@ -1,4 +1,4 @@
-#include "proto/service/radio/RadioMessageId.pb.h"
+#include <aap_proto/proto/service/radio/RadioMessageId.pb.h>
 #include <aasdk/Channel/Radio/IRadioServiceEventHandler.hpp>
 #include <aasdk/Channel/Radio/RadioService.hpp>
 #include "aasdk/Common/Log.hpp"

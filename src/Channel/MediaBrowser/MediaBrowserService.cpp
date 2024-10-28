@@ -1,5 +1,5 @@
 
-#include "proto/service/mediabrowser/MediaBrowserMessageId.pb.h"
+#include <aap_proto/proto/service/mediabrowser/MediaBrowserMessageId.pb.h>
 #include <aasdk/Channel/MediaBrowser/IMediaBrowserServiceEventHandler.hpp>
 #include <aasdk/Channel/MediaBrowser/MediaBrowserService.hpp>
 #include "aasdk/Common/Log.hpp"

@@ -20,10 +20,10 @@
 
 #include <stdint.h>
 
-#include "proto/channel/media/event/Setup.pb.h"
-#include "proto/channel/media/event/Start.pb.h"
-#include "proto/channel/media/event/Stop.pb.h"
-#include "proto/channel/ChannelOpenRequest.pb.h"
+#include <aap_proto/proto/channel/media/event/Setup.pb.h>
+#include <aap_proto/proto/channel/media/event/Start.pb.h>
+#include <aap_proto/proto/channel/media/event/Stop.pb.h>
+#include <aap_proto/proto/channel/ChannelOpenRequest.pb.h>
 #include "aasdk/Messenger/Timestamp.hpp"
 #include "aasdk/Common/Data.hpp"
 #include "aasdk/Error/Error.hpp"

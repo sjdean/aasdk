@@ -16,7 +16,7 @@
 *  along with aasdk. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "proto/service/mediaplayback/MediaPlaybackStatusMessageId.pb.h"
+#include <aap_proto/proto/service/mediaplayback/MediaPlaybackStatusMessageId.pb.h>
 #include "aasdk/Channel/MediaPlaybackStatus/MediaPlaybackStatusService.hpp"
 #include "aasdk/Channel/MediaPlaybackStatus/IMediaPlaybackStatusServiceEventHandler.hpp"
 #include "aasdk/Common/Log.hpp"

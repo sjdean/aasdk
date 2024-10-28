@@ -16,7 +16,7 @@
 *  along with aasdk. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "proto/service/media/shared/enum/MediaMessageId.pb.h"
+#include <aap_proto/proto/service/media/shared/enum/MediaMessageId.pb.h>
 #include <aasdk/channel/mediasink/IMediaSinkServiceEventHandler.hpp>
 #include <aasdk/channel/mediasink/MediaSinkService.hpp>
 #include "aasdk/Common/Log.hpp"

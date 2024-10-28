@@ -16,7 +16,7 @@
 *  along with aasdk. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "proto/service/bluetooth/message/BluetoothMessageId.pb.h"
+#include <aap_proto/proto/service/bluetooth/message/BluetoothMessageId.pb.h>
 #include "aasdk/Channel/Bluetooth/IBluetoothServiceEventHandler.hpp"
 #include "aasdk/Channel/Bluetooth/BluetoothService.hpp"
 #include "aasdk/Common/Log.hpp"

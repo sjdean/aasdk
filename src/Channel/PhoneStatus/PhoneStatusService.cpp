@@ -1,5 +1,5 @@
 
-#include "proto/service/phonestatus/PhoneStatusMessageId.pb.h"
+#include <aap_proto/proto/service/phonestatus/PhoneStatusMessageId.pb.h>
 #include <aasdk/Channel/PhoneStatus/IPhoneStatusServiceEventHandler.hpp>
 #include <aasdk/Channel/PhoneStatus/PhoneStatusService.hpp>
 #include "aasdk/Common/Log.hpp"

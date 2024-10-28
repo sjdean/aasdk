@@ -19,7 +19,7 @@
 #pragma once
 
 #include <memory>
-#include "proto/channel/ChannelOpenResponse.pb.h"
+#include <aap_proto/proto/channel/ChannelOpenResponse.pb.h>
 #include "aasdk/Messenger/ServiceId.hpp"
 #include "aasdk/Channel/Promise.hpp"
 #include "IMediaPlaybackStatusServiceEventHandler.hpp"

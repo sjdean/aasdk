@@ -18,9 +18,9 @@
 
 #pragma once
 
-#include "proto/channel/ChannelOpenRequest.pb.h"
-#include "proto/service/mediaplayback/message/MediaPlaybackMetadata.pb.h"
-#include "proto/service/mediaplayback/message/MediaPlaybackStatus.pb.h"
+#include <aap_proto/proto/channel/ChannelOpenRequest.pb.h>
+#include <aap_proto/proto/service/mediaplayback/message/MediaPlaybackMetadata.pb.h>
+#include <aap_proto/proto/service/mediaplayback/message/MediaPlaybackStatus.pb.h>
 #include "aasdk/Error/Error.hpp"
 
 

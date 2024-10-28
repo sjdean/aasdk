@@ -19,9 +19,9 @@
 #pragma once
 
 #include <memory>
-#include "proto/service/media/sink/message/MediaSinkChannelSetupResponse.pb.h"
-#include "proto/service/media/source/message/MediaSourceMediaAckIndication.pb.h"
-#include "proto/channel/ChannelOpenResponse.pb.h"
+#include <aap_proto/proto/service/media/sink/message/MediaSinkChannelSetupResponse.pb.h>
+#include <aap_proto/proto/service/media/source/message/MediaSourceMediaAckIndication.pb.h>
+#include <aap_proto/proto/channel/ChannelOpenResponse.pb.h>
 #include "aasdk/Messenger/ServiceId.hpp"
 #include "aasdk/Channel/Promise.hpp"
 #include "IMediaSinkServiceEventHandler.hpp"

@@ -21,7 +21,7 @@
 #include <boost/asio.hpp>
 #include "aasdk/Messenger/IMessenger.hpp"
 #include "aasdk/Channel/Promise.hpp"
-#include "proto/channel/control/ControlMessageId.pb.h"
+#include <aap_proto/proto/channel/control/ControlMessageId.pb.h>
 
 namespace aasdk {
   namespace channel {

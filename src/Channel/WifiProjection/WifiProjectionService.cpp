@@ -16,7 +16,7 @@
 *  along with aasdk. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "proto/service/wifiprojection/enum/WifiProjectionMessageId.pb.h"
+#include <aap_proto/proto/service/wifiprojection/enum/WifiProjectionMessageId.pb.h>
 #include <aasdk/Channel/WifiProjection/IWifiProjectionServiceEventHandler.hpp>
 #include <aasdk/Channel/WifiProjection/WifiProjectionService.hpp>
 #include "aasdk/Common/Log.hpp"

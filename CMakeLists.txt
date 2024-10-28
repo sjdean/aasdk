@@ -64,13 +64,14 @@ if(AASDK_TEST)
     include(ExternalGtest)
 endif(AASDK_TEST)
 
-find_package(AAPProto REQUIRED)
+find_package(aap_protobuf REQUIRED)
 find_package(Boost REQUIRED COMPONENTS system log OPTIONAL_COMPONENTS unit_test_framework)
 find_package(libusb-1.0 REQUIRED)
 find_package(Protobuf REQUIRED)
 find_package(OpenSSL REQUIRED)
 
-include_directories(    ${Boost_INCLUDE_DIRS}
+include_directories(
+        ${Boost_INCLUDE_DIRS}
         ${LIBUSB_1_INCLUDE_DIRS}
         ${PROTOBUF_INCLUDE_DIR}
         ${OPENSSL_INCLUDE_DIR}
@@ -90,11 +91,8 @@ add_library(aasdk SHARED
         ${source_files}
         ${include_files})
 
-add_dependencies(aasdk aap_proto_lib)
-target_link_libraries(aasdk PUBLIC AAPProto)
 target_link_libraries(aasdk PUBLIC
-        AAPProto
-        libusb
+        aap_protobuf
         ${Boost_LIBRARIES}
         ${LIBUSB_1_LIBRARIES}
         ${PROTOBUF_LIBRARIES}
@@ -107,23 +105,22 @@ set_target_properties(aasdk
         PROPERTIES VERSION ${LIBRARY_VERSION_STRING} SOVERSION ${LIBRARY_BUILD_INCREMENTAL})
 
 # Install rules
-install(TARGETS aap_protobuf
-        EXPORT aap_protobuf_targets
+install(TARGETS aasdk
+        EXPORT aasdkTargets
         LIBRARY DESTINATION lib
         ARCHIVE DESTINATION lib
         RUNTIME DESTINATION bin
         INCLUDES DESTINATION include
-        COMPONENT libraries
 )
 
 # Install headers explicitly
 install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/aasdk
         DESTINATION include/aasdk
-        COMPONENT headers)
+)
 
 # Export the targets to a script
-install(EXPORT aasdk_targets
-        FILE aasdk_targets.cmake
+install(EXPORT aasdkTargets
+        FILE aasdkTargets.cmake
         NAMESPACE AASDK::
         DESTINATION lib/cmake/aasdk
 )
@@ -131,19 +128,19 @@ install(EXPORT aasdk_targets
 # Create a Config file for FindPackage
 include(CMakePackageConfigHelpers)
 write_basic_package_version_file(
-        "${CMAKE_CURRENT_BINARY_DIR}/aasdk_configversion.cmake"
+        "${CMAKE_CURRENT_BINARY_DIR}/aasdkConfigVersion.cmake"
         VERSION 1.0
         COMPATIBILITY AnyNewerVersion
 )
 
 configure_package_config_file(${CMAKE_CURRENT_SOURCE_DIR}/Config.cmake.in
-        "${CMAKE_CURRENT_BINARY_DIR}/aasdk_config.cmake"
+        "${CMAKE_CURRENT_BINARY_DIR}/aasdkConfig.cmake"
         INSTALL_DESTINATION lib/cmake/aasdk
 )
 
 # Install the config files
-install(FILES "${CMAKE_CURRENT_BINARY_DIR}/aasdk_configversion.cmake"
-        "${CMAKE_CURRENT_BINARY_DIR}/aasdk_config.cmake"
+install(FILES "${CMAKE_CURRENT_BINARY_DIR}/aasdkConfigVersion.cmake"
+        "${CMAKE_CURRENT_BINARY_DIR}/aasdkConfig.cmake"
         DESTINATION lib/cmake/aasdk)
 
 if(AASDK_TEST)
