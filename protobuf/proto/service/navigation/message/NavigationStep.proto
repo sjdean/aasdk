@@ -1,0 +1,15 @@
+syntax="proto2";
+
+import "proto/service/navigation/message/NavigationManeuver.proto";
+import "proto/service/navigation/message/NavigationRoad.proto";
+import "proto/service/navigation/message/NavigationLane.proto";
+import "proto/service/navigation/message/NavigationCue.proto";
+
+package aasdk.proto.service.navigation.message;
+
+message NavigationStep {
+  optional NavigationManeuver maneuver = 1;
+  optional NavigationRoad road = 2;
+  repeated NavigationLane lanes = 3;
+  optional NavigationCue cue = 4;
+}

@@ -1,0 +1,12 @@
+syntax="proto2";
+
+option optimize_for=SPEED;
+
+import "proto/shared/MessageStatus.proto";
+
+package aasdk.proto.service.radio.message;
+
+message SeekStationResponse {
+  optional shared.MessageStatus status = 1;
+  required int32 radio_id = 2;
+}

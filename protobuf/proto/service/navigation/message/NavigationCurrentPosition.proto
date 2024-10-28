@@ -1,0 +1,13 @@
+syntax="proto2";
+
+import "proto/service/navigation/message/NavigationStepDistance.proto";
+import "proto/service/navigation/message/NavigationDestinationDistance.proto";
+import "proto/service/navigation/message/NavigationRoad.proto";
+
+package aasdk.proto.service.navigation.message;
+
+message NavigationCurrentPosition {
+  optional NavigationStepDistance step_distance = 1;
+  repeated NavigationDestinationDistance destination_distances = 2;
+  optional NavigationRoad current_road = 3;
+}

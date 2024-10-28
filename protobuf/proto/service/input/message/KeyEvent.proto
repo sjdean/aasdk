@@ -1,0 +1,9 @@
+syntax="proto2";
+
+import "proto/service/input/message/Key.proto";
+
+package aasdk.proto.service.input.message;
+
+message KeyEvent {
+  repeated message.Key keys = 1;
+}

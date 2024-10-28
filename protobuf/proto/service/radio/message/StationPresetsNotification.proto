@@ -1,0 +1,11 @@
+syntax="proto2";
+
+option optimize_for=SPEED;
+
+import "proto/service/radio/message/StationPresetList.proto";
+
+package aasdk.proto.service.radio.message;
+
+message StationPresetsNotification {
+  repeated StationPresetList preset_lists = 2;
+}

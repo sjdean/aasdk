@@ -1,0 +1,40 @@
+/*
+*  This file is part of aasdk library project.
+*  Copyright (C) 2018 f1x.studio (Michal Szwaj)
+*
+*  aasdk is free software: you can redistribute it and/or modify
+*  it under the terms of the GNU General Public License as published by
+*  the Free Software Foundation; either version 3 of the License, or
+*  (at your option) any later version.
+
+*  aasdk is distributed in the hope that it will be useful,
+*  but WITHOUT ANY WARRANTY; without even the implied warranty of
+*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+*  GNU General Public License for more details.
+*
+*  You should have received a copy of the GNU General Public License
+*  along with aasdk. If not, see <http://www.gnu.org/licenses/>.
+*/
+
+syntax="proto2";
+
+import "proto/service/media/shared/message/MediaCodecType.proto";
+import "proto/service/media/sink/AudioStreamType.proto";
+import "proto/service/media/shared/message/AudioConfiguration.proto";
+import "proto/service/media/shared/message/VideoConfiguration.proto";
+import "proto/service/media/sink/DisplayType.proto";
+import "proto/service/media/sink/KeyCode.proto";
+
+package aasdk.proto.service.media.sink;
+
+message MediaSinkService
+{
+    optional shared.message.MediaCodecType stream_type = 1 [default = MEDIA_CODEC_AUDIO_PCM];;
+    optional AudioStreamType audio_type = 2;
+    repeated shared.message.AudioConfiguration audio_configs = 3;
+    repeated shared.message.VideoConfiguration video_configs = 4;
+    optional bool available_while_in_call = 5;
+    optional uint32 display_id = 6;
+    optional sink.DisplayType display_type = 7;
+    optional sink.KeyCode initial_content_keycode = 8;
+}

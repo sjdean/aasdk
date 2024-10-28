@@ -1,0 +1,7 @@
+syntax="proto2";
+
+package aasdk.proto;
+
+message TestMessage {
+  required string Display = 1;
+}

@@ -1,0 +1,14 @@
+syntax="proto2";
+
+option optimize_for=SPEED;
+
+import "proto/shared/MessageStatus.proto";
+import "proto/service/radio/message/TrafficIncident.proto";
+
+package aasdk.proto.service.radio.message;
+
+message GetTrafficUpdateResponse {
+  required shared.MessageStatus status = 1;
+  required int32 radio_id = 2;
+  repeated TrafficIncident incidents = 3;
+}

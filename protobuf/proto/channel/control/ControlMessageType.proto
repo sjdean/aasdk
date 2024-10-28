@@ -1,0 +1,53 @@
+/*
+*  This file is part of aasdk library project.
+*  Copyright (C) 2018 f1x.studio (Michal Szwaj)
+*
+*  aasdk is free software: you can redistribute it and/or modify
+*  it under the terms of the GNU General Public License as published by
+*  the Free Software Foundation; either version 3 of the License, or
+*  (at your option) any later version.
+
+*  aasdk is distributed in the hope that it will be useful,
+*  but WITHOUT ANY WARRANTY; without even the implied warranty of
+*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+*  GNU General Public License for more details.
+*
+*  You should have received a copy of the GNU General Public License
+*  along with aasdk. If not, see <http://www.gnu.org/licenses/>.
+*/
+
+syntax="proto2";
+
+package aasdk.proto.channel.control;
+
+enum ControlMessageType
+{
+    MESSAGE_VERSION_REQUEST = 1;
+    MESSAGE_VERSION_RESPONSE = 2;
+    MESSAGE_ENCAPSULATED_SSL = 3;
+    MESSAGE_AUTH_COMPLETE = 4;
+    MESSAGE_SERVICE_DISCOVERY_REQUEST = 5;
+    MESSAGE_SERVICE_DISCOVERY_RESPONSE = 6;
+    MESSAGE_CHANNEL_OPEN_REQUEST = 7;
+    MESSAGE_CHANNEL_OPEN_RESPONSE = 8;
+    MESSAGE_CHANNEL_CLOSE_NOTIFICATION = 9;
+    MESSAGE_PING_REQUEST = 11;
+    MESSAGE_PING_RESPONSE = 12;
+    MESSAGE_NAV_FOCUS_REQUEST = 13;
+    MESSAGE_NAV_FOCUS_NOTIFICATION = 14;
+    MESSAGE_BYEBYE_REQUEST = 15;
+    MESSAGE_BYEBYE_RESPONSE = 16;
+    MESSAGE_VOICE_SESSION_NOTIFICATION = 17;
+    MESSAGE_AUDIO_FOCUS_REQUEST = 18;
+    MESSAGE_AUDIO_FOCUS_NOTIFICATION = 19;
+    MESSAGE_CAR_CONNECTED_DEVICES_REQUEST = 20;
+    MESSAGE_CAR_CONNECTED_DEVICES_RESPONSE = 21;
+    MESSAGE_USER_SWITCH_REQUEST = 22;
+    MESSAGE_BATTERY_STATUS_NOTIFICATION = 23;
+    MESSAGE_CALL_AVAILABILITY_STATUS = 24;
+    MESSAGE_USER_SWITCH_RESPONSE = 25;
+    MESSAGE_SERVICE_DISCOVERY_UPDATE = 26;
+    MESSAGE_UNEXPECTED_MESSAGE = 255;
+    MESSAGE_FRAMING_ERROR = 65535;
+}
+

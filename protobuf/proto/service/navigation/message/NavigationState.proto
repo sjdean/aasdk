@@ -1,0 +1,11 @@
+syntax="proto2";
+
+import "proto/service/navigation/message/NavigationStep.proto";
+import "proto/service/navigation/message/NavigationDestination.proto";
+
+package aasdk.proto.service.navigation.message;
+
+message NavigationState {
+  repeated NavigationStep steps = 1;
+  repeated NavigationDestination destinations = 2;
+}

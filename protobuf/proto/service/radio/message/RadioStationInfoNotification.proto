@@ -1,0 +1,13 @@
+syntax="proto2";
+
+option optimize_for=SPEED;
+
+import "proto/service/radio/message/RadioStationInfo.proto";
+
+package aasdk.proto.service.radio.message;
+
+message RadioStationInfoNotification {
+  required int32 radio_id = 1;
+  required RadioStationInfo station_info = 2;
+}
+
