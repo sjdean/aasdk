@@ -37,7 +37,7 @@ namespace aasdk::channel::mediaplaybackstatus {
     void receive(IMediaPlaybackStatusServiceEventHandler::Pointer eventHandler) override;
 
     void
-    sendChannelOpenResponse(const proto::channel::ChannelOpenResponse &response, SendPromise::Pointer promise) override;
+    sendChannelOpenResponse(const aap_protobuf::channel::ChannelOpenResponse &response, SendPromise::Pointer promise) override;
 
   private:
     using std::enable_shared_from_this<MediaPlaybackStatusService>::shared_from_this;

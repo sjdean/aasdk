@@ -18,16 +18,16 @@
 
 #pragma once
 
-#include <proto/channel/control/byebye/event/ByeByeRequest.pb.h>
-#include <proto/channel/control/byebye/notification//ByeByeResponse.pb.h>
-#include <proto/channel/control/auth/AuthResponse.pb.h>
-#include <proto/channel/control/servicediscovery/notification/ServiceDiscoveryResponse.pb.h>
-#include <proto/channel/control/focus/audio/notification/AudioFocusNotification.pb.h>
-#include <proto/channel/control/focus/navigation/notification/NavigationFocusNotification.pb.h>
-#include <proto/shared/MessageStatus.pb.h>
-#include <proto/channel/control/ping/PingRequest.pb.h>
-#include <proto/channel/control/ping/PingResponse.pb.h>
-#include <proto/channel/control/voice/VoiceSessionNotification.pb.h>
+#include <aap_protobuf/channel/control/byebye/event/ByeByeRequest.pb.h>
+#include <aap_protobuf/channel/control/byebye/notification/ByeByeResponse.pb.h>
+#include <aap_protobuf/channel/control/auth/AuthResponse.pb.h>
+#include <aap_protobuf/channel/control/servicediscovery/notification/ServiceDiscoveryResponse.pb.h>
+#include <aap_protobuf/channel/control/focus/audio/notification/AudioFocusNotification.pb.h>
+#include <aap_protobuf/channel/control/focus/navigation/notification/NavFocusNotification.pb.h>
+#include <aap_protobuf/shared/MessageStatus.pb.h>
+#include <aap_protobuf/channel/control/ping/PingRequest.pb.h>
+#include <aap_protobuf/channel/control/ping/PingResponse.pb.h>
+#include <aap_protobuf/channel/control/voice/VoiceSessionNotification.pb.h>
 #include <aasdk/Common/Data.hpp>
 #include <aasdk/Channel/Promise.hpp>
 #include <aasdk/Channel/Control/IControlServiceChannelEventHandler.hpp>
@@ -49,38 +49,38 @@ namespace aasdk::channel::control {
 
     virtual void sendHandshake(common::Data handshakeBuffer, SendPromise::Pointer promise) = 0;
 
-    virtual void sendAuthComplete(const proto::channel::control::auth::AuthResponse &response,
+    virtual void sendAuthComplete(const aap_protobuf::channel::control::auth::AuthResponse &response,
                                   SendPromise::Pointer promise) = 0;
 
     virtual void sendServiceDiscoveryResponse(
-        const proto::channel::control::servicediscovery::notification::ServiceDiscoveryResponse &response,
+        const aap_protobuf::channel::control::servicediscovery::notification::ServiceDiscoveryResponse &response,
         SendPromise::Pointer promise) = 0;
 
     virtual void
-    sendAudioFocusResponse(const proto::channel::control::focus::audio::notification::AudioFocusNotification &response,
+    sendAudioFocusResponse(const aap_protobuf::channel::control::focus::audio::notification::AudioFocusNotification &response,
                            SendPromise::Pointer promise) = 0;
 
     virtual void
-    sendShutdownRequest(const proto::channel::control::byebye::event::ByeByeRequest &request,
+    sendShutdownRequest(const aap_protobuf::channel::control::byebye::event::ByeByeRequest &request,
                         SendPromise::Pointer promise) = 0;
 
-    virtual void sendShutdownResponse(const proto::channel::control::byebye::notification::ByeByeResponse &response,
+    virtual void sendShutdownResponse(const aap_protobuf::channel::control::byebye::notification::ByeByeResponse &response,
                                       SendPromise::Pointer promise) = 0;
 
     virtual void
     sendNavigationFocusResponse(
-        const proto::channel::control::focus::navigation::notification::NavigationFocusNotification &response,
+        const aap_protobuf::channel::control::focus::navigation::notification::NavFocusNotification &response,
         SendPromise::Pointer promise) = 0;
 
     virtual void
-    sendVoiceSessionFocusResponse(const proto::channel::control::version::VoiceSessionNotification &response,
+    sendVoiceSessionFocusResponse(const aap_protobuf::channel::control::version::VoiceSessionNotification &response,
                                   SendPromise::Pointer promise) = 0;
 
     virtual void
-    sendPingRequest(const proto::channel::control::ping::PingRequest &request, SendPromise::Pointer promise) = 0;
+    sendPingRequest(const aap_protobuf::channel::control::ping::PingRequest &request, SendPromise::Pointer promise) = 0;
 
     virtual void
-    sendPingResponse(const proto::channel::control::ping::PingResponse &response, SendPromise::Pointer promise) = 0;
+    sendPingResponse(const aap_protobuf::channel::control::ping::PingResponse &response, SendPromise::Pointer promise) = 0;
   };
 }
 

@@ -64,7 +64,7 @@ if(AASDK_TEST)
     include(ExternalGtest)
 endif(AASDK_TEST)
 
-find_package(aap_protobuf REQUIRED)
+find_package(protobuf/aap_protobuf REQUIRED)
 find_package(Boost REQUIRED COMPONENTS system log OPTIONAL_COMPONENTS unit_test_framework)
 find_package(libusb-1.0 REQUIRED)
 find_package(Protobuf REQUIRED)
@@ -91,6 +91,8 @@ add_library(aasdk SHARED
         ${source_files}
         ${include_files})
 
+target_include_directories(aasdk PRIVATE ${AAP_PROTOBUF_INCLUDE_DIRS})
+
 target_link_libraries(aasdk PUBLIC
         aap_protobuf
         ${Boost_LIBRARIES}
@@ -113,9 +115,15 @@ install(TARGETS aasdk
         INCLUDES DESTINATION include
 )
 
+#target_include_directories(aap_protobuf
+#        PUBLIC
+#        $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
+#        $<INSTALL_INTERFACE:include/aap_protobuf>
+#)
+
 # Install headers explicitly
-install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/aasdk
-        DESTINATION include/aasdk
+install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/aasdk
+        DESTINATION include
 )
 
 # Export the targets to a script

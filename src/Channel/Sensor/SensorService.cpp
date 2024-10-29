@@ -16,7 +16,7 @@
 *  along with aasdk. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <aap_proto/proto/service/sensor/SensorChannelMessageId.pb.h>
+#include <aap_protobuf/service/sensor/SensorChannelMessageId.pb.h>
 #include <aasdk/Channel/Sensor/ISensorServiceEventHandler.hpp>
 #include <aasdk/Channel/Sensor/SensorService.hpp>
 #include "aasdk/Common/Log.hpp"
@@ -38,12 +38,12 @@ namespace aasdk::channel::sensor {
     messenger_->enqueueReceive(channelId_, std::move(receivePromise));
   }
 
-  void SensorService::sendChannelOpenResponse(const proto::channel::ChannelOpenResponse &response,
+  void SensorService::sendChannelOpenResponse(const aap_protobuf::channel::ChannelOpenResponse &response,
                                               SendPromise::Pointer promise) {
     auto message(std::make_shared<messenger::Message>(channelId_, messenger::EncryptionType::ENCRYPTED,
                                                       messenger::MessageType::CONTROL));
     message->insertPayload(
-        messenger::MessageId(proto::channel::control::ControlMessageType::MESSAGE_CHANNEL_OPEN_RESPONSE).getData());
+        messenger::MessageId(aap_protobuf::channel::control::ControlMessageType::MESSAGE_CHANNEL_OPEN_RESPONSE).getData());
     message->insertPayload(response);
 
     this->send(std::move(message), std::move(promise));
@@ -55,10 +55,10 @@ namespace aasdk::channel::sensor {
     common::DataConstBuffer payload(message->getPayload(), messageId.getSizeOf());
 
     switch (messageId.getId()) {
-      case proto::service::sensor::SensorChannelMessageId::SENSOR_MESSAGE_REQUEST:
+      case aap_protobuf::service::sensor::SensorChannelMessageId::SENSOR_MESSAGE_REQUEST:
         this->handleSensorStartRequest(payload, std::move(eventHandler));
         break;
-      case proto::channel::control::ControlMessageType::MESSAGE_CHANNEL_OPEN_REQUEST:
+      case aap_protobuf::channel::control::ControlMessageType::MESSAGE_CHANNEL_OPEN_REQUEST:
         this->handleChannelOpenRequest(payload, std::move(eventHandler));
         break;
       default:
@@ -69,24 +69,24 @@ namespace aasdk::channel::sensor {
   }
 
   void
-  SensorService::sendSensorEventIndication(const proto::service::sensor::message::SensorBatch &indication,
+  SensorService::sendSensorEventIndication(const aap_protobuf::service::sensor::message::SensorBatch &indication,
                                            SendPromise::Pointer promise) {
     auto message(std::make_shared<messenger::Message>(channelId_, messenger::EncryptionType::ENCRYPTED,
                                                       messenger::MessageType::SPECIFIC));
     message->insertPayload(
-        messenger::MessageId(proto::service::sensor::SensorChannelMessageId::SENSOR_MESSAGE_BATCH).getData());
+        messenger::MessageId(aap_protobuf::service::sensor::SensorChannelMessageId::SENSOR_MESSAGE_BATCH).getData());
     message->insertPayload(indication);
 
     this->send(std::move(message), std::move(promise));
   }
 
   void
-  SensorService::sendSensorStartResponse(const proto::service::sensor::message::SensorStartResponseMessage &response,
+  SensorService::sendSensorStartResponse(const aap_protobuf::service::sensor::message::SensorStartResponseMessage &response,
                                          SendPromise::Pointer promise) {
     auto message(std::make_shared<messenger::Message>(channelId_, messenger::EncryptionType::ENCRYPTED,
                                                       messenger::MessageType::SPECIFIC));
     message->insertPayload(
-        messenger::MessageId(proto::service::sensor::SensorChannelMessageId::SENSOR_MESSAGE_RESPONSE).getData());
+        messenger::MessageId(aap_protobuf::service::sensor::SensorChannelMessageId::SENSOR_MESSAGE_RESPONSE).getData());
     message->insertPayload(response);
 
     this->send(std::move(message), std::move(promise));
@@ -94,7 +94,7 @@ namespace aasdk::channel::sensor {
 
   void SensorService::handleSensorStartRequest(const common::DataConstBuffer &payload,
                                                ISensorServiceEventHandler::Pointer eventHandler) {
-    proto::channel::sensor::event::SensorRequest request;
+    aap_protobuf::channel::sensor::event::SensorRequest request;
     if (request.ParseFromArray(payload.cdata, payload.size)) {
       eventHandler->onSensorStartRequest(request);
     } else {
@@ -104,7 +104,7 @@ namespace aasdk::channel::sensor {
 
   void SensorService::handleChannelOpenRequest(const common::DataConstBuffer &payload,
                                                ISensorServiceEventHandler::Pointer eventHandler) {
-    proto::channel::ChannelOpenRequest request;
+    aap_protobuf::channel::ChannelOpenRequest request;
     if (request.ParseFromArray(payload.cdata, payload.size)) {
       eventHandler->onChannelOpenRequest(request);
     } else {

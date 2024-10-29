@@ -18,8 +18,8 @@
 
 #pragma once
 
-#include <proto/channel/sensor/event/SensorRequest.pb.h>
-#include <proto/channel/ChannelOpenRequest.pb.h>
+#include <aap_protobuf/channel/sensor/event/SensorRequest.pb.h>
+#include <aap_protobuf/channel/ChannelOpenRequest.pb.h>
 #include "aasdk/Error/Error.hpp"
 
 namespace aasdk::channel::sensor {
@@ -32,9 +32,9 @@ namespace aasdk::channel::sensor {
 
     virtual ~ISensorServiceEventHandler() = default;
 
-    virtual void onChannelOpenRequest(const proto::channel::ChannelOpenRequest &request) = 0;
+    virtual void onChannelOpenRequest(const aap_protobuf::channel::ChannelOpenRequest &request) = 0;
 
-    virtual void onSensorStartRequest(const proto::channel::sensor::event::SensorRequest &request) = 0;
+    virtual void onSensorStartRequest(const aap_protobuf::channel::sensor::event::SensorRequest &request) = 0;
 
     virtual void onChannelError(const error::Error &e) = 0;
   };

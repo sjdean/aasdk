@@ -18,10 +18,10 @@
 
 #pragma once
 
-#include <proto/channel/media/event/Setup.pb.h>
-#include <proto/service/media/source/message/MediaSourceMediaAckIndication.pb.h>
-#include <proto/service/media/source/message/MicrophoneRequest.pb.h>
-#include <proto/channel/ChannelOpenRequest.pb.h>
+#include <aap_protobuf/channel/media/event/Setup.pb.h>
+#include <aap_protobuf/service/media/source/message/MediaSourceMediaAckIndication.pb.h>
+#include <aap_protobuf/service/media/source/message/MicrophoneRequest.pb.h>
+#include <aap_protobuf/channel/ChannelOpenRequest.pb.h>
 #include "aasdk/Error/Error.hpp"
 
 
@@ -35,15 +35,15 @@ namespace aasdk::channel::mediasource {
 
     virtual ~IMediaSourceServiceEventHandler() = default;
 
-    virtual void onChannelOpenRequest(const proto::channel::ChannelOpenRequest &request) = 0;
+    virtual void onChannelOpenRequest(const aap_protobuf::channel::ChannelOpenRequest &request) = 0;
 
-    virtual void onAVChannelSetupRequest(const proto::channel::media::event::Setup &request) = 0;
-
-    virtual void
-    onAVInputOpenRequest(const proto::service::media::source::message::MicrophoneRequest &request) = 0;
+    virtual void onAVChannelSetupRequest(const aap_protobuf::channel::media::event::Setup &request) = 0;
 
     virtual void
-    onAVMediaAckIndication(const proto::service::media::source::message::MediaSourceMediaAckIndication &indication) = 0;
+    onAVInputOpenRequest(const aap_protobuf::service::media::source::message::MicrophoneRequest &request) = 0;
+
+    virtual void
+    onAVMediaAckIndication(const aap_protobuf::service::media::source::message::MediaSourceMediaAckIndication &indication) = 0;
 
     virtual void onChannelError(const error::Error &e) = 0;
   };

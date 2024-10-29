@@ -37,10 +37,10 @@ namespace aasdk::channel::mediasource {
     void receive(IMediaSourceServiceEventHandler::Pointer eventHandler) override;
 
     void
-    sendChannelOpenResponse(const proto::channel::ChannelOpenResponse &response, SendPromise::Pointer promise) override;
+    sendChannelOpenResponse(const aap_protobuf::channel::ChannelOpenResponse &response, SendPromise::Pointer promise) override;
 
 
-    void sendAVInputOpenResponse(const proto::service::media::source::message::MicrophoneResponse &response,
+    void sendAVInputOpenResponse(const aap_protobuf::service::media::source::message::MicrophoneResponse &response,
                                  SendPromise::Pointer promise) override;
 
     void sendAVMediaWithTimestampIndication(messenger::Timestamp::ValueType, const common::Data &data,

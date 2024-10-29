@@ -36,7 +36,7 @@ void ChannelReceiveMessageQueue::push(Message::Pointer message)
     channelQueue.emplace(std::move(message));
 }
 
-Message::Pointer ChannelReceiveMessageQueue::pop(ServiceChannelId channelId)
+Message::Pointer ChannelReceiveMessageQueue::pop(ChannelId channelId)
 {
     auto& channelQueue = queue_.at(channelId);
     auto message(std::move(channelQueue.front()));
@@ -50,7 +50,7 @@ Message::Pointer ChannelReceiveMessageQueue::pop(ServiceChannelId channelId)
     return message;
 }
 
-bool ChannelReceiveMessageQueue::empty(ServiceChannelId channelId) const
+bool ChannelReceiveMessageQueue::empty(ChannelId channelId) const
 {
     return queue_.count(channelId) == 0;
 }

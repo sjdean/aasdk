@@ -35,7 +35,7 @@ namespace aasdk::channel::navigationstatus {
     void receive(INavigationStatusServiceEventHandler::Pointer eventHandler) override;
 
     void
-    sendChannelOpenResponse(const proto::channel::ChannelOpenResponse &response, SendPromise::Pointer promise) override;
+    sendChannelOpenResponse(const aap_protobuf::channel::ChannelOpenResponse &response, SendPromise::Pointer promise) override;
 
   private:
     using std::enable_shared_from_this<NavigationStatusService>::shared_from_this;

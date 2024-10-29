@@ -1,0 +1,11 @@
+syntax="proto2";
+
+import "aap_protobuf/service/navigation/message/NavigationStepDistance.proto";
+import "aap_protobuf/service/navigation/message/NavigationDestinationDistance.proto";
+import "aap_protobuf/service/navigation/message/NavigationRoad.proto";
+
+package aap_protobuf.service.navigation.message;
+
+message NavigationCue {
+  repeated string alternate_text = 1;
+}

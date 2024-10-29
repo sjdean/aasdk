@@ -1,9 +1,0 @@
-syntax="proto2";
-
-package aasdk.proto.service.input.message;
-
-enum TouchScreenType {
-    CAPACITIVE = 1;
-    RESISTIVE = 2;
-    INFRARED = 3;
-}

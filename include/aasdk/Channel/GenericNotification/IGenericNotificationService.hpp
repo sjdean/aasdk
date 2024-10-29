@@ -1,8 +1,8 @@
 #pragma once
 
 #include <memory>
-#include <proto/channel/ChannelOpenResponse.pb.h>
-#include <proto/service/wifiprojection/message/WifiCredentialsResponse.pb.h>
+#include <aap_protobuf/channel/ChannelOpenResponse.pb.h>
+#include <aap_protobuf/service/wifiprojection/message/WifiCredentialsResponse.pb.h>
 #include "aasdk/Messenger/ServiceId.hpp"
 #include "aasdk/Channel/Promise.hpp"
 #include "IGenericNotificationServiceEventHandler.hpp"
@@ -20,7 +20,7 @@ namespace aasdk::channel::genericnotification {
     virtual void receive(IGenericNotificationServiceEventHandler::Pointer eventHandler) = 0;
 
     virtual void
-    sendChannelOpenResponse(const proto::channel::ChannelOpenResponse &response, SendPromise::Pointer promise) = 0;
+    sendChannelOpenResponse(const aap_protobuf::channel::ChannelOpenResponse &response, SendPromise::Pointer promise) = 0;
 
   };
 }

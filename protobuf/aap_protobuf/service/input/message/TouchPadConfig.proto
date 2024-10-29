@@ -1,0 +1,14 @@
+syntax="proto2";
+
+package aap_protobuf.service.input.message;
+
+message TouchPadConfig {
+    required int32 width = 1;
+    required int32 height = 2;
+    optional bool ui_navigation = 3;
+    optional int32 physical_width = 4;
+    optional int32 physical_height = 5;
+    optional bool ui_absolute = 6;
+    optional bool tap_as_select = 7;
+    optional int32 sensitivity = 8;
+}

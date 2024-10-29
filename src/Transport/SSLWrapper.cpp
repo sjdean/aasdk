@@ -17,10 +17,12 @@
 */
 
 #include <string>
+#include <openssl/bio.h>
 #include <openssl/engine.h>
 #include <openssl/err.h>
 #include <openssl/ssl.h>
 #include <openssl/conf.h>
+#include <openssl/crypto.h>
 #include <aasdk/Transport/SSLWrapper.hpp>
 #include <aasdk/Common/Log.hpp>
 
@@ -33,13 +35,11 @@ SSLWrapper::SSLWrapper()
 {
     SSL_library_init();
     SSL_load_error_strings();
-    ERR_load_BIO_strings();
     OpenSSL_add_all_algorithms();
 }
 
 SSLWrapper::~SSLWrapper()
 {
-    FIPS_mode_set(0);
     ENGINE_cleanup();
     CONF_modules_unload(1);
     EVP_cleanup();
@@ -49,7 +49,6 @@ SSLWrapper::~SSLWrapper()
 #endif
     ERR_free_strings();
     ERR_load_crypto_strings();
-    ERR_load_ERR_strings();
 }
 
 X509* SSLWrapper::readCertificate(const std::string& certificate)

@@ -19,10 +19,10 @@
 #pragma once
 
 #include <memory>
-#include "aasdk/Messenger/ServiceId.hpp"
+#include "aasdk/Messenger/ChannelId.hpp"
 #include "aasdk/Channel/Promise.hpp"
-#include <proto/channel/ChannelOpenResponse.pb.h>
-#include <proto/service/wifiprojection/message/WifiCredentialsResponse.pb.h>
+#include <aap_protobuf/channel/ChannelOpenResponse.pb.h>
+#include <aap_protobuf/service/wifiprojection/message/WifiCredentialsResponse.pb.h>
 #include "IWifiProjectionServiceEventHandler.hpp"
 
 namespace aasdk::channel::wifiprojection {
@@ -38,9 +38,9 @@ namespace aasdk::channel::wifiprojection {
     virtual void receive(IWifiProjectionServiceEventHandler::Pointer eventHandler) = 0;
 
     virtual void
-    sendChannelOpenResponse(const proto::channel::ChannelOpenResponse &response, SendPromise::Pointer promise) = 0;
+    sendChannelOpenResponse(const aap_protobuf::channel::ChannelOpenResponse &response, SendPromise::Pointer promise) = 0;
 
-    virtual void sendWifiCredentialsResponse(const proto::service::wifiprojection::message::WifiCredentialsResponse &response,
+    virtual void sendWifiCredentialsResponse(const aap_protobuf::service::wifiprojection::message::WifiCredentialsResponse &response,
                                              SendPromise::Pointer promise) = 0;
 
   };

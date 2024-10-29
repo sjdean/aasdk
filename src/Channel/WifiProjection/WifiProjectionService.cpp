@@ -16,7 +16,7 @@
 *  along with aasdk. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <aap_proto/proto/service/wifiprojection/enum/WifiProjectionMessageId.pb.h>
+#include <aap_protobuf/service/wifiprojection/WifiProjectionMessageId.pb.h>
 #include <aasdk/Channel/WifiProjection/IWifiProjectionServiceEventHandler.hpp>
 #include <aasdk/Channel/WifiProjection/WifiProjectionService.hpp>
 #include "aasdk/Common/Log.hpp"
@@ -42,23 +42,23 @@ namespace aasdk::channel::wifiprojection {
     messenger_->enqueueReceive(channelId_, std::move(receivePromise));
   }
 
-  void WifiProjectionService::sendChannelOpenResponse(const proto::channel::ChannelOpenResponse &response,
+  void WifiProjectionService::sendChannelOpenResponse(const aap_protobuf::channel::ChannelOpenResponse &response,
                                                       SendPromise::Pointer promise) {
     auto message(std::make_shared<messenger::Message>(channelId_, messenger::EncryptionType::ENCRYPTED,
                                                       messenger::MessageType::CONTROL));
     message->insertPayload(
-        messenger::MessageId(proto::channel::control::ControlMessageType::MESSAGE_CHANNEL_OPEN_RESPONSE).getData());
+        messenger::MessageId(aap_protobuf::channel::control::ControlMessageType::MESSAGE_CHANNEL_OPEN_RESPONSE).getData());
     message->insertPayload(response);
 
     this->send(std::move(message), std::move(promise));
   }
 
   void WifiProjectionService::sendWifiCredentialsResponse(
-      const proto::service::wifi::message::WifiCredentialsResponse &response, SendPromise::Pointer promise) {
+      const aap_protobuf::service::wifiprojection::message::WifiCredentialsResponse &response, SendPromise::Pointer promise) {
     auto message(std::make_shared<messenger::Message>(channelId_, messenger::EncryptionType::ENCRYPTED,
                                                       messenger::MessageType::SPECIFIC));
     message->insertPayload(messenger::MessageId(
-        proto::service::wifi::enum_::WifiProjectionMessageId::WIFI_MESSAGE_CREDENTIALS_RESPONSE).getData());
+        aap_protobuf::service::wifiprojection::WifiProjectionMessageId::WIFI_MESSAGE_CREDENTIALS_RESPONSE).getData());
     message->insertPayload(response);
 
     this->send(std::move(message), std::move(promise));
@@ -72,10 +72,10 @@ namespace aasdk::channel::wifiprojection {
     AASDK_LOG(debug) << "[WifiProjectionService] Processing Message";
 
     switch (messageId.getId()) {
-      case proto::channel::control::ControlMessageType::MESSAGE_CHANNEL_OPEN_REQUEST:
+      case aap_protobuf::channel::control::ControlMessageType::MESSAGE_CHANNEL_OPEN_REQUEST:
         this->handleChannelOpenRequest(payload, std::move(eventHandler));
         break;
-      case proto::service::wifi::enum_::WifiProjectionMessageId::WIFI_MESSAGE_CREDENTIALS_REQUEST:
+      case aap_protobuf::service::wifiprojection::WifiProjectionMessageId::WIFI_MESSAGE_CREDENTIALS_REQUEST:
         this->handleWifiCredentialsRequest(payload, std::move(eventHandler));
         break;
       default:
@@ -88,7 +88,7 @@ namespace aasdk::channel::wifiprojection {
   void WifiProjectionService::handleChannelOpenRequest(const common::DataConstBuffer &payload,
                                                        IWifiProjectionServiceEventHandler::Pointer eventHandler) {
     AASDK_LOG(debug) << "[WifiProjectionService] Handling Channel Open";
-    proto::channel::ChannelOpenRequest request;
+    aap_protobuf::channel::ChannelOpenRequest request;
     if (request.ParseFromArray(payload.cdata, payload.size)) {
       eventHandler->onChannelOpenRequest(request);
     } else {
@@ -98,7 +98,7 @@ namespace aasdk::channel::wifiprojection {
 
   void WifiProjectionService::handleWifiCredentialsRequest(const common::DataConstBuffer &payload,
                                                            IWifiProjectionServiceEventHandler::Pointer eventHandler) {
-    proto::service::wifi::message::WifiCredentialsRequest request;
+    aap_protobuf::service::wifiprojection::message::WifiCredentialsRequest request;
     if (request.ParseFromArray(payload.cdata, payload.size)) {
       eventHandler->onWifiCredentialsRequest(request);
     } else {

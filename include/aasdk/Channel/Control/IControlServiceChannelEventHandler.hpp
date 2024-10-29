@@ -20,13 +20,13 @@
 
 #include <aasdk/Error/Error.hpp>
 #include <aasdk/Common/Data.hpp>
-#include <proto/channel/control/byebye/notification/ByeByeResponse.pb.h>
-#include <proto/channel/control/servicediscovery/event/ServiceDiscoveryRequest.pb.h>
-#include <proto/channel/control/focus/audio/event/AudioFocusRequest.pb.h>
-#include <proto/channel/control/focus/navigation/event/NavigationFocusRequest.pb.h>
-#include <proto/channel/control/ping/PingRequest.pb.h>
-#include <proto/channel/control/ping/PingResponse.pb.h>
-#include <proto/channel/control/voice/VoiceSessionNotification.pb.h>
+#include <aap_protobuf/channel/control/byebye/notification/ByeByeResponse.pb.h>
+#include <aap_protobuf/channel/control/servicediscovery/event/ServiceDiscoveryRequest.pb.h>
+#include <aap_protobuf/channel/control/focus/audio/event/AudioFocusRequest.pb.h>
+#include <aap_protobuf/channel/control/focus/navigation/event/NavFocusRequestNotification.pb.h>
+#include <aap_protobuf/channel/control/ping/PingRequest.pb.h>
+#include <aap_protobuf/channel/control/ping/PingResponse.pb.h>
+#include <aap_protobuf/channel/control/voice/VoiceSessionNotification.pb.h>
 
 
 
@@ -41,28 +41,28 @@
         virtual ~IControlServiceChannelEventHandler() = default;
 
         virtual void onVersionResponse(uint16_t majorCode, uint16_t minorCode,
-                                       proto::shared::MessageStatus status) = 0;
+                                       aap_protobuf::shared::MessageStatus status) = 0;
 
         virtual void onHandshake(const common::DataConstBuffer &payload) = 0;
 
-        virtual void onServiceDiscoveryRequest(const proto::channel::control::servicediscovery::event::ServiceDiscoveryRequest &request) = 0;
+        virtual void onServiceDiscoveryRequest(const aap_protobuf::channel::control::servicediscovery::event::ServiceDiscoveryRequest &request) = 0;
 
-        virtual void onAudioFocusRequest(const proto::channel::control::focus::audio::event::AudioFocusRequest &request) = 0;
+        virtual void onAudioFocusRequest(const aap_protobuf::channel::control::focus::audio::event::AudioFocusRequest &request) = 0;
 
-        virtual void onByeByeRequest(const proto::channel::control::byebye::event::ByeByeRequest &request) = 0;
+        virtual void onByeByeRequest(const aap_protobuf::channel::control::byebye::event::ByeByeRequest &request) = 0;
 
-        virtual void onByeByeResponse(const proto::channel::control::byebye::notification::ByeByeResponse &response) = 0;
+        virtual void onByeByeResponse(const aap_protobuf::channel::control::byebye::notification::ByeByeResponse &response) = 0;
 
         virtual void
-        onNavigationFocusRequest(const proto::channel::control::focus::navigation::event::NavigationFocusRequest &request) = 0;
+        onNavigationFocusRequest(const aap_protobuf::channel::control::focus::navigation::event::NavFocusRequestNotification &request) = 0;
 
-        virtual void onPingRequest(const proto::channel::control::ping::PingRequest &request) = 0;
+        virtual void onPingRequest(const aap_protobuf::channel::control::ping::PingRequest &request) = 0;
 
-        virtual void onPingResponse(const proto::channel::control::ping::PingResponse &response) = 0;
+        virtual void onPingResponse(const aap_protobuf::channel::control::ping::PingResponse &response) = 0;
 
         virtual void onChannelError(const error::Error &e) = 0;
 
-        virtual void onVoiceSessionRequest(const proto::channel::control::version::VoiceSessionNotification &request) = 0;
+        virtual void onVoiceSessionRequest(const aap_protobuf::channel::control::version::VoiceSessionNotification &request) = 0;
       };
     }
 

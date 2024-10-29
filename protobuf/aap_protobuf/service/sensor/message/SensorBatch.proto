@@ -1,0 +1,70 @@
+/*
+*  This file is part of aasdk library project.
+*  Copyright (C) 2018 f1x.studio (Michal Szwaj)
+*
+*  aasdk is free software: you can redistribute it and/or modify
+*  it under the terms of the GNU General Public License as published by
+*  the Free Software Foundation; either version 3 of the License, or
+*  (at your option) any later version.
+
+*  aasdk is distributed in the hope that it will be useful,
+*  but WITHOUT ANY WARRANTY; without even the implied warranty of
+*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+*  GNU General Public License for more details.
+*
+*  You should have received a copy of the GNU General Public License
+*  along with aasdk. If not, see <http://www.gnu.org/licenses/>.
+*/
+
+syntax="proto2";
+
+import "aap_protobuf/service/sensor/message/LocationData.proto";
+import "aap_protobuf/service/sensor/message/CompassData.proto";
+import "aap_protobuf/service/sensor/message/SpeedData.proto";
+import "aap_protobuf/service/sensor/message/RPMData.proto";
+import "aap_protobuf/service/sensor/message/OdometerData.proto";
+import "aap_protobuf/service/sensor/message/FuelLevelData.proto";
+import "aap_protobuf/service/sensor/message/ParkingBrakeData.proto";
+import "aap_protobuf/service/sensor/message/GearData.proto";
+import "aap_protobuf/service/sensor/message/DiagnosticsData.proto";
+import "aap_protobuf/service/sensor/message/NightModeData.proto";
+import "aap_protobuf/service/sensor/message/EnvironmentData.proto";
+import "aap_protobuf/service/sensor/message/HVACData.proto";
+import "aap_protobuf/service/sensor/message/DrivingStatusData.proto";
+import "aap_protobuf/service/sensor/message/DeadReckoningData.proto";
+import "aap_protobuf/service/sensor/message/PassengerData.proto";
+import "aap_protobuf/service/sensor/message/DoorData.proto";
+import "aap_protobuf/service/sensor/message/LightData.proto";
+import "aap_protobuf/service/sensor/message/AccelerometerData.proto";
+import "aap_protobuf/service/sensor/message/GyroscopeData.proto";
+import "aap_protobuf/service/sensor/message/TirePressureData.proto";
+import "aap_protobuf/service/sensor/message/TollCardData.proto";
+import "aap_protobuf/service/sensor/message/GpsSatellite.proto";
+
+
+package aap_protobuf.service.sensor.message;
+
+message SensorBatch {
+    repeated LocationData location_data = 1;
+    repeated CompassData compass_data = 2;
+    repeated SpeedData speed_data = 3;
+    repeated RPMData rpm_data = 4;
+    repeated OdometerData odometer_data = 5;
+    repeated FuelLevelData fuel_data = 6;
+    repeated ParkingBrakeData parking_brake_data = 7;
+    repeated GearData gear_data = 8;
+    repeated DiagnosticsData diagnostics_data = 9;
+    repeated NightModeData night_mode_data = 10;
+    repeated EnvironmentData environment_data = 11;
+    repeated HVACData hvac_data = 12;
+    repeated DrivingStatusData driving_status_data = 13;
+    repeated DeadReckoningData dead_reckoning_data = 14;
+    repeated PassengerData passenger_data = 15;
+    repeated DoorData door_data = 16;
+    repeated LightData light_data = 17;
+    repeated TirePressureData tire_pressure_data = 18;
+    repeated AccelerometerData accelerometer_data = 19;
+    repeated GyroscopeData gyroscope_data = 20;
+    repeated GpsSatelliteData gps_satellite_data = 21;
+    repeated TollCardData toll_card_data = 22;
+}

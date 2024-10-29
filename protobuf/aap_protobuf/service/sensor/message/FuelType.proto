@@ -1,0 +1,37 @@
+/*
+*  This file is part of aasdk library project.
+*  Copyright (C) 2018 f1x.studio (Michal Szwaj)
+*
+*  aasdk is free software: you can redistribute it and/or modify
+*  it under the terms of the GNU General Public License as published by
+*  the Free Software Foundation; either version 3 of the License, or
+*  (at your option) any later version.
+
+*  aasdk is distributed in the hope that it will be useful,
+*  but WITHOUT ANY WARRANTY; without even the implied warranty of
+*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+*  GNU General Public License for more details.
+*
+*  You should have received a copy of the GNU General Public License
+*  along with aasdk. If not, see <http://www.gnu.org/licenses/>.
+*/
+
+syntax="proto2";
+
+package aap_protobuf.service.sensor.message;
+
+enum FuelType {
+  FUEL_TYPE_UNKNOWN = 0;
+  FUEL_TYPE_UNLEADED = 1;
+  FUEL_TYPE_LEADED = 2;
+  FUEL_TYPE_DIESEL_1 = 3;
+  FUEL_TYPE_DIESEL_2 = 4;
+  FUEL_TYPE_BIODIESEL = 5;
+  FUEL_TYPE_E85 = 6;
+  FUEL_TYPE_LPG = 7;
+  FUEL_TYPE_CNG = 8;
+  FUEL_TYPE_LNG = 9;
+  FUEL_TYPE_ELECTRIC = 10;
+  FUEL_TYPE_HYDROGEN = 11;
+  FUEL_TYPE_OTHER = 12;
+}

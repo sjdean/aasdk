@@ -19,8 +19,8 @@
 #pragma once
 
 #include <memory>
-#include <aap_proto/proto/channel/ChannelOpenResponse.pb.h>
-#include "aasdk/Messenger/ServiceId.hpp"
+#include <aap_protobuf/channel/ChannelOpenResponse.pb.h>
+#include "aasdk/Messenger/ChannelId.hpp"
 #include "aasdk/Channel/Promise.hpp"
 #include "IMediaPlaybackStatusServiceEventHandler.hpp"
 
@@ -38,7 +38,7 @@ namespace aasdk::channel::mediaplaybackstatus {
     virtual void receive(IMediaPlaybackStatusServiceEventHandler::Pointer eventHandler) = 0;
 
     virtual void
-    sendChannelOpenResponse(const proto::channel::ChannelOpenResponse &response, SendPromise::Pointer promise) = 0;
+    sendChannelOpenResponse(const aap_protobuf::channel::ChannelOpenResponse &response, SendPromise::Pointer promise) = 0;
   };
 
 }

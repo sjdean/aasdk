@@ -19,11 +19,11 @@
 #pragma once
 
 #include <memory>
-#include "aasdk/Messenger/ServiceId.hpp"
+#include "aasdk/Messenger/ChannelId.hpp"
 #include "aasdk/Channel/Promise.hpp"
-#include <proto/service/sensor/message/SensorStartResponseMessage.pb.h>
-#include <proto/service/sensor/message/SensorBatch.pb.h>
-#include <proto/channel/ChannelOpenResponse.pb.h>
+#include <aap_protobuf/service/sensor/message/SensorStartResponseMessage.pb.h>
+#include <aap_protobuf/service/sensor/message/SensorBatch.pb.h>
+#include <aap_protobuf/channel/ChannelOpenResponse.pb.h>
 #include "ISensorServiceEventHandler.hpp"
 
 namespace aasdk::channel::sensor {
@@ -39,12 +39,12 @@ namespace aasdk::channel::sensor {
     virtual void receive(ISensorServiceEventHandler::Pointer eventHandler) = 0;
 
     virtual void
-    sendChannelOpenResponse(const proto::channel::ChannelOpenResponse &response, SendPromise::Pointer promise) = 0;
+    sendChannelOpenResponse(const aap_protobuf::channel::ChannelOpenResponse &response, SendPromise::Pointer promise) = 0;
 
-    virtual void sendSensorEventIndication(const proto::service::sensor::message::SensorBatch &indication,
+    virtual void sendSensorEventIndication(const aap_protobuf::service::sensor::message::SensorBatch &indication,
                                            SendPromise::Pointer promise) = 0;
 
-    virtual void sendSensorStartResponse(const proto::service::sensor::message::SensorStartResponseMessage &response,
+    virtual void sendSensorStartResponse(const aap_protobuf::service::sensor::message::SensorStartResponseMessage &response,
                                          SendPromise::Pointer promise) = 0;
   };
 

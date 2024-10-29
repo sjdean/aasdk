@@ -20,11 +20,11 @@
 
 #include <memory>
 
-#include <proto/shared/MessageStatus.pb.h>
-#include <proto/service/media/sink/message/BindingResponse.pb.h>
-#include <proto/service/input/message/InputEventIndication.pb.h>
-#include <proto/channel/ChannelOpenResponse.pb.h>
-#include "aasdk/Messenger/ServiceId.hpp"
+#include <aap_protobuf/shared/MessageStatus.pb.h>
+#include <aap_protobuf/service/media/sink/message/BindingResponse.pb.h>
+#include <aap_protobuf/service/input/message/InputEventIndication.pb.h>
+#include <aap_protobuf/channel/ChannelOpenResponse.pb.h>
+#include "aasdk/Messenger/ChannelId.hpp"
 #include "aasdk/Channel/Promise.hpp"
 #include "IInputSourceServiceEventHandler.hpp"
 
@@ -41,12 +41,12 @@ namespace aasdk::channel::inputsource {
     virtual void receive(IInputSourceServiceEventHandler::Pointer eventHandler) = 0;
 
     virtual void
-    sendChannelOpenResponse(const proto::channel::ChannelOpenResponse &response, SendPromise::Pointer promise) = 0;
+    sendChannelOpenResponse(const aap_protobuf::channel::ChannelOpenResponse &response, SendPromise::Pointer promise) = 0;
 
-    virtual void sendInputEventIndication(const proto::service::input::message::InputEventIndication &indication,
+    virtual void sendInputEventIndication(const aap_protobuf::service::input::message::InputEventIndication &indication,
                                           SendPromise::Pointer promise) = 0;
 
-    virtual void sendBindingResponse(const proto::service::media::sink::message::BindingResponse &response,
+    virtual void sendBindingResponse(const aap_protobuf::service::media::sink::message::BindingResponse &response,
                                      SendPromise::Pointer promise) = 0;
   };
 

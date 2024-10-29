@@ -50,7 +50,7 @@ Message& Message::operator=(Message&& other)
     return *this;
 }
 
-ServiceId Message::getChannelId() const
+ChannelId Message::getChannelId() const
 {
     return channelId_;
 }
@@ -83,7 +83,7 @@ void Message::insertPayload(const common::Data& payload)
 void Message::insertPayload(const google::protobuf::Message& message)
 {
     auto offset = payload_.size();
-    payload_.resize(payload_.size() + message.ByteSize());
+    payload_.resize(payload_.size() + message.ByteSizeLong());
 
     common::DataBuffer buffer(payload_, offset);
     message.SerializeToArray(buffer.data, buffer.size);

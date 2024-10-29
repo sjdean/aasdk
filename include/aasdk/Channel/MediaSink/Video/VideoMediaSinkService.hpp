@@ -23,7 +23,7 @@
 #include "aasdk/Channel/Channel.hpp"
 #include "IVideoMediaSinkService.hpp"
 #include "aasdk/Channel/MediaSink/MediaSinkService.hpp"
-#include <aap_proto/proto/channel/control/focus/video/notification/VideoFocusNotification.pb.h>
+#include <aap_protobuf/channel/control/focus/video/notification/VideoFocusNotification.pb.h>
 
 namespace aasdk::channel::mediasink::video {
 
@@ -38,7 +38,7 @@ namespace aasdk::channel::mediasink::video {
 
     void messageHandler(messenger::Message::Pointer message, IMediaSinkServiceEventHandler::Pointer eventHandler);
 
-    void sendVideoFocusIndication(const proto::channel::control::focus::video::notification::VideoFocusNotification &indication,
+    void sendVideoFocusIndication(const aap_protobuf::channel::control::focus::video::notification::VideoFocusNotification &indication,
                                   SendPromise::Pointer promise);
   };
 

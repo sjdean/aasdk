@@ -14,7 +14,7 @@ set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Require ProtoBuf library
-find_package(Protobuf CONFIG REQUIRED)
+find_package(Protobuf REQUIRED)
 include(FindProtobuf)
 
 
@@ -28,13 +28,13 @@ file(GLOB_RECURSE source_proto_files ${CMAKE_CURRENT_SOURCE_DIR}/*.proto)
 protobuf_generate_cpp(PROTO_SRCS PROTO_HDRS ${source_proto_files})
 
 # Generate Library
-add_library(aap_protobuf SHARED ${PROTO_SRCS} ${PROTO_HDRS})
+add_library(aap_protobuf ${PROTO_SRCS} ${PROTO_HDRS})
 target_link_libraries(aap_protobuf PUBLIC ${PROTOBUF_LIBRARIES})
 
 
 include_directories(
         ${CMAKE_CURRENT_BINARY_DIR}
-        ${CMAKE_CURRENT_BINARY_DIR}/proto
+        ${CMAKE_CURRENT_BINARY_DIR}/aap_protobuf
         ${PROTOBUF_INCLUDE_DIR}
 )
 
@@ -47,16 +47,22 @@ set_target_properties(aap_protobuf
 
 # Install rules
 install(TARGETS aap_protobuf
-        EXPORT aap_protobuf_targets
+        EXPORT aap_protobufTargets
         LIBRARY DESTINATION lib
         ARCHIVE DESTINATION lib
         RUNTIME DESTINATION bin
         INCLUDES DESTINATION include
 )
 
+target_include_directories(aap_protobuf
+        PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
+        $<INSTALL_INTERFACE:include/aap_protobuf>
+)
+
 # Install headers explicitly
-install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-        DESTINATION include/aap_protobuf
+install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/aap_protobuf
+        DESTINATION include
         FILES_MATCHING PATTERN "*.h")
 
 # Export the targets to a script
@@ -74,7 +80,7 @@ write_basic_package_version_file(
         COMPATIBILITY AnyNewerVersion
 )
 
-configure_package_config_file(${CMAKE_CURRENT_SOURCE_DIR}/Config.cmake.in
+configure_package_config_file(Config.cmake.in
         "${CMAKE_CURRENT_BINARY_DIR}/aap_protobufConfig.cmake"
         INSTALL_DESTINATION lib/cmake/aap_protobuf
 )

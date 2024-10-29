@@ -38,7 +38,7 @@ namespace aasdk {
         auto message(std::make_shared<messenger::Message>(channelId_, messenger::EncryptionType::PLAIN,
                                                           messenger::MessageType::SPECIFIC));
         message->insertPayload(
-            messenger::MessageId(proto::channel::control::ControlMessageType::MESSAGE_VERSION_REQUEST).getData());
+            messenger::MessageId(aap_protobuf::channel::control::ControlMessageType::MESSAGE_VERSION_REQUEST).getData());
 
         common::Data versionBuffer(4, 0);
         reinterpret_cast<uint16_t &>(versionBuffer[0]) = boost::endian::native_to_big(AASDK_MAJOR);
@@ -52,96 +52,96 @@ namespace aasdk {
         auto message(std::make_shared<messenger::Message>(channelId_, messenger::EncryptionType::PLAIN,
                                                           messenger::MessageType::SPECIFIC));
         message->insertPayload(
-            messenger::MessageId(proto::channel::control::ControlMessageType::MESSAGE_ENCAPSULATED_SSL).getData());
+            messenger::MessageId(aap_protobuf::channel::control::ControlMessageType::MESSAGE_ENCAPSULATED_SSL).getData());
         message->insertPayload(handshakeBuffer);
 
         this->send(std::move(message), std::move(promise));
       }
 
-      void ControlServiceChannel::sendAuthComplete(const proto::channel::control::auth::AuthResponse &response,
+      void ControlServiceChannel::sendAuthComplete(const aap_protobuf::channel::control::auth::AuthResponse &response,
                                                    SendPromise::Pointer promise) {
         auto message(std::make_shared<messenger::Message>(channelId_, messenger::EncryptionType::PLAIN,
                                                           messenger::MessageType::SPECIFIC));
         message->insertPayload(
-            messenger::MessageId(proto::channel::control::ControlMessageType::MESSAGE_AUTH_COMPLETE).getData());
+            messenger::MessageId(aap_protobuf::channel::control::ControlMessageType::MESSAGE_AUTH_COMPLETE).getData());
         message->insertPayload(response);
 
         this->send(std::move(message), std::move(promise));
       }
 
-      void ControlServiceChannel::sendServiceDiscoveryResponse(const proto::channel::control::servicediscovery::notification::ServiceDiscoveryResponse &response,
+      void ControlServiceChannel::sendServiceDiscoveryResponse(const aap_protobuf::channel::control::servicediscovery::notification::ServiceDiscoveryResponse &response,
                                                                SendPromise::Pointer promise) {
         auto message(std::make_shared<messenger::Message>(channelId_, messenger::EncryptionType::ENCRYPTED,
                                                           messenger::MessageType::SPECIFIC));
         message->insertPayload(messenger::MessageId(
-            proto::channel::control::ControlMessageType::MESSAGE_SERVICE_DISCOVERY_RESPONSE).getData());
+            aap_protobuf::channel::control::ControlMessageType::MESSAGE_SERVICE_DISCOVERY_RESPONSE).getData());
         message->insertPayload(response);
 
         this->send(std::move(message), std::move(promise));
       }
 
       void
-      ControlServiceChannel::sendAudioFocusResponse(const proto::channel::control::focus::audio::notification::AudioFocusNotification &response,
+      ControlServiceChannel::sendAudioFocusResponse(const aap_protobuf::channel::control::focus::audio::notification::AudioFocusNotification &response,
                                                     SendPromise::Pointer promise) {
         auto message(std::make_shared<messenger::Message>(channelId_, messenger::EncryptionType::ENCRYPTED,
                                                           messenger::MessageType::SPECIFIC));
         message->insertPayload(
-            messenger::MessageId(proto::channel::control::ControlMessageType::MESSAGE_AUDIO_FOCUS_REQUEST).getData());
+            messenger::MessageId(aap_protobuf::channel::control::ControlMessageType::MESSAGE_AUDIO_FOCUS_REQUEST).getData());
         message->insertPayload(response);
 
         this->send(std::move(message), std::move(promise));
       }
 
-      void ControlServiceChannel::sendShutdownRequest(const proto::channel::control::byebye::event::ByeByeRequest &request,
+      void ControlServiceChannel::sendShutdownRequest(const aap_protobuf::channel::control::byebye::event::ByeByeRequest &request,
                                                       SendPromise::Pointer promise) {
         auto message(std::make_shared<messenger::Message>(channelId_, messenger::EncryptionType::ENCRYPTED,
                                                           messenger::MessageType::SPECIFIC));
         message->insertPayload(
-            messenger::MessageId(proto::channel::control::ControlMessageType::MESSAGE_BYEBYE_REQUEST).getData());
+            messenger::MessageId(aap_protobuf::channel::control::ControlMessageType::MESSAGE_BYEBYE_REQUEST).getData());
         message->insertPayload(request);
 
         this->send(std::move(message), std::move(promise));
       }
 
-      void ControlServiceChannel::sendShutdownResponse(const proto::channel::control::byebye::notification::ByeByeResponse &response,
+      void ControlServiceChannel::sendShutdownResponse(const aap_protobuf::channel::control::byebye::notification::ByeByeResponse &response,
                                                        SendPromise::Pointer promise) {
         auto message(std::make_shared<messenger::Message>(channelId_, messenger::EncryptionType::ENCRYPTED,
                                                           messenger::MessageType::SPECIFIC));
         message->insertPayload(
-            messenger::MessageId(proto::channel::control::ControlMessageType::MESSAGE_BYEBYE_RESPONSE).getData());
+            messenger::MessageId(aap_protobuf::channel::control::ControlMessageType::MESSAGE_BYEBYE_RESPONSE).getData());
         message->insertPayload(response);
 
         this->send(std::move(message), std::move(promise));
       }
 
       void ControlServiceChannel::sendNavigationFocusResponse(
-          const proto::channel::control::focus::navigation::notification::NavigationFocusNotification &response, SendPromise::Pointer promise) {
+          const aap_protobuf::channel::control::focus::navigation::notification::NavFocusNotification &response, SendPromise::Pointer promise) {
         auto message(std::make_shared<messenger::Message>(channelId_, messenger::EncryptionType::ENCRYPTED,
                                                           messenger::MessageType::SPECIFIC));
         message->insertPayload(
-            messenger::MessageId(proto::channel::control::ControlMessageType::MESSAGE_NAV_FOCUS_NOTIFICATION).getData());
+            messenger::MessageId(aap_protobuf::channel::control::ControlMessageType::MESSAGE_NAV_FOCUS_NOTIFICATION).getData());
         message->insertPayload(response);
 
         this->send(std::move(message), std::move(promise));
       }
 
-      void ControlServiceChannel::sendPingResponse(const proto::channel::control::ping::PingResponse &request,
+      void ControlServiceChannel::sendPingResponse(const aap_protobuf::channel::control::ping::PingResponse &request,
                                                    SendPromise::Pointer promise) {
         auto message(std::make_shared<messenger::Message>(channelId_, messenger::EncryptionType::PLAIN,
                                                           messenger::MessageType::SPECIFIC));
         message->insertPayload(
-            messenger::MessageId(proto::channel::control::ControlMessageType::MESSAGE_PING_RESPONSE).getData());
+            messenger::MessageId(aap_protobuf::channel::control::ControlMessageType::MESSAGE_PING_RESPONSE).getData());
         message->insertPayload(request);
 
         this->send(std::move(message), std::move(promise));
       }
 
-      void ControlServiceChannel::sendPingRequest(const proto::channel::control::ping::PingRequest &request,
+      void ControlServiceChannel::sendPingRequest(const aap_protobuf::channel::control::ping::PingRequest &request,
                                                   SendPromise::Pointer promise) {
         auto message(std::make_shared<messenger::Message>(channelId_, messenger::EncryptionType::PLAIN,
                                                           messenger::MessageType::SPECIFIC));
         message->insertPayload(
-            messenger::MessageId(proto::channel::control::ControlMessageType::MESSAGE_PING_REQUEST).getData());
+            messenger::MessageId(aap_protobuf::channel::control::ControlMessageType::MESSAGE_PING_REQUEST).getData());
         message->insertPayload(request);
 
         this->send(std::move(message), std::move(promise));
@@ -163,34 +163,34 @@ namespace aasdk {
         common::DataConstBuffer payload(message->getPayload(), messageId.getSizeOf());
 
         switch (messageId.getId()) {
-          case proto::channel::control::ControlMessageType::MESSAGE_VERSION_RESPONSE:
+          case aap_protobuf::channel::control::ControlMessageType::MESSAGE_VERSION_RESPONSE:
             this->handleVersionResponse(payload, std::move(eventHandler));
             break;
-          case proto::channel::control::ControlMessageType::MESSAGE_ENCAPSULATED_SSL:
+          case aap_protobuf::channel::control::ControlMessageType::MESSAGE_ENCAPSULATED_SSL:
             eventHandler->onHandshake(payload);
             break;
-          case proto::channel::control::ControlMessageType::MESSAGE_SERVICE_DISCOVERY_REQUEST:
+          case aap_protobuf::channel::control::ControlMessageType::MESSAGE_SERVICE_DISCOVERY_REQUEST:
             this->handleServiceDiscoveryRequest(payload, std::move(eventHandler));
             break;
-          case proto::channel::control::ControlMessageType::MESSAGE_PING_REQUEST:
+          case aap_protobuf::channel::control::ControlMessageType::MESSAGE_PING_REQUEST:
             this->handlePingRequest(payload, std::move(eventHandler));
             break;
-          case proto::channel::control::ControlMessageType::MESSAGE_PING_RESPONSE:
+          case aap_protobuf::channel::control::ControlMessageType::MESSAGE_PING_RESPONSE:
             this->handlePingResponse(payload, std::move(eventHandler));
             break;
-          case proto::channel::control::ControlMessageType::MESSAGE_NAV_FOCUS_REQUEST:
+          case aap_protobuf::channel::control::ControlMessageType::MESSAGE_NAV_FOCUS_REQUEST:
             this->handleNavigationFocusRequest(payload, std::move(eventHandler));
             break;
-          case proto::channel::control::ControlMessageType::MESSAGE_BYEBYE_REQUEST:
+          case aap_protobuf::channel::control::ControlMessageType::MESSAGE_BYEBYE_REQUEST:
             this->handleShutdownRequest(payload, std::move(eventHandler));
             break;
-          case proto::channel::control::ControlMessageType::MESSAGE_BYEBYE_RESPONSE:
+          case aap_protobuf::channel::control::ControlMessageType::MESSAGE_BYEBYE_RESPONSE:
             this->handleShutdownResponse(payload, std::move(eventHandler));
             break;
-          case proto::channel::control::ControlMessageType::MESSAGE_VOICE_SESSION_NOTIFICATION:
+          case aap_protobuf::channel::control::ControlMessageType::MESSAGE_VOICE_SESSION_NOTIFICATION:
             this->handleVoiceSessionRequest(payload, std::move(eventHandler));
             break;
-          case proto::channel::control::ControlMessageType::MESSAGE_AUDIO_FOCUS_REQUEST:
+          case aap_protobuf::channel::control::ControlMessageType::MESSAGE_AUDIO_FOCUS_REQUEST:
             this->handleAudioFocusRequest(payload, std::move(eventHandler));
             break;
 
@@ -209,16 +209,16 @@ namespace aasdk {
 
         uint16_t majorCode = 1; //elements > 0 ? boost::endian::big_to_native(versionResponse[0]) : 0;
         uint16_t minorCode = 1; //elements > 1 ? boost::endian::big_to_native(versionResponse[1]) : 0;
-        proto::shared::MessageStatus status =
-            elements > 2 ? static_cast<proto::shared::MessageStatus>(versionResponse[2])
-                         : proto::shared::MessageStatus::STATUS_NO_COMPATIBLE_VERSION;
+        aap_protobuf::shared::MessageStatus status =
+            elements > 2 ? static_cast<aap_protobuf::shared::MessageStatus>(versionResponse[2])
+                         : aap_protobuf::shared::MessageStatus::STATUS_NO_COMPATIBLE_VERSION;
 
         eventHandler->onVersionResponse(majorCode, minorCode, status);
       }
 
       void ControlServiceChannel::handleServiceDiscoveryRequest(const common::DataConstBuffer &payload,
                                                                 IControlServiceChannelEventHandler::Pointer eventHandler) {
-        proto::channel::control::ServiceDiscoveryRequest request;
+        aap_protobuf::channel::control::servicediscovery::event::ServiceDiscoveryRequest request;
         if (request.ParseFromArray(payload.cdata, payload.size)) {
           eventHandler->onServiceDiscoveryRequest(request);
         } else {
@@ -228,7 +228,7 @@ namespace aasdk {
 
       void ControlServiceChannel::handleAudioFocusRequest(const common::DataConstBuffer &payload,
                                                           IControlServiceChannelEventHandler::Pointer eventHandler) {
-        proto::channel::control::focus::audio::AudioFocusRequest request;
+        aap_protobuf::channel::control::focus::audio::event::AudioFocusRequest request;
         if (request.ParseFromArray(payload.cdata, payload.size)) {
           eventHandler->onAudioFocusRequest(request);
         } else {
@@ -238,7 +238,7 @@ namespace aasdk {
 
       void ControlServiceChannel::handleVoiceSessionRequest(const common::DataConstBuffer &payload,
                                                             IControlServiceChannelEventHandler::Pointer eventHandler) {
-        proto::channel::control::version::VoiceSessionNotification request;
+        aap_protobuf::channel::control::version::VoiceSessionNotification request;
         if (request.ParseFromArray(payload.cdata, payload.size)) {
           eventHandler->onVoiceSessionRequest(request);
         } else {
@@ -248,7 +248,7 @@ namespace aasdk {
 
       void ControlServiceChannel::handleShutdownRequest(const common::DataConstBuffer &payload,
                                                         IControlServiceChannelEventHandler::Pointer eventHandler) {
-        proto::channel::control::shutdown::ShutdownRequest request;
+        aap_protobuf::channel::control::byebye::event::ByeByeRequest request;
         if (request.ParseFromArray(payload.cdata, payload.size)) {
           eventHandler->onByeByeRequest(request);
         } else {
@@ -258,7 +258,7 @@ namespace aasdk {
 
       void ControlServiceChannel::handleShutdownResponse(const common::DataConstBuffer &payload,
                                                          IControlServiceChannelEventHandler::Pointer eventHandler) {
-        proto::channel::control::byebye::notification::ByeByeResponse response;
+        aap_protobuf::channel::control::byebye::notification::ByeByeResponse response;
         if (response.ParseFromArray(payload.cdata, payload.size)) {
           eventHandler->onByeByeResponse(response);
         } else {
@@ -268,7 +268,7 @@ namespace aasdk {
 
       void ControlServiceChannel::handleNavigationFocusRequest(const common::DataConstBuffer &payload,
                                                                IControlServiceChannelEventHandler::Pointer eventHandler) {
-        proto::channel::control::focus::navigation::NavigationFocusRequest request;
+        aap_protobuf::channel::control::focus::navigation::event::NavFocusRequestNotification request;
         if (request.ParseFromArray(payload.cdata, payload.size)) {
           eventHandler->onNavigationFocusRequest(request);
         } else {
@@ -278,7 +278,7 @@ namespace aasdk {
 
       void ControlServiceChannel::handlePingRequest(const common::DataConstBuffer &payload,
                                                     IControlServiceChannelEventHandler::Pointer eventHandler) {
-        proto::channel::control::ping::Ping request;
+        aap_protobuf::channel::control::ping::PingRequest request;
         if (request.ParseFromArray(payload.cdata, payload.size)) {
           eventHandler->onPingRequest(request);
         } else {
@@ -288,7 +288,7 @@ namespace aasdk {
 
       void ControlServiceChannel::handlePingResponse(const common::DataConstBuffer &payload,
                                                      IControlServiceChannelEventHandler::Pointer eventHandler) {
-        proto::channel::control::ping::PingResponse response;
+        aap_protobuf::channel::control::ping::PingResponse response;
         if (response.ParseFromArray(payload.cdata, payload.size)) {
           eventHandler->onPingResponse(response);
         } else {

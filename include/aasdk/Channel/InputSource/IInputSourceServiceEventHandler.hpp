@@ -19,8 +19,8 @@
 #pragma once
 
 #include <stdint.h>
-#include <proto/channel/ChannelOpenRequest.pb.h>
-#include <proto/channel/input/event/BindingRequest.pb.h>
+#include <aap_protobuf/channel/ChannelOpenRequest.pb.h>
+#include <aap_protobuf/channel/input/event/BindingRequest.pb.h>
 
 namespace aasdk::channel::inputsource {
 
@@ -32,9 +32,9 @@ namespace aasdk::channel::inputsource {
 
     virtual ~IInputSourceServiceEventHandler() = default;
 
-    virtual void onChannelOpenRequest(const proto::channel::ChannelOpenRequest &request) = 0;
+    virtual void onChannelOpenRequest(const aap_protobuf::channel::ChannelOpenRequest &request) = 0;
 
-    virtual void onBindingRequest(const proto::channel::input::event::BindingRequest &request) = 0;
+    virtual void onBindingRequest(const aap_protobuf::channel::input::event::BindingRequest &request) = 0;
 
     virtual void onChannelError(const error::Error &e) = 0;
   };

@@ -36,13 +36,13 @@ namespace aasdk::channel::mediasink {
     void receive(IMediaSinkServiceEventHandler::Pointer eventHandler) override;
 
     void
-    sendChannelOpenResponse(const proto::channel::ChannelOpenResponse &response, SendPromise::Pointer promise) override;
+    sendChannelOpenResponse(const aap_protobuf::channel::ChannelOpenResponse &response, SendPromise::Pointer promise) override;
 
-    void sendChannelSetupResponse(const proto::service::media::sink::message::MediaSinkChannelSetupResponse &response,
+    void sendChannelSetupResponse(const aap_protobuf::service::media::sink::message::MediaSinkChannelSetupResponse &response,
                                   SendPromise::Pointer promise) override;
 
     void
-    sendMediaAckIndication(const proto::service::media::source::message::MediaSourceMediaAckIndication &indication,
+    sendMediaAckIndication(const aap_protobuf::service::media::source::message::MediaSourceMediaAckIndication &indication,
                            SendPromise::Pointer promise) override;
 
     messenger::ChannelId channelId_;

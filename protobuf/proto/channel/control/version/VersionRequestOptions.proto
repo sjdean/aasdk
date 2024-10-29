@@ -1,7 +1,0 @@
-syntax="proto2";
-
-package aasdk.proto.channel.control.version;
-
-message VersionRequestOptions {
-  optional int64 snapshot_version = 1;
-}

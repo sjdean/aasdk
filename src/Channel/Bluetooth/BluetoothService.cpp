@@ -16,7 +16,7 @@
 *  along with aasdk. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <aap_proto/proto/service/bluetooth/message/BluetoothMessageId.pb.h>
+#include <aap_protobuf/service/bluetooth/message/BluetoothMessageId.pb.h>
 #include "aasdk/Channel/Bluetooth/IBluetoothServiceEventHandler.hpp"
 #include "aasdk/Channel/Bluetooth/BluetoothService.hpp"
 #include "aasdk/Common/Log.hpp"
@@ -41,27 +41,27 @@ namespace aasdk::channel::bluetooth {
     messenger_->enqueueReceive(channelId_, std::move(receivePromise));
   }
 
-  void BluetoothService::sendChannelOpenResponse(const proto::channel::ChannelOpenResponse &response,
+  void BluetoothService::sendChannelOpenResponse(const aap_protobuf::channel::ChannelOpenResponse &response,
                                                  SendPromise::Pointer promise) {
     AASDK_LOG(info) << "[BluetoothService] service open response ";
 
     auto message(std::make_shared<messenger::Message>(channelId_, messenger::EncryptionType::ENCRYPTED,
                                                       messenger::MessageType::CONTROL));
     message->insertPayload(
-        messenger::MessageId(proto::channel::control::ControlMessageType::MESSAGE_CHANNEL_OPEN_RESPONSE).getData());
+        messenger::MessageId(aap_protobuf::channel::control::ControlMessageType::MESSAGE_CHANNEL_OPEN_RESPONSE).getData());
     message->insertPayload(response);
 
     this->send(std::move(message), std::move(promise));
   }
 
   void BluetoothService::sendBluetoothPairingResponse(
-      const proto::service::bluetooth::message::BluetoothPairingResponse &response, SendPromise::Pointer promise) {
+      const aap_protobuf::service::bluetooth::message::BluetoothPairingResponse &response, SendPromise::Pointer promise) {
     AASDK_LOG(info) << "[BluetoothService] pairing response ";
 
     auto message(std::make_shared<messenger::Message>(channelId_, messenger::EncryptionType::ENCRYPTED,
                                                       messenger::MessageType::SPECIFIC));
     message->insertPayload(
-        messenger::MessageId(proto::service::bluetooth::message::BluetoothMessageId::PAIRING_RESPONSE).getData());
+        messenger::MessageId(aap_protobuf::service::bluetooth::message::BluetoothMessageId::PAIRING_RESPONSE).getData());
     message->insertPayload(response);
 
     this->send(std::move(message), std::move(promise));
@@ -75,10 +75,10 @@ namespace aasdk::channel::bluetooth {
     common::DataConstBuffer payload(message->getPayload(), messageId.getSizeOf());
 
     switch (messageId.getId()) {
-      case proto::channel::control::ControlMessageType::MESSAGE_CHANNEL_OPEN_REQUEST:
+      case aap_protobuf::channel::control::ControlMessageType::MESSAGE_CHANNEL_OPEN_REQUEST:
         this->handleChannelOpenRequest(payload, std::move(eventHandler));
         break;
-      case proto::service::bluetooth::message::BluetoothMessageId::PAIRING_REQUEST:
+      case aap_protobuf::service::bluetooth::message::BluetoothMessageId::PAIRING_REQUEST:
         this->handleBluetoothPairingRequest(payload, std::move(eventHandler));
         break;
       default:
@@ -92,7 +92,7 @@ namespace aasdk::channel::bluetooth {
                                                   IBluetoothServiceEventHandler::Pointer eventHandler) {
     AASDK_LOG(info) << "[BluetoothService] service open request ";
 
-    proto::channel::ChannelOpenRequest request;
+    aap_protobuf::channel::ChannelOpenRequest request;
     if (request.ParseFromArray(payload.cdata, payload.size)) {
       eventHandler->onChannelOpenRequest(request);
     } else {
@@ -104,7 +104,7 @@ namespace aasdk::channel::bluetooth {
                                                        IBluetoothServiceEventHandler::Pointer eventHandler) {
     AASDK_LOG(info) << "[BluetoothService] pairing request ";
 
-    proto::channel::bluetooth::event::BluetoothPairingRequest request;
+    aap_protobuf::channel::bluetooth::event::BluetoothPairingRequest request;
     if (request.ParseFromArray(payload.cdata, payload.size)) {
       eventHandler->onBluetoothPairingRequest(request);
     } else {

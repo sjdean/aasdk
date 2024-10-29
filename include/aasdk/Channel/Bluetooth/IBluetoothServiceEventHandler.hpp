@@ -18,8 +18,8 @@
 
 #pragma once
 
-#include <proto/channel//bluetooth/event/BluetoothPairingRequest.pb.h>
-#include <proto/channel/ChannelOpenRequest.pb.h>
+#include <aap_protobuf/channel/bluetooth/event/BluetoothPairingRequest.pb.h>
+#include <aap_protobuf/channel/ChannelOpenRequest.pb.h>
 #include "aasdk/Error/Error.hpp"
 
 namespace aasdk::channel::bluetooth {
@@ -32,10 +32,10 @@ namespace aasdk::channel::bluetooth {
 
     virtual ~IBluetoothServiceEventHandler() = default;
 
-    virtual void onChannelOpenRequest(const proto::channel::ChannelOpenRequest &request) = 0;
+    virtual void onChannelOpenRequest(const aap_protobuf::channel::ChannelOpenRequest &request) = 0;
 
     virtual void
-    onBluetoothPairingRequest(const proto::channel::bluetooth::event::BluetoothPairingRequest &request) = 0;
+    onBluetoothPairingRequest(const aap_protobuf::channel::bluetooth::event::BluetoothPairingRequest &request) = 0;
 
     virtual void onChannelError(const error::Error &e) = 0;
   };

@@ -20,8 +20,6 @@
 
 #include <aasdk/Common/Data.hpp>
 #include <aasdk/Messenger/ChannelId.hpp>
-#include <aasdk/Messenger/ServiceId.hpp>
-#include <aasdk/Messenger/ServiceChannelId.hpp>
 #include <aasdk/Messenger/FrameType.hpp>
 #include <aasdk/Messenger/EncryptionType.hpp>
 #include <aasdk/Messenger/MessageType.hpp>

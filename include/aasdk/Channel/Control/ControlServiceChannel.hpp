@@ -39,32 +39,32 @@ namespace aasdk::channel::control {
 
     void sendHandshake(common::Data handshakeBuffer, SendPromise::Pointer promise) override;
 
-    void sendAuthComplete(const proto::channel::control::auth::AuthResponse &response,
+    void sendAuthComplete(const aap_protobuf::channel::control::auth::AuthResponse &response,
                           SendPromise::Pointer promise) override;
 
     void sendServiceDiscoveryResponse(
-        const proto::channel::control::servicediscovery::notification::ServiceDiscoveryResponse &response,
+        const aap_protobuf::channel::control::servicediscovery::notification::ServiceDiscoveryResponse &response,
         SendPromise::Pointer promise) override;
 
     void
-    sendAudioFocusResponse(const proto::channel::control::focus::audio::notification::AudioFocusNotification &response,
+    sendAudioFocusResponse(const aap_protobuf::channel::control::focus::audio::notification::AudioFocusNotification &response,
                            SendPromise::Pointer promise) override;
 
-    void sendShutdownRequest(const proto::channel::control::byebye::event::ByeByeRequest &request,
+    void sendShutdownRequest(const aap_protobuf::channel::control::byebye::event::ByeByeRequest &request,
                              SendPromise::Pointer promise) override;
 
-    void sendShutdownResponse(const proto::channel::control::byebye::notification::ByeByeResponse &response,
+    void sendShutdownResponse(const aap_protobuf::channel::control::byebye::notification::ByeByeResponse &response,
                               SendPromise::Pointer promise) override;
 
     void sendNavigationFocusResponse(
-        const proto::channel::control::focus::navigation::notification::NavigationFocusNotification &response,
+        const aap_protobuf::channel::control::focus::navigation::notification::NavFocusNotification &response,
         SendPromise::Pointer promise) override;
 
     void
-    sendPingRequest(const proto::channel::control::ping::PingRequest &request, SendPromise::Pointer promise) override;
+    sendPingRequest(const aap_protobuf::channel::control::ping::PingRequest &request, SendPromise::Pointer promise) override;
 
     void
-    sendPingResponse(const proto::channel::control::ping::PingResponse &response,
+    sendPingResponse(const aap_protobuf::channel::control::ping::PingResponse &response,
                      SendPromise::Pointer promise) override;
 
   private:

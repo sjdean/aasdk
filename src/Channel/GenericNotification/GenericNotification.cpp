@@ -29,12 +29,12 @@ namespace aasdk::channel::genericnotification {
     messenger_->enqueueReceive(channelId_, std::move(receivePromise));
   }
 
-  void GenericNotificationService::sendChannelOpenResponse(const proto::channel::ChannelOpenResponse &response,
+  void GenericNotificationService::sendChannelOpenResponse(const aap_protobuf::channel::ChannelOpenResponse &response,
                                                            SendPromise::Pointer promise) {
     auto message(std::make_shared<messenger::Message>(channelId_, messenger::EncryptionType::ENCRYPTED,
                                                       messenger::MessageType::CONTROL));
     message->insertPayload(
-        messenger::MessageId(proto::channel::control::ControlMessageType::MESSAGE_CHANNEL_OPEN_RESPONSE).getData());
+        messenger::MessageId(aap_protobuf::channel::control::ControlMessageType::MESSAGE_CHANNEL_OPEN_RESPONSE).getData());
     message->insertPayload(response);
 
     this->send(std::move(message), std::move(promise));
@@ -48,7 +48,7 @@ namespace aasdk::channel::genericnotification {
     AASDK_LOG(debug) << "[GenericNotificationService] Processing Message";
 
     switch (messageId.getId()) {
-      case proto::channel::control::ControlMessageType::MESSAGE_CHANNEL_OPEN_REQUEST:
+      case aap_protobuf::channel::control::ControlMessageType::MESSAGE_CHANNEL_OPEN_REQUEST:
         this->handleChannelOpenRequest(payload, std::move(eventHandler));
         break;
       default:
@@ -61,7 +61,7 @@ namespace aasdk::channel::genericnotification {
   void GenericNotificationService::handleChannelOpenRequest(const common::DataConstBuffer &payload,
                                                             IGenericNotificationServiceEventHandler::Pointer eventHandler) {
     AASDK_LOG(debug) << "[GenericNotificationService] Handling Channel Open";
-    proto::channel::ChannelOpenRequest request;
+    aap_protobuf::channel::ChannelOpenRequest request;
     if (request.ParseFromArray(payload.cdata, payload.size)) {
       eventHandler->onChannelOpenRequest(request);
     } else {

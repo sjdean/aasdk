@@ -16,7 +16,7 @@
 *  along with aasdk. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <aap_proto/proto/service/mediaplayback/MediaPlaybackStatusMessageId.pb.h>
+#include <aap_protobuf/service/mediaplayback/MediaPlaybackStatusMessageId.pb.h>
 #include "aasdk/Channel/MediaPlaybackStatus/MediaPlaybackStatusService.hpp"
 #include "aasdk/Channel/MediaPlaybackStatus/IMediaPlaybackStatusServiceEventHandler.hpp"
 #include "aasdk/Common/Log.hpp"
@@ -43,13 +43,13 @@ namespace aasdk::channel::mediaplaybackstatus {
     messenger_->enqueueReceive(channelId_, std::move(receivePromise));
   }
 
-  void MediaPlaybackStatusService::sendChannelOpenResponse(const proto::channel::ChannelOpenResponse &response,
+  void MediaPlaybackStatusService::sendChannelOpenResponse(const aap_protobuf::channel::ChannelOpenResponse &response,
                                                            SendPromise::Pointer promise) {
     AASDK_LOG(info) << "[MediaStatusServiceChannel] service open response ";
     auto message(std::make_shared<messenger::Message>(channelId_, messenger::EncryptionType::ENCRYPTED,
                                                       messenger::MessageType::CONTROL));
     message->insertPayload(
-        messenger::MessageId(proto::channel::control::ControlMessageType::MESSAGE_CHANNEL_OPEN_RESPONSE).getData());
+        messenger::MessageId(aap_protobuf::channel::control::ControlMessageType::MESSAGE_CHANNEL_OPEN_RESPONSE).getData());
     message->insertPayload(response);
 
     this->send(std::move(message), std::move(promise));
@@ -62,15 +62,15 @@ namespace aasdk::channel::mediaplaybackstatus {
     common::DataConstBuffer payload(message->getPayload(), messageId.getSizeOf());
 
     switch (messageId.getId()) {
-      case proto::channel::control::ControlMessageType::MESSAGE_CHANNEL_OPEN_REQUEST:
+      case aap_protobuf::channel::control::ControlMessageType::MESSAGE_CHANNEL_OPEN_REQUEST:
         this->handleChannelOpenRequest(payload, std::move(eventHandler));
         break;
 
-      case proto::service::mediaplayback::MediaPlaybackStatusMessageId::MEDIA_PLAYBACK_METADATA:
+      case aap_protobuf::service::mediaplayback::MediaPlaybackStatusMessageId::MEDIA_PLAYBACK_METADATA:
         this->handleMetadataUpdate(payload, std::move(eventHandler));
         break;
 
-      case proto::service::mediaplayback::MediaPlaybackStatusMessageId::MEDIA_PLAYBACK_STATUS:
+      case aap_protobuf::service::mediaplayback::MediaPlaybackStatusMessageId::MEDIA_PLAYBACK_STATUS:
         this->handlePlaybackUpdate(payload, std::move(eventHandler));
         break;
 
@@ -87,7 +87,7 @@ namespace aasdk::channel::mediaplaybackstatus {
   void MediaPlaybackStatusService::handleMetadataUpdate(const common::DataConstBuffer &payload,
                                                         IMediaPlaybackStatusServiceEventHandler::Pointer eventHandler) {
     //TODO: Check MetaData or Status
-    proto::service::mediaplayback::message::MediaPlaybackMetadata metadata;
+    aap_protobuf::service::mediaplayback::message::MediaPlaybackMetadata metadata;
     if (metadata.ParseFromArray(payload.cdata, payload.size)) {
       eventHandler->onMetadataUpdate(metadata);
     } else {
@@ -101,7 +101,7 @@ namespace aasdk::channel::mediaplaybackstatus {
   void MediaPlaybackStatusService::handlePlaybackUpdate(const common::DataConstBuffer &payload,
                                                         IMediaPlaybackStatusServiceEventHandler::Pointer eventHandler) {
     //TODO: Check MetaData or Status
-    proto::service::mediaplayback::message::MediaPlaybackStatus playback;
+    aap_protobuf::service::mediaplayback::message::MediaPlaybackStatus playback;
     if (playback.ParseFromArray(payload.cdata, payload.size)) {
       eventHandler->onPlaybackUpdate(playback);
     } else {
@@ -115,7 +115,7 @@ namespace aasdk::channel::mediaplaybackstatus {
                                                             IMediaPlaybackStatusServiceEventHandler::Pointer eventHandler) {
     AASDK_LOG(info) << "[MediaPlaybackStatusService] service open request ";
 
-    proto::channel::ChannelOpenRequest request;
+    aap_protobuf::channel::ChannelOpenRequest request;
     if (request.ParseFromArray(payload.cdata, payload.size)) {
       eventHandler->onChannelOpenRequest(request);
     } else {

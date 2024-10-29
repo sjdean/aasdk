@@ -19,7 +19,7 @@ namespace aasdk::channel::genericnotification {
     void receive(IGenericNotificationServiceEventHandler::Pointer eventHandler) override;
 
     void
-    sendChannelOpenResponse(const proto::channel::ChannelOpenResponse &response, SendPromise::Pointer promise) override;
+    sendChannelOpenResponse(const aap_protobuf::channel::ChannelOpenResponse &response, SendPromise::Pointer promise) override;
 
 
   private:

@@ -1,9 +1,9 @@
 #pragma once
 
 #include <memory>
-#include "aasdk/Messenger/ServiceId.hpp"
+#include "aasdk/Messenger/ChannelId.hpp"
 #include "aasdk/Channel/Promise.hpp"
-#include <proto/channel/ChannelOpenResponse.pb.h>
+#include <aap_protobuf/channel/ChannelOpenResponse.pb.h>
 #include "IMediaBrowserServiceEventHandler.hpp"
 
 namespace aasdk::channel::mediabrowser {
@@ -19,7 +19,7 @@ namespace aasdk::channel::mediabrowser {
     virtual void receive(IMediaBrowserServiceEventHandler::Pointer eventHandler) = 0;
 
     virtual void
-    sendChannelOpenResponse(const proto::channel::ChannelOpenResponse &response, SendPromise::Pointer promise) = 0;
+    sendChannelOpenResponse(const aap_protobuf::channel::ChannelOpenResponse &response, SendPromise::Pointer promise) = 0;
 
   };
 }

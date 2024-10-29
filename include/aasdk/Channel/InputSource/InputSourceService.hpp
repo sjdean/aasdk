@@ -34,12 +34,12 @@ namespace aasdk::channel::inputsource {
     void receive(IInputSourceServiceEventHandler::Pointer eventHandler) override;
 
     void
-    sendChannelOpenResponse(const proto::channel::ChannelOpenResponse &response, SendPromise::Pointer promise) override;
+    sendChannelOpenResponse(const aap_protobuf::channel::ChannelOpenResponse &response, SendPromise::Pointer promise) override;
 
-    void sendInputEventIndication(const proto::service::input::message::InputEventIndication &indication,
+    void sendInputEventIndication(const aap_protobuf::service::input::message::InputEventIndication &indication,
                                   SendPromise::Pointer promise) override;
 
-    void sendBindingResponse(const proto::service::media::sink::message::BindingResponse &response,
+    void sendBindingResponse(const aap_protobuf::service::media::sink::message::BindingResponse &response,
                              SendPromise::Pointer promise) override;
 
   private:

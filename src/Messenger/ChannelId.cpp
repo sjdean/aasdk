@@ -22,18 +22,46 @@ namespace aasdk::messenger {
 
   std::string channelIdToString(ChannelId channelId) {
     switch (channelId) {
-      case ChannelId::MICROPHONE:
-        return "MICROPHONE";
-      case ChannelId::TELEPHONY_AUDIO:
-        return "TELEPHONY_AUDIO";
-      case ChannelId::VIDEO:
-        return "VIDEO";
-      case ChannelId::MEDIA_AUDIO:
-        return "MEDIA_AUDIO";
-      case ChannelId::GUIDANCE_AUDIO:
-        return "SPEECH_AUDIO";
-      case ChannelId::SYSTEM_AUDIO:
-        return "SYSTEM_AUDIO";
+      case ChannelId::CONTROL:
+        return "CONTROL";
+      case ChannelId::SENSOR:
+        return "SENSOR";
+      case ChannelId::MEDIA_SINK:
+        return "MEDIA_SINK";
+      case ChannelId::MEDIA_SINK_VIDEO:
+        return "MEDIA_SINK_VIDEO";
+      case ChannelId::MEDIA_SINK_MEDIA_AUDIO:
+        return "MEDIA_SINK_MEDIA_AUDIO";
+      case ChannelId::MEDIA_SINK_GUIDANCE_AUDIO:
+        return "MEDIA_SINK_GUIDANCE_AUDIO";
+      case ChannelId::MEDIA_SINK_SYSTEM_AUDIO:
+        return "MEDIA_SINK_SYSTEM_AUDIO";
+      case ChannelId::MEDIA_SINK_TELEPHONY_AUDIO:
+        return "MEDIA_SINK_TELEPHONY_AUDIO";
+      case ChannelId::INPUT_SOURCE:
+        return "INPUT_SOURCE";
+      case ChannelId::MEDIA_SOURCE:
+        return "MEDIA_SOURCE";
+      case ChannelId::MEDIA_SOURCE_MICROPHONE:
+        return "MEDIA_SOURCE_MICROPHONE";
+      case ChannelId::BLUETOOTH:
+        return "BLUETOOTH";
+      case ChannelId::RADIO:
+        return "RADIO";
+      case ChannelId::NAVIGATION_STATUS:
+        return "NAVIGATION_STATUS";
+      case ChannelId::MEDIA_PLAYBACK_STATUS:
+        return "MEDIA_PLAYBACK_STATUS";
+      case ChannelId::PHONE_STATUS:
+        return "PHONE_STATUS";
+      case ChannelId::MEDIA_BROWSER:
+        return "MEDIA_BROWSER";
+      case ChannelId::VENDOR_EXTENSION:
+        return "VENDOR_EXTENSION";
+      case ChannelId::GENERIC_NOTIFICATION:
+        return "GENERIC_NOTIFICATION";
+      case ChannelId::WIFI_PROJECTION:
+        return "WIFI_PROJECTION";
       case ChannelId::NONE:
         return "NONE";
       default:
@@ -42,4 +70,5 @@ namespace aasdk::messenger {
   }
 
 }
+
 

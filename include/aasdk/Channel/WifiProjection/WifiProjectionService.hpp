@@ -35,9 +35,9 @@ namespace aasdk::channel::wifiprojection {
     void receive(IWifiProjectionServiceEventHandler::Pointer eventHandler) override;
 
     void
-    sendChannelOpenResponse(const proto::channel::ChannelOpenResponse &response, SendPromise::Pointer promise) override;
+    sendChannelOpenResponse(const aap_protobuf::channel::ChannelOpenResponse &response, SendPromise::Pointer promise) override;
 
-    void sendWifiCredentialsResponse(const proto::service::wifiprojection::message::WifiCredentialsResponse &response,
+    void sendWifiCredentialsResponse(const aap_protobuf::service::wifiprojection::message::WifiCredentialsResponse &response,
                                      SendPromise::Pointer promise) override;
 
   private:

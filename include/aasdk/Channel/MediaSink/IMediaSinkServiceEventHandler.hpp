@@ -20,10 +20,10 @@
 
 #include <stdint.h>
 
-#include <aap_proto/proto/channel/media/event/Setup.pb.h>
-#include <aap_proto/proto/channel/media/event/Start.pb.h>
-#include <aap_proto/proto/channel/media/event/Stop.pb.h>
-#include <aap_proto/proto/channel/ChannelOpenRequest.pb.h>
+#include <aap_protobuf/channel/media/event/Setup.pb.h>
+#include <aap_protobuf/channel/media/event/Start.pb.h>
+#include <aap_protobuf/channel/media/event/Stop.pb.h>
+#include <aap_protobuf/channel/ChannelOpenRequest.pb.h>
 #include "aasdk/Messenger/Timestamp.hpp"
 #include "aasdk/Common/Data.hpp"
 #include "aasdk/Error/Error.hpp"
@@ -39,13 +39,13 @@ namespace aasdk::channel::mediasink {
 
     virtual ~IMediaSinkServiceEventHandler() = default;
 
-    virtual void onChannelOpenRequest(const proto::channel::ChannelOpenRequest &request) = 0;
+    virtual void onChannelOpenRequest(const aap_protobuf::channel::ChannelOpenRequest &request) = 0;
 
-    virtual void onSetup(const proto::channel::media::event::Setup &request) = 0;
+    virtual void onSetup(const aap_protobuf::channel::media::event::Setup &request) = 0;
 
-    virtual void onStart(const proto::channel::media::event::Start &indication) = 0;
+    virtual void onStart(const aap_protobuf::channel::media::event::Start &indication) = 0;
 
-    virtual void onStop(const proto::channel::media::event::Stop &indication) = 0;
+    virtual void onStop(const aap_protobuf::channel::media::event::Stop &indication) = 0;
 
     virtual void
     onMediaWithTimestampIndication(messenger::Timestamp::ValueType, const common::DataConstBuffer &buffer) = 0;

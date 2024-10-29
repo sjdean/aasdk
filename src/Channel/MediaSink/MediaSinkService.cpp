@@ -16,9 +16,9 @@
 *  along with aasdk. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <aap_proto/proto/service/media/shared/enum/MediaMessageId.pb.h>
-#include <aasdk/channel/mediasink/IMediaSinkServiceEventHandler.hpp>
-#include <aasdk/channel/mediasink/MediaSinkService.hpp>
+#include <aap_protobuf/service/media/shared/message/MediaMessageId.pb.h>
+#include <aasdk/Channel//MediaSink//IMediaSinkServiceEventHandler.hpp>
+#include <aasdk/Channel/MediaSink/MediaSinkService.hpp>
 #include "aasdk/Common/Log.hpp"
 
 
@@ -40,35 +40,35 @@ namespace aasdk::channel::mediasink {
     messenger_->enqueueReceive(channelId_, std::move(receivePromise));
   }
 
-  void MediaSinkService::sendChannelOpenResponse(const proto::channel::ChannelOpenResponse &response,
+  void MediaSinkService::sendChannelOpenResponse(const aap_protobuf::channel::ChannelOpenResponse &response,
                                                  SendPromise::Pointer promise) {
     auto message(std::make_shared<messenger::Message>(channelId_, messenger::EncryptionType::ENCRYPTED,
                                                       messenger::MessageType::CONTROL));
-    message->insertPayload(messenger::MessageId(proto::channel::control::MESSAGE_CHANNEL_OPEN_RESPONSE).getData());
+    message->insertPayload(messenger::MessageId(aap_protobuf::channel::control::MESSAGE_CHANNEL_OPEN_RESPONSE).getData());
     message->insertPayload(response);
 
     this->send(std::move(message), std::move(promise));
   }
 
   void MediaSinkService::sendChannelSetupResponse(
-      const proto::service::media::sink::message::MediaSinkChannelSetupResponse &response,
+      const aap_protobuf::service::media::sink::message::MediaSinkChannelSetupResponse &response,
       SendPromise::Pointer promise) {
     auto message(std::make_shared<messenger::Message>(channelId_, messenger::EncryptionType::ENCRYPTED,
                                                       messenger::MessageType::SPECIFIC));
     message->insertPayload(
-        messenger::MessageId(proto::service::media::shared::enum_::MediaSinkMessage::MEDIA_MESSAGE_CONFIG).getData());
+        messenger::MessageId(aap_protobuf::service::media::shared::message::MediaMessageId::MEDIA_MESSAGE_CONFIG).getData());
     message->insertPayload(response);
 
     this->send(std::move(message), std::move(promise));
   }
 
   void MediaSinkService::sendMediaAckIndication(
-      const proto::service::media::source::message::MediaSourceMediaAckIndication &indication,
+      const aap_protobuf::service::media::source::message::MediaSourceMediaAckIndication &indication,
       SendPromise::Pointer promise) {
     auto message(std::make_shared<messenger::Message>(channelId_, messenger::EncryptionType::ENCRYPTED,
                                                       messenger::MessageType::SPECIFIC));
     message->insertPayload(
-        messenger::MessageId(proto::service::media::shared::enum_::MediaSinkMessage::MEDIA_MESSAGE_ACK).getData());
+        messenger::MessageId(aap_protobuf::service::media::shared::message::MediaMessageId::MEDIA_MESSAGE_ACK).getData());
     message->insertPayload(indication);
 
     this->send(std::move(message), std::move(promise));
@@ -80,22 +80,22 @@ namespace aasdk::channel::mediasink {
     common::DataConstBuffer payload(message->getPayload(), messageId.getSizeOf());
 
     switch (messageId.getId()) {
-      case proto::service::media::shared::message::MediaMessageId::MEDIA_MESSAGE_SETUP:
+      case aap_protobuf::service::media::shared::message::MediaMessageId::MEDIA_MESSAGE_SETUP:
         this->handleChannelSetupRequest(payload, std::move(eventHandler));
         break;
-      case proto::service::media::shared::message::MediaMessageId::MEDIA_MESSAGE_START:
+      case aap_protobuf::service::media::shared::message::MediaMessageId::MEDIA_MESSAGE_START:
         this->handleStartIndication(payload, std::move(eventHandler));
         break;
-      case proto::service::media::shared::message::MediaMessageId::MEDIA_MESSAGE_STOP:
+      case aap_protobuf::service::media::shared::message::MediaMessageId::MEDIA_MESSAGE_STOP:
         this->handleStopIndication(payload, std::move(eventHandler));
         break;
-      case proto::service::media::shared::message::MediaMessageId::MEDIA_MESSAGE_DATA:
+      case aap_protobuf::service::media::shared::message::MediaMessageId::MEDIA_MESSAGE_DATA:
         this->handleMediaWithTimestampIndication(payload, std::move(eventHandler));
         break;
-      case proto::service::media::shared::message::MediaMessageId::MEDIA_MESSAGE_CODEC_CONFIG:
+      case aap_protobuf::service::media::shared::message::MediaMessageId::MEDIA_MESSAGE_CODEC_CONFIG:
         eventHandler->onMediaIndication(payload);
         break;
-      case proto::channel::control::MESSAGE_CHANNEL_OPEN_REQUEST:
+      case aap_protobuf::channel::control::MESSAGE_CHANNEL_OPEN_REQUEST:
         this->handleChannelOpenRequest(payload, std::move(eventHandler));
         break;
       default:
@@ -107,7 +107,7 @@ namespace aasdk::channel::mediasink {
 
   void MediaSinkService::handleChannelSetupRequest(const common::DataConstBuffer &payload,
                                                    IMediaSinkServiceEventHandler::Pointer eventHandler) {
-    proto::channel::media::event::Setup request;
+    aap_protobuf::channel::media::event::Setup request;
     if (request.ParseFromArray(payload.cdata, payload.size)) {
       eventHandler->onSetup(request);
     } else {
@@ -117,7 +117,7 @@ namespace aasdk::channel::mediasink {
 
   void MediaSinkService::handleStartIndication(const common::DataConstBuffer &payload,
                                                IMediaSinkServiceEventHandler::Pointer eventHandler) {
-    proto::channel::media::event::Start indication;
+    aap_protobuf::channel::media::event::Start indication;
     if (indication.ParseFromArray(payload.cdata, payload.size)) {
       eventHandler->onStart(indication);
     } else {
@@ -127,7 +127,7 @@ namespace aasdk::channel::mediasink {
 
   void MediaSinkService::handleStopIndication(const common::DataConstBuffer &payload,
                                               IMediaSinkServiceEventHandler::Pointer eventHandler) {
-    proto::channel::media::event::Stop indication;
+    aap_protobuf::channel::media::event::Stop indication;
     if (indication.ParseFromArray(payload.cdata, payload.size)) {
       eventHandler->onStop(indication);
     } else {
@@ -137,7 +137,7 @@ namespace aasdk::channel::mediasink {
 
   void MediaSinkService::handleChannelOpenRequest(const common::DataConstBuffer &payload,
                                                   IMediaSinkServiceEventHandler::Pointer eventHandler) {
-    proto::channel::ChannelOpenRequest request;
+    aap_protobuf::channel::ChannelOpenRequest request;
     if (request.ParseFromArray(payload.cdata, payload.size)) {
       eventHandler->onChannelOpenRequest(request);
     } else {

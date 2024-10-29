@@ -19,10 +19,10 @@
 #pragma once
 
 #include <memory>
-#include <proto/service/media/source/message/MicrophoneResponse.pb.h>
-#include <proto/service/media/source/message/MicrophoneResponse.pb.h>
-#include <proto/service/media/source/message/MicrophoneRequest.pb.h>
-#include <proto/channel/ChannelOpenResponse.pb.h>
+#include <aap_protobuf/service/media/source/message/MicrophoneResponse.pb.h>
+#include <aap_protobuf/service/media/source/message/MicrophoneResponse.pb.h>
+#include <aap_protobuf/service/media/source/message/MicrophoneRequest.pb.h>
+#include <aap_protobuf/channel/ChannelOpenResponse.pb.h>
 #include "aasdk/Messenger/ChannelId.hpp"
 #include "aasdk/Messenger/Timestamp.hpp"
 #include "aasdk/Channel/Promise.hpp"
@@ -42,13 +42,13 @@ namespace aasdk::channel::mediasource {
     virtual void receive(IMediaSourceServiceEventHandler::Pointer eventHandler) = 0;
 
     virtual void
-    sendChannelOpenResponse(const proto::channel::ChannelOpenResponse &response, SendPromise::Pointer promise) = 0;
+    sendChannelOpenResponse(const aap_protobuf::channel::ChannelOpenResponse &response, SendPromise::Pointer promise) = 0;
 
     virtual void sendAVMediaWithTimestampIndication(messenger::Timestamp::ValueType, const common::Data &data,
                                                     SendPromise::Pointer promise) = 0;
 
     virtual void
-    sendAVInputOpenResponse(const proto::service::media::source::message::MicrophoneResponse &response,
+    sendAVInputOpenResponse(const aap_protobuf::service::media::source::message::MicrophoneResponse &response,
                             SendPromise::Pointer promise) = 0;
   };
 

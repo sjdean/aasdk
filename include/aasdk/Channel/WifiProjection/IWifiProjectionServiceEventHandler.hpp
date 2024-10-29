@@ -18,8 +18,8 @@
 
 #pragma once
 
-#include <proto/service/wifiprojection/message/WifiCredentialsRequest.pb.h>
-#include <proto/channel/ChannelOpenRequest.pb.h>
+#include <aap_protobuf/service/wifiprojection/message/WifiCredentialsRequest.pb.h>
+#include <aap_protobuf/channel/ChannelOpenRequest.pb.h>
 #include "aasdk/Error/Error.hpp"
 
 namespace aasdk::channel::wifiprojection {
@@ -33,9 +33,9 @@ namespace aasdk::channel::wifiprojection {
 
     virtual ~IWifiProjectionServiceEventHandler() = default;
 
-    virtual void onWifiCredentialsRequest(const proto::service::wifiprojection::message::WifiCredentialsRequest &request) = 0;
+    virtual void onWifiCredentialsRequest(const aap_protobuf::service::wifiprojection::message::WifiCredentialsRequest &request) = 0;
 
-    virtual void onChannelOpenRequest(const proto::channel::ChannelOpenRequest &request) = 0;
+    virtual void onChannelOpenRequest(const aap_protobuf::channel::ChannelOpenRequest &request) = 0;
 
     virtual void onChannelError(const error::Error &e) = 0;
   };

@@ -23,8 +23,6 @@
 #include <google/protobuf/message.h>
 #include <aasdk/Common/Data.hpp>
 #include <aasdk/Messenger/ChannelId.hpp>
-#include <aasdk/Messenger/ServiceId.hpp>
-#include <aasdk/Messenger/ServiceChannelId.hpp>
 #include <aasdk/Messenger/EncryptionType.hpp>
 #include <aasdk/Messenger/MessageType.hpp>
 #include <aasdk/Messenger/MessageId.hpp>
@@ -41,7 +39,7 @@ public:
     Message(Message&& other);
     Message& operator=(Message&& other);
 
-    ServiceId getServiceId() const;
+    ChannelId getChannelId() const;
     EncryptionType getEncryptionType() const;
     MessageType getType() const;
 
@@ -53,7 +51,7 @@ public:
     void insertPayload(common::DataBuffer& buffer);
 
 private:
-    ServiceId channelId_;
+    ChannelId channelId_;
     EncryptionType encryptionType_;
     MessageType type_;
     common::Data payload_;

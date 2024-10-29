@@ -1,4 +1,4 @@
-#include <aap_proto/proto/service/radio/RadioMessageId.pb.h>
+#include <aap_protobuf/service/radio/RadioMessageId.pb.h>
 #include <aasdk/Channel/Radio/IRadioServiceEventHandler.hpp>
 #include <aasdk/Channel/Radio/RadioService.hpp>
 #include "aasdk/Common/Log.hpp"
@@ -27,12 +27,12 @@ namespace aasdk::channel::radio {
     messenger_->enqueueReceive(channelId_, std::move(receivePromise));
   }
 
-  void RadioService::sendChannelOpenResponse(const proto::channel::ChannelOpenResponse &response,
+  void RadioService::sendChannelOpenResponse(const aap_protobuf::channel::ChannelOpenResponse &response,
                                              SendPromise::Pointer promise) {
     auto message(std::make_shared<messenger::Message>(channelId_, messenger::EncryptionType::ENCRYPTED,
                                                       messenger::MessageType::CONTROL));
     message->insertPayload(
-        messenger::MessageId(proto::channel::control::ControlMessageType::MESSAGE_CHANNEL_OPEN_RESPONSE).getData());
+        messenger::MessageId(aap_protobuf::channel::control::ControlMessageType::MESSAGE_CHANNEL_OPEN_RESPONSE).getData());
     message->insertPayload(response);
 
     this->send(std::move(message), std::move(promise));
@@ -46,34 +46,34 @@ namespace aasdk::channel::radio {
     AASDK_LOG(debug) << "[RadioService] Processing Message";
 
     switch (messageId.getId()) {
-      case proto::channel::control::ControlMessageType::MESSAGE_CHANNEL_OPEN_REQUEST:
+      case aap_protobuf::channel::control::ControlMessageType::MESSAGE_CHANNEL_OPEN_REQUEST:
         this->handleChannelOpenRequest(payload, std::move(eventHandler));
         break;
-      case proto::service::radio::_::RadioMessageId::RADIO_MESSAGE_ACTIVE_RADIO_NOTIFICATION:
-      case proto::service::radio::_::RadioMessageId::RADIO_MESSAGE_SELECT_ACTIVE_RADIO_REQUEST:
-      case proto::service::radio::_::RadioMessageId::RADIO_MESSAGE_STEP_CHANNEL_REQUEST:
-      case proto::service::radio::_::RadioMessageId::RADIO_MESSAGE_STEP_CHANNEL_RESPONSE:
-      case proto::service::radio::_::RadioMessageId::RADIO_MESSAGE_SEEK_STATION_REQUEST:
-      case proto::service::radio::_::RadioMessageId::RADIO_MESSAGE_SEEK_STATION_RESPONSE:
-      case proto::service::radio::_::RadioMessageId::RADIO_MESSAGE_SCAN_STATIONS_REQUEST:
-      case proto::service::radio::_::RadioMessageId::RADIO_MESSAGE_SCAN_STATIONS_RESPONSE:
-      case proto::service::radio::_::RadioMessageId::RADIO_MESSAGE_TUNE_TO_STATION_REQUEST:
-      case proto::service::radio::_::RadioMessageId::RADIO_MESSAGE_TUNE_TO_STATION_RESPONSE:
-      case proto::service::radio::_::RadioMessageId::RADIO_MESSAGE_GET_PROGRAM_LIST_REQUEST:
-      case proto::service::radio::_::RadioMessageId::RADIO_MESSAGE_GET_PROGRAM_LIST_RESPONSE:
-      case proto::service::radio::_::RadioMessageId::RADIO_MESSAGE_STATION_PRESETS_NOTIFICATION:
-      case proto::service::radio::_::RadioMessageId::RADIO_MESSAGE_CANCEL_OPERATIONS_REQUEST:
-      case proto::service::radio::_::RadioMessageId::RADIO_MESSAGE_CANCEL_OPERATIONS_RESPONSE:
-      case proto::service::radio::_::RadioMessageId::RADIO_MESSAGE_CONFIGURE_CHANNEL_SPACING_REQUEST:
-      case proto::service::radio::_::RadioMessageId::RADIO_MESSAGE_CONFIGURE_CHANNEL_SPACING_RESPONSE:
-      case proto::service::radio::_::RadioMessageId::RADIO_MESSAGE_RADIO_STATION_INFO_NOTIFICATION:
-      case proto::service::radio::_::RadioMessageId::RADIO_MESSAGE_MUTE_RADIO_REQUEST:
-      case proto::service::radio::_::RadioMessageId::RADIO_MESSAGE_MUTE_RADIO_RESPONSE:
-      case proto::service::radio::_::RadioMessageId::RADIO_MESSAGE_GET_TRAFFIC_UPDATE_REQUEST:
-      case proto::service::radio::_::RadioMessageId::RADIO_MESSAGE_GET_TRAFFIC_UPDATE_RESPONSE:
-      case proto::service::radio::_::RadioMessageId::RADIO_MESSAGE_RADIO_SOURCE_REQUEST:
-      case proto::service::radio::_::RadioMessageId::RADIO_MESSAGE_RADIO_SOURCE_RESPONSE:
-      case proto::service::radio::_::RadioMessageId::RADIO_MESSAGE_STATE_NOTIFICATION:
+      case aap_protobuf::service::radio::RadioMessageId::RADIO_MESSAGE_ACTIVE_RADIO_NOTIFICATION:
+      case aap_protobuf::service::radio::RadioMessageId::RADIO_MESSAGE_SELECT_ACTIVE_RADIO_REQUEST:
+      case aap_protobuf::service::radio::RadioMessageId::RADIO_MESSAGE_STEP_CHANNEL_REQUEST:
+      case aap_protobuf::service::radio::RadioMessageId::RADIO_MESSAGE_STEP_CHANNEL_RESPONSE:
+      case aap_protobuf::service::radio::RadioMessageId::RADIO_MESSAGE_SEEK_STATION_REQUEST:
+      case aap_protobuf::service::radio::RadioMessageId::RADIO_MESSAGE_SEEK_STATION_RESPONSE:
+      case aap_protobuf::service::radio::RadioMessageId::RADIO_MESSAGE_SCAN_STATIONS_REQUEST:
+      case aap_protobuf::service::radio::RadioMessageId::RADIO_MESSAGE_SCAN_STATIONS_RESPONSE:
+      case aap_protobuf::service::radio::RadioMessageId::RADIO_MESSAGE_TUNE_TO_STATION_REQUEST:
+      case aap_protobuf::service::radio::RadioMessageId::RADIO_MESSAGE_TUNE_TO_STATION_RESPONSE:
+      case aap_protobuf::service::radio::RadioMessageId::RADIO_MESSAGE_GET_PROGRAM_LIST_REQUEST:
+      case aap_protobuf::service::radio::RadioMessageId::RADIO_MESSAGE_GET_PROGRAM_LIST_RESPONSE:
+      case aap_protobuf::service::radio::RadioMessageId::RADIO_MESSAGE_STATION_PRESETS_NOTIFICATION:
+      case aap_protobuf::service::radio::RadioMessageId::RADIO_MESSAGE_CANCEL_OPERATIONS_REQUEST:
+      case aap_protobuf::service::radio::RadioMessageId::RADIO_MESSAGE_CANCEL_OPERATIONS_RESPONSE:
+      case aap_protobuf::service::radio::RadioMessageId::RADIO_MESSAGE_CONFIGURE_CHANNEL_SPACING_REQUEST:
+      case aap_protobuf::service::radio::RadioMessageId::RADIO_MESSAGE_CONFIGURE_CHANNEL_SPACING_RESPONSE:
+      case aap_protobuf::service::radio::RadioMessageId::RADIO_MESSAGE_RADIO_STATION_INFO_NOTIFICATION:
+      case aap_protobuf::service::radio::RadioMessageId::RADIO_MESSAGE_MUTE_RADIO_REQUEST:
+      case aap_protobuf::service::radio::RadioMessageId::RADIO_MESSAGE_MUTE_RADIO_RESPONSE:
+      case aap_protobuf::service::radio::RadioMessageId::RADIO_MESSAGE_GET_TRAFFIC_UPDATE_REQUEST:
+      case aap_protobuf::service::radio::RadioMessageId::RADIO_MESSAGE_GET_TRAFFIC_UPDATE_RESPONSE:
+      case aap_protobuf::service::radio::RadioMessageId::RADIO_MESSAGE_RADIO_SOURCE_REQUEST:
+      case aap_protobuf::service::radio::RadioMessageId::RADIO_MESSAGE_RADIO_SOURCE_RESPONSE:
+      case aap_protobuf::service::radio::RadioMessageId::RADIO_MESSAGE_STATE_NOTIFICATION:
       default:
         AASDK_LOG(error) << "[RadioService] message not handled: " << messageId.getId();
         this->receive(std::move(eventHandler));
@@ -84,7 +84,7 @@ namespace aasdk::channel::radio {
   void RadioService::handleChannelOpenRequest(const common::DataConstBuffer &payload,
                                               IRadioServiceEventHandler::Pointer eventHandler) {
     AASDK_LOG(debug) << "[RadioService] Handling Channel Open";
-    proto::channel::ChannelOpenRequest request;
+    aap_protobuf::channel::ChannelOpenRequest request;
     if (request.ParseFromArray(payload.cdata, payload.size)) {
       eventHandler->onChannelOpenRequest(request);
     } else {

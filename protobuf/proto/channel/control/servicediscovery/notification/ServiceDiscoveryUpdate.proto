@@ -1,9 +1,0 @@
-syntax="proto2";
-
-import "proto/service/ServiceDescriptor.proto";
-
-package aasdk.proto.channel.control.servicediscovery.notification;
-
-message ServiceDiscoveryUpdate {
-  optional service.ServiceDescriptor service = 1;
-}

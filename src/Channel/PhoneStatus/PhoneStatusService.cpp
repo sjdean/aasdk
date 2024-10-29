@@ -1,5 +1,5 @@
 
-#include <aap_proto/proto/service/phonestatus/PhoneStatusMessageId.pb.h>
+#include <aap_protobuf/service/phonestatus/PhoneStatusMessageId.pb.h>
 #include <aasdk/Channel/PhoneStatus/IPhoneStatusServiceEventHandler.hpp>
 #include <aasdk/Channel/PhoneStatus/PhoneStatusService.hpp>
 #include "aasdk/Common/Log.hpp"
@@ -28,12 +28,12 @@ namespace aasdk::channel::phonestatus {
     messenger_->enqueueReceive(channelId_, std::move(receivePromise));
   }
 
-  void PhoneStatusService::sendChannelOpenResponse(const proto::channel::ChannelOpenResponse &response,
+  void PhoneStatusService::sendChannelOpenResponse(const aap_protobuf::channel::ChannelOpenResponse &response,
                                                    SendPromise::Pointer promise) {
     auto message(std::make_shared<messenger::Message>(channelId_, messenger::EncryptionType::ENCRYPTED,
                                                       messenger::MessageType::CONTROL));
     message->insertPayload(
-        messenger::MessageId(proto::channel::control::ControlMessageType::MESSAGE_CHANNEL_OPEN_RESPONSE).getData());
+        messenger::MessageId(aap_protobuf::channel::control::ControlMessageType::MESSAGE_CHANNEL_OPEN_RESPONSE).getData());
     message->insertPayload(response);
 
     this->send(std::move(message), std::move(promise));
@@ -47,11 +47,11 @@ namespace aasdk::channel::phonestatus {
     AASDK_LOG(debug) << "[PhoneStatusService] Processing Message";
 
     switch (messageId.getId()) {
-      case proto::channel::control::ControlMessageType::MESSAGE_CHANNEL_OPEN_REQUEST:
+      case aap_protobuf::channel::control::ControlMessageType::MESSAGE_CHANNEL_OPEN_REQUEST:
         this->handleChannelOpenRequest(payload, std::move(eventHandler));
         break;
-      case proto::service::phonestatus::PhoneStatusMessageId::PHONE_STATUS:
-      case proto::service::phonestatus::PhoneStatusMessageId::PHONE_STATUS_INPUT:
+      case aap_protobuf::service::phonestatus::PhoneStatusMessageId::PHONE_STATUS:
+      case aap_protobuf::service::phonestatus::PhoneStatusMessageId::PHONE_STATUS_INPUT:
       default:
         AASDK_LOG(error) << "[PhoneStatusService] message not handled: " << messageId.getId();
         this->receive(std::move(eventHandler));
@@ -62,7 +62,7 @@ namespace aasdk::channel::phonestatus {
   void PhoneStatusService::handleChannelOpenRequest(const common::DataConstBuffer &payload,
                                                     IPhoneStatusServiceEventHandler::Pointer eventHandler) {
     AASDK_LOG(debug) << "[PhoneStatusService] Handling Channel Open";
-    proto::channel::ChannelOpenRequest request;
+    aap_protobuf::channel::ChannelOpenRequest request;
     if (request.ParseFromArray(payload.cdata, payload.size)) {
       eventHandler->onChannelOpenRequest(request);
     } else {

@@ -26,12 +26,12 @@ namespace aasdk::channel::vendorextension {
     messenger_->enqueueReceive(channelId_, std::move(receivePromise));
   }
 
-  void VendorExtensionService::sendChannelOpenResponse(const proto::channel::ChannelOpenResponse &response,
+  void VendorExtensionService::sendChannelOpenResponse(const aap_protobuf::channel::ChannelOpenResponse &response,
                                                        SendPromise::Pointer promise) {
     auto message(std::make_shared<messenger::Message>(channelId_, messenger::EncryptionType::ENCRYPTED,
                                                       messenger::MessageType::CONTROL));
     message->insertPayload(
-        messenger::MessageId(proto::channel::control::ControlMessageType::MESSAGE_CHANNEL_OPEN_RESPONSE).getData());
+        messenger::MessageId(aap_protobuf::channel::control::ControlMessageType::MESSAGE_CHANNEL_OPEN_RESPONSE).getData());
     message->insertPayload(response);
 
     this->send(std::move(message), std::move(promise));
@@ -45,7 +45,7 @@ namespace aasdk::channel::vendorextension {
     AASDK_LOG(debug) << "[VendorExtensionService] Processing Message";
 
     switch (messageId.getId()) {
-      case proto::channel::control::ControlMessageType::MESSAGE_CHANNEL_OPEN_REQUEST:
+      case aap_protobuf::channel::control::ControlMessageType::MESSAGE_CHANNEL_OPEN_REQUEST:
         this->handleChannelOpenRequest(payload, std::move(eventHandler));
         break;
       default:
@@ -58,7 +58,7 @@ namespace aasdk::channel::vendorextension {
   void VendorExtensionService::handleChannelOpenRequest(const common::DataConstBuffer &payload,
                                                         IVendorExtensionServiceEventHandler::Pointer eventHandler) {
     AASDK_LOG(debug) << "[VendorExtensionService] Handling Channel Open";
-    proto::channel::ChannelOpenRequest request;
+    aap_protobuf::channel::ChannelOpenRequest request;
     if (request.ParseFromArray(payload.cdata, payload.size)) {
       eventHandler->onChannelOpenRequest(request);
     } else {

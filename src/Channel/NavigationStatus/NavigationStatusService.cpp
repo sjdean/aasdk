@@ -16,7 +16,7 @@
 *  along with aasdk. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <aap_proto/proto/service/navigation/NavigationChannelMessageIds.pb.h>
+#include <aap_protobuf/service/navigation/NavigationChannelMessageIds.pb.h>
 #include "aasdk/Channel/NavigationStatus/INavigationStatusServiceEventHandler.hpp"
 #include "aasdk/Channel/NavigationStatus/NavigationStatusService.hpp"
 #include "aasdk/Common/Log.hpp"
@@ -45,14 +45,14 @@ namespace aasdk::channel::navigationstatus {
     messenger_->enqueueReceive(channelId_, std::move(receivePromise));
   }
 
-  void NavigationStatusService::sendChannelOpenResponse(const proto::channel::ChannelOpenResponse &response,
+  void NavigationStatusService::sendChannelOpenResponse(const aap_protobuf::channel::ChannelOpenResponse &response,
                                                         SendPromise::Pointer promise) {
     AASDK_LOG(info) << "[NavigationStatusService] service open response ";
 
     auto message(std::make_shared<messenger::Message>(channelId_, messenger::EncryptionType::ENCRYPTED,
                                                       messenger::MessageType::CONTROL));
     message->insertPayload(
-        messenger::MessageId(proto::channel::control::ControlMessageType::MESSAGE_CHANNEL_OPEN_RESPONSE).getData());
+        messenger::MessageId(aap_protobuf::channel::control::ControlMessageType::MESSAGE_CHANNEL_OPEN_RESPONSE).getData());
     message->insertPayload(response);
 
     this->send(std::move(message), std::move(promise));
@@ -67,16 +67,16 @@ namespace aasdk::channel::navigationstatus {
     common::DataConstBuffer payload(message->getPayload(), messageId.getSizeOf());
 
     switch (messageId.getId()) {
-      case proto::channel::control::ControlMessageType::MESSAGE_CHANNEL_OPEN_REQUEST:
+      case aap_protobuf::channel::control::ControlMessageType::MESSAGE_CHANNEL_OPEN_REQUEST:
         this->handleChannelOpenRequest(payload, std::move(eventHandler));
         break;
-      case proto::service::navigation::NavigationChannelMessageId::INSTRUMENT_CLUSTER_NAVIGATION_STATUS:
+      case aap_protobuf::service::navigation::NavigationChannelMessageId::INSTRUMENT_CLUSTER_NAVIGATION_STATUS:
         this->handleStatusUpdate(payload, std::move(eventHandler));
         break;
-      case proto::service::navigation::NavigationChannelMessageId::INSTRUMENT_CLUSTER_NAVIGATION_TURN_EVENT:
+      case aap_protobuf::service::navigation::NavigationChannelMessageId::INSTRUMENT_CLUSTER_NAVIGATION_TURN_EVENT:
         this->handleTurnEvent(payload, std::move(eventHandler));
         break;
-      case proto::service::navigation::NavigationChannelMessageId::INSTRUMENT_CLUSTER_NAVIGATION_DISTANCE_EVENT:
+      case aap_protobuf::service::navigation::NavigationChannelMessageId::INSTRUMENT_CLUSTER_NAVIGATION_DISTANCE_EVENT:
         this->handleDistanceEvent(payload, std::move(eventHandler));
         break;
       default:
@@ -91,7 +91,7 @@ namespace aasdk::channel::navigationstatus {
                                                          INavigationStatusServiceEventHandler::Pointer eventHandler) {
     AASDK_LOG(info) << "[NavigationStatusService] service open request ";
 
-    proto::channel::ChannelOpenRequest request;
+    aap_protobuf::channel::ChannelOpenRequest request;
     if (request.ParseFromArray(payload.cdata, payload.size)) {
       eventHandler->onChannelOpenRequest(request);
     } else {
@@ -101,7 +101,7 @@ namespace aasdk::channel::navigationstatus {
 
   void NavigationStatusService::handleStatusUpdate(const common::DataConstBuffer &payload,
                                                    INavigationStatusServiceEventHandler::Pointer eventHandler) {
-    proto::channel::navigation::event::NavigationStatus navStatus;
+    aap_protobuf::channel::navigation::event::NavigationStatus navStatus;
     if (navStatus.ParseFromArray(payload.cdata, payload.size)) {
       eventHandler->onStatusUpdate(navStatus);
     } else {
@@ -113,7 +113,7 @@ namespace aasdk::channel::navigationstatus {
 
   void NavigationStatusService::handleTurnEvent(const common::DataConstBuffer &payload,
                                                 INavigationStatusServiceEventHandler::Pointer eventHandler) {
-    proto::channel::navigation::event::NavigationNextTurnEvent turnEvent;
+    aap_protobuf::channel::navigation::event::NavigationNextTurnEvent turnEvent;
     if (turnEvent.ParseFromArray(payload.cdata, payload.size)) {
       eventHandler->onTurnEvent(turnEvent);
     } else {
@@ -125,7 +125,7 @@ namespace aasdk::channel::navigationstatus {
 
   void NavigationStatusService::handleDistanceEvent(const common::DataConstBuffer &payload,
                                                     INavigationStatusServiceEventHandler::Pointer eventHandler) {
-    proto::channel::navigation::event::NavigationTurnDistanceEvent distanceEvent;
+    aap_protobuf::channel::navigation::event::NavigationTurnDistanceEvent distanceEvent;
     if (distanceEvent.ParseFromArray(payload.cdata, payload.size)) {
       eventHandler->onDistanceEvent(distanceEvent);
     } else {

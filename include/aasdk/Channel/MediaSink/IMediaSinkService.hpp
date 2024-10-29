@@ -19,10 +19,10 @@
 #pragma once
 
 #include <memory>
-#include <aap_proto/proto/service/media/sink/message/MediaSinkChannelSetupResponse.pb.h>
-#include <aap_proto/proto/service/media/source/message/MediaSourceMediaAckIndication.pb.h>
-#include <aap_proto/proto/channel/ChannelOpenResponse.pb.h>
-#include "aasdk/Messenger/ServiceId.hpp"
+#include <aap_protobuf/service/media/sink/message/MediaSinkChannelSetupResponse.pb.h>
+#include <aap_protobuf/service/media/source/message/MediaSourceMediaAckIndication.pb.h>
+#include <aap_protobuf/channel/ChannelOpenResponse.pb.h>
+#include "aasdk/Messenger/ChannelId.hpp"
 #include "aasdk/Channel/Promise.hpp"
 #include "IMediaSinkServiceEventHandler.hpp"
 
@@ -40,14 +40,14 @@ namespace aasdk::channel::mediasink {
     virtual void receive(IMediaSinkServiceEventHandler::Pointer eventHandler) = 0;
 
     virtual void
-    sendChannelOpenResponse(const proto::channel::ChannelOpenResponse &response, SendPromise::Pointer promise) = 0;
+    sendChannelOpenResponse(const aap_protobuf::channel::ChannelOpenResponse &response, SendPromise::Pointer promise) = 0;
 
     virtual void
-    sendChannelSetupResponse(const proto::service::media::sink::message::MediaSinkChannelSetupResponse &response,
+    sendChannelSetupResponse(const aap_protobuf::service::media::sink::message::MediaSinkChannelSetupResponse &response,
                                SendPromise::Pointer promise) = 0;
 
     virtual void
-    sendMediaAckIndication(const proto::service::media::source::message::MediaSourceMediaAckIndication &indication,
+    sendMediaAckIndication(const aap_protobuf::service::media::source::message::MediaSourceMediaAckIndication &indication,
                              SendPromise::Pointer promise) = 0;
   };
 
