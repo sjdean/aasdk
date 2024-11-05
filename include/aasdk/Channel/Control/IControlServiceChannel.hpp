@@ -17,7 +17,9 @@
 */
 
 #pragma once
-
+#include "aasdk/Channel/Promise.hpp"
+#include "aasdk/Channel/IChannel.hpp"
+#include "aasdk/Messenger/ChannelId.hpp"
 #include <aap_protobuf/channel/control/byebye/event/ByeByeRequest.pb.h>
 #include <aap_protobuf/channel/control/byebye/notification/ByeByeResponse.pb.h>
 #include <aap_protobuf/channel/control/auth/AuthResponse.pb.h>
@@ -29,13 +31,12 @@
 #include <aap_protobuf/channel/control/ping/PingResponse.pb.h>
 #include <aap_protobuf/channel/control/voice/VoiceSessionNotification.pb.h>
 #include <aasdk/Common/Data.hpp>
-#include <aasdk/Channel/Promise.hpp>
 #include <aasdk/Channel/Control/IControlServiceChannelEventHandler.hpp>
 
 
 namespace aasdk::channel::control {
 
-  class IControlServiceChannel {
+  class IControlServiceChannel : public virtual IChannel {
   public:
     typedef std::shared_ptr<IControlServiceChannel> Pointer;
 
@@ -73,7 +74,7 @@ namespace aasdk::channel::control {
         SendPromise::Pointer promise) = 0;
 
     virtual void
-    sendVoiceSessionFocusResponse(const aap_protobuf::channel::control::version::VoiceSessionNotification &response,
+    sendVoiceSessionFocusResponse(const aap_protobuf::channel::control::voice::VoiceSessionNotification &response,
                                   SendPromise::Pointer promise) = 0;
 
     virtual void

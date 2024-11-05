@@ -17,8 +17,9 @@
 */
 
 #pragma once
-
 #include <aap_protobuf/channel/media/event/Setup.pb.h>
+#include <aap_protobuf/channel/media/event/Start.pb.h>
+#include <aap_protobuf/channel/media/event/Stop.pb.h>
 #include <aap_protobuf/service/media/source/message/MediaSourceMediaAckIndication.pb.h>
 #include <aap_protobuf/service/media/source/message/MicrophoneRequest.pb.h>
 #include <aap_protobuf/channel/ChannelOpenRequest.pb.h>
@@ -37,13 +38,13 @@ namespace aasdk::channel::mediasource {
 
     virtual void onChannelOpenRequest(const aap_protobuf::channel::ChannelOpenRequest &request) = 0;
 
-    virtual void onAVChannelSetupRequest(const aap_protobuf::channel::media::event::Setup &request) = 0;
+    virtual void onMediaChannelSetupRequest(const aap_protobuf::channel::media::event::Setup &request) = 0;
 
     virtual void
-    onAVInputOpenRequest(const aap_protobuf::service::media::source::message::MicrophoneRequest &request) = 0;
+    onMediaSourceOpenRequest(const aap_protobuf::service::media::source::message::MicrophoneRequest &request) = 0;
 
     virtual void
-    onAVMediaAckIndication(const aap_protobuf::service::media::source::message::MediaSourceMediaAckIndication &indication) = 0;
+    onMediaChannelAckIndication(const aap_protobuf::service::media::source::message::MediaSourceMediaAckIndication &indication) = 0;
 
     virtual void onChannelError(const error::Error &e) = 0;
   };

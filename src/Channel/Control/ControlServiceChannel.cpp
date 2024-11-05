@@ -44,7 +44,7 @@ namespace aasdk {
         reinterpret_cast<uint16_t &>(versionBuffer[0]) = boost::endian::native_to_big(AASDK_MAJOR);
         reinterpret_cast<uint16_t &>(versionBuffer[2]) = boost::endian::native_to_big(AASDK_MINOR);
         message->insertPayload(versionBuffer);
-
+        AASDK_LOG(error) << "[ControlServiceChannel] Sending Version Request ";
         this->send(std::move(message), std::move(promise));
       }
 
@@ -123,6 +123,12 @@ namespace aasdk {
         message->insertPayload(response);
 
         this->send(std::move(message), std::move(promise));
+      }
+
+      void
+      ControlServiceChannel::sendVoiceSessionFocusResponse(const aap_protobuf::channel::control::voice::VoiceSessionNotification &response,
+                                    SendPromise::Pointer promise) {
+        // TODO: FIXME
       }
 
       void ControlServiceChannel::sendPingResponse(const aap_protobuf::channel::control::ping::PingResponse &request,
@@ -207,13 +213,10 @@ namespace aasdk {
         const size_t elements = payload.size / sizeof(uint16_t);
         const uint16_t *versionResponse = reinterpret_cast<const uint16_t *>(payload.cdata);
 
-        uint16_t majorCode = 1; //elements > 0 ? boost::endian::big_to_native(versionResponse[0]) : 0;
-        uint16_t minorCode = 1; //elements > 1 ? boost::endian::big_to_native(versionResponse[1]) : 0;
-        aap_protobuf::shared::MessageStatus status =
-            elements > 2 ? static_cast<aap_protobuf::shared::MessageStatus>(versionResponse[2])
-                         : aap_protobuf::shared::MessageStatus::STATUS_NO_COMPATIBLE_VERSION;
+        aap_protobuf::shared::MessageStatus status = static_cast<aap_protobuf::shared::MessageStatus>(boost::endian::big_to_native(versionResponse[2]));
+        AASDK_LOG(error) << "[ControlServiceChannel] Handling Version - Major: " << versionResponse[0] << " Minor: " << versionResponse[1] << "Status: " << status;
 
-        eventHandler->onVersionResponse(majorCode, minorCode, status);
+        eventHandler->onVersionResponse(versionResponse[0], versionResponse[1], status);
       }
 
       void ControlServiceChannel::handleServiceDiscoveryRequest(const common::DataConstBuffer &payload,
@@ -238,7 +241,7 @@ namespace aasdk {
 
       void ControlServiceChannel::handleVoiceSessionRequest(const common::DataConstBuffer &payload,
                                                             IControlServiceChannelEventHandler::Pointer eventHandler) {
-        aap_protobuf::channel::control::version::VoiceSessionNotification request;
+        aap_protobuf::channel::control::voice::VoiceSessionNotification request;
         if (request.ParseFromArray(payload.cdata, payload.size)) {
           eventHandler->onVoiceSessionRequest(request);
         } else {

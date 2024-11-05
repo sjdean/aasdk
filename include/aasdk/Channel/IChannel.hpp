@@ -16,16 +16,23 @@
 *  along with aasdk. If not, see <http://www.gnu.org/licenses/>.
 */
 
-syntax="proto2";
+#pragma once
 
-import "aap_protobuf/service/input/message/TouchScreenType.proto";
+#include <memory>
+#include "aasdk/Messenger/ChannelId.hpp"
+#include "aasdk/Channel/Promise.hpp"
 
-package aap_protobuf.service.input.message;
+namespace aasdk::channel {
 
-message TouchScreenConfig
-{
-    required int32 width = 1;
-    required int32 height = 2;
-    optional TouchScreenType type = 3;
-    optional bool is_secondary = 4;
+  class IChannel {
+  public:
+    IChannel() = default;
+
+    virtual ~IChannel() = default;
+
+    virtual messenger::ChannelId getId() const = 0;
+
+    virtual void send(messenger::Message::Pointer message, SendPromise::Pointer promise) = 0;
+
+  };
 }

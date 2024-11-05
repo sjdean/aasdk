@@ -19,15 +19,16 @@
 #pragma once
 
 #include <memory>
+#include "aasdk/Channel/Promise.hpp"
+#include "aasdk/Channel/IChannel.hpp"
+#include "aasdk/Messenger/ChannelId.hpp"
 #include <aap_protobuf/channel/ChannelOpenResponse.pb.h>
 #include <aap_protobuf/service/bluetooth/message/BluetoothPairingResponse.pb.h>
-#include "aasdk/Messenger/ServiceId.hpp"
-#include "aasdk/Channel/Promise.hpp"
 #include "IBluetoothServiceEventHandler.hpp"
 
 namespace aasdk::channel::bluetooth {
 
-  class IBluetoothService {
+  class IBluetoothService : public virtual IChannel {
   public:
     typedef std::shared_ptr<IBluetoothService> Pointer;
 

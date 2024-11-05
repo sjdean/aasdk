@@ -19,15 +19,16 @@
 #pragma once
 
 #include <memory>
-#include <aap_protobuf/channel/ChannelOpenResponse.pb.h>
-#include "aasdk/Messenger/ChannelId.hpp"
 #include "aasdk/Channel/Promise.hpp"
+#include "aasdk/Channel/IChannel.hpp"
+#include "aasdk/Messenger/ChannelId.hpp"
+#include <aap_protobuf/channel/ChannelOpenResponse.pb.h>
 #include "IMediaPlaybackStatusServiceEventHandler.hpp"
 
 
 namespace aasdk::channel::mediaplaybackstatus {
 
-  class IMediaPlaybackStatusService {
+  class IMediaPlaybackStatusService : public virtual IChannel {
   public:
     typedef std::shared_ptr<IMediaPlaybackStatusService> Pointer;
 

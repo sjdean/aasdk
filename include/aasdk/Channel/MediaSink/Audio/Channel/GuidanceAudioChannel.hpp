@@ -16,19 +16,16 @@
 *  along with aasdk. If not, see <http://www.gnu.org/licenses/>.
 */
 
-syntax="proto2";
+#pragma once
 
-import "aap_protobuf/service/input/FeedbackEventType.proto";
-import "aap_protobuf/service/input/message/TouchPad.proto";
-import "aap_protobuf/service/input/message/TouchScreen.proto";
+#include "aasdk/Channel/MediaSink/Audio/AudioMediaSinkService.hpp"
 
-package aap_protobuf.service.input;
+namespace aasdk::channel::mediasink::audio::channel {
+  using aasdk::channel::mediasink::audio::AudioMediaSinkService;
 
-message InputSourceService
-{
-    repeated uint32 supported_keycodes = 1 [packed = true];
-    repeated message.TouchScreen touchscreen = 2;
-    repeated message.TouchPad touchpad = 3;
-    repeated FeedbackEventType feedback_events_types_supported = 4;
-    optional uint32 display_id = 5;
+
+  class GuidanceAudioChannel : public AudioMediaSinkService {
+  public:
+    GuidanceAudioChannel(boost::asio::io_service::strand &strand, messenger::IMessenger::Pointer messenger);
+  };
 }

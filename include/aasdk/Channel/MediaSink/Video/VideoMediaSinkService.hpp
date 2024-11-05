@@ -20,26 +20,64 @@
 
 #include "aasdk/Messenger/MessageId.hpp"
 #include "aasdk/Channel/Channel.hpp"
-#include "aasdk/Channel/Channel.hpp"
 #include "IVideoMediaSinkService.hpp"
-#include "aasdk/Channel/MediaSink/MediaSinkService.hpp"
 #include <aap_protobuf/channel/control/focus/video/notification/VideoFocusNotification.pb.h>
 
 namespace aasdk::channel::mediasink::video {
 
   class VideoMediaSinkService
-      : public MediaSinkService {
+      : public IVideoMediaSinkService, public Channel, public std::enable_shared_from_this<VideoMediaSinkService> {
   public:
     VideoMediaSinkService(boost::asio::io_service::strand &strand, messenger::IMessenger::Pointer messenger,
-                          messenger::ChannelId channelId);
+                     messenger::ChannelId channelId);
 
-  private:
-    using std::enable_shared_from_this<MediaSinkService>::shared_from_this;
+    // Senders and Receivers
 
-    void messageHandler(messenger::Message::Pointer message, IMediaSinkServiceEventHandler::Pointer eventHandler);
+    void receive(IVideoMediaSinkServiceEventHandler::Pointer eventHandler) override;
+
+    void
+    sendChannelOpenResponse(const aap_protobuf::channel::ChannelOpenResponse &response, SendPromise::Pointer promise) override;
+
+    void sendChannelSetupResponse(const aap_protobuf::service::media::sink::message::MediaSinkChannelSetupResponse &response,
+                                  SendPromise::Pointer promise) override;
+
+    void
+    sendMediaAckIndication(const aap_protobuf::service::media::source::message::MediaSourceMediaAckIndication &indication,
+                           SendPromise::Pointer promise) override;
 
     void sendVideoFocusIndication(const aap_protobuf::channel::control::focus::video::notification::VideoFocusNotification &indication,
-                                  SendPromise::Pointer promise);
+                                  SendPromise::Pointer promise) override;
+
+    messenger::ChannelId channelId_;
+
+  protected:
+    void registerMessageHandler(int messageId,
+                                std::function<void(const common::DataConstBuffer&, IVideoMediaSinkServiceEventHandler::Pointer)> handler);
+  private:
+    using std::enable_shared_from_this<VideoMediaSinkService>::shared_from_this;
+
+    // Internal Message Handlers
+    std::unordered_map<int, std::function<void(const common::DataConstBuffer&, IVideoMediaSinkServiceEventHandler::Pointer)>> messageHandlers_;
+
+    void messageHandler(messenger::Message::Pointer message, IVideoMediaSinkServiceEventHandler::Pointer eventHandler);
+
+    void handleChannelSetupRequest(const common::DataConstBuffer &payload,
+                                   IVideoMediaSinkServiceEventHandler::Pointer eventHandler);
+
+    void
+    handleStartIndication(const common::DataConstBuffer &payload, IVideoMediaSinkServiceEventHandler::Pointer eventHandler);
+
+    void
+    handleStopIndication(const common::DataConstBuffer &payload, IVideoMediaSinkServiceEventHandler::Pointer eventHandler);
+
+    void handleChannelOpenRequest(const common::DataConstBuffer &payload,
+                                  IVideoMediaSinkServiceEventHandler::Pointer eventHandler);
+
+    void handleMediaWithTimestampIndication(const common::DataConstBuffer &payload,
+                                            IVideoMediaSinkServiceEventHandler::Pointer eventHandler);
+
+    void handleVideoFocusRequest(const common::DataConstBuffer& payload, IVideoMediaSinkServiceEventHandler::Pointer eventHandler);
+
   };
 
 }

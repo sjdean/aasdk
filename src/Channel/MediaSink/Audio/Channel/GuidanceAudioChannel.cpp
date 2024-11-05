@@ -16,12 +16,12 @@
 *  along with aasdk. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "aasdk/Channel/MediaSink/Audio/GuidanceAudioChannel.hpp"
+#include "aasdk/Channel/MediaSink/Audio/Channel/GuidanceAudioChannel.hpp"
 
-namespace aasdk::channel::mediasink::audio {
+namespace aasdk::channel::mediasink::audio::channel {
   GuidanceAudioChannel::GuidanceAudioChannel(boost::asio::io_service::strand &strand,
                                              messenger::IMessenger::Pointer messenger)
-      : MediaSinkService(strand, std::move(messenger), messenger::ChannelId::MEDIA_SINK_GUIDANCE_AUDIO) {
+      : AudioMediaSinkService(strand, std::move(messenger), messenger::ChannelId::MEDIA_SINK_GUIDANCE_AUDIO) {
 
   }
 }

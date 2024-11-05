@@ -21,20 +21,24 @@
 #include <boost/asio.hpp>
 #include "aasdk/Messenger/IMessenger.hpp"
 #include "aasdk/Channel/Promise.hpp"
+#include "aasdk/Channel/IChannel.hpp"
 #include <aap_protobuf/channel/control/ControlMessageType.pb.h>
 
 namespace aasdk {
   namespace channel {
-    class Channel {
-    protected:
+    class Channel : public virtual IChannel {
+    public:
       Channel(boost::asio::io_service::strand &strand,
               messenger::IMessenger::Pointer messenger,
               messenger::ChannelId channelId);
 
       virtual ~Channel() = default;
 
-      void send(messenger::Message::Pointer message, SendPromise::Pointer promise);
+      messenger::ChannelId getId() const override;
 
+      void send(messenger::Message::Pointer message, SendPromise::Pointer promise) override;
+
+    protected:
       boost::asio::io_service::strand &strand_;
       messenger::IMessenger::Pointer messenger_;
       messenger::ChannelId channelId_;

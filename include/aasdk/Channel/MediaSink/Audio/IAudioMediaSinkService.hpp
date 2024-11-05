@@ -2,7 +2,7 @@
 #pragma once
 
 #include <memory>
-#include "IVideoMediaSinkServiceEventHandler.hpp"
+#include "IAudioMediaSinkServiceEventHandler.hpp"
 #include "aasdk/Channel/Promise.hpp"
 #include "aasdk/Channel/IChannel.hpp"
 #include "aasdk/Messenger/ChannelId.hpp"
@@ -12,17 +12,17 @@
 #include <aap_protobuf/channel/control/focus/video/event/VideoFocusRequestNotification.pb.h>
 #include <aap_protobuf/channel/ChannelOpenResponse.pb.h>
 
-namespace aasdk::channel::mediasink::video {
+namespace aasdk::channel::mediasink::audio {
 
-  class IVideoMediaSinkService : public virtual IChannel {
+  class IAudioMediaSinkService : public virtual IChannel {
   public:
-    typedef std::shared_ptr<IVideoMediaSinkService> Pointer;
+    typedef std::shared_ptr<IAudioMediaSinkService> Pointer;
 
-    IVideoMediaSinkService() = default;
+    IAudioMediaSinkService() = default;
 
-    virtual ~IVideoMediaSinkService() = default;
+    virtual ~IAudioMediaSinkService() = default;
 
-    virtual void receive(IVideoMediaSinkServiceEventHandler::Pointer eventHandler) = 0;
+    virtual void receive(IAudioMediaSinkServiceEventHandler::Pointer eventHandler) = 0;
 
     virtual void
     sendChannelOpenResponse(const aap_protobuf::channel::ChannelOpenResponse &response, SendPromise::Pointer promise) = 0;
@@ -35,13 +35,8 @@ namespace aasdk::channel::mediasink::video {
     sendMediaAckIndication(const aap_protobuf::service::media::source::message::MediaSourceMediaAckIndication &indication,
                            SendPromise::Pointer promise) = 0;
 
-    virtual void
-    sendVideoFocusIndication(const aap_protobuf::channel::control::focus::video::notification::VideoFocusNotification &indication, SendPromise::Pointer promise) = 0;
-
   };
 
 }
-
-
 
 

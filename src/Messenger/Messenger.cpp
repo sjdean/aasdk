@@ -72,6 +72,7 @@ void Messenger::enqueueSend(Message::Pointer message, SendPromise::Pointer promi
 void Messenger::inStreamMessageHandler(Message::Pointer message)
 {
     auto channelId = message->getChannelId();
+    AASDK_LOG(debug) << "[inStreamMessageHandler] Resolve ChannelId " << channelIdToString(message->getChannelId());
 
     // If there's a promise on the queue, we resolve the promise with this message....
     if(channelReceivePromiseQueue_.isPending(channelId))

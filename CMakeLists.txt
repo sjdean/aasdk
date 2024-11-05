@@ -12,12 +12,18 @@ elseif( TARGET_ARCH STREQUAL "armhf" )
     set(CMAKE_CXX_COMPILER /usr/bin/arm-linux-gnueabihf-g++-8)
     set(CPACK_DEBIAN_PACKAGE_ARCHITECTURE "armhf")
 else()
+    if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")  # macOS
+        # macOS specific command
+        #set(CMAKE_OSX_ARCHITECTURES "x86_64")
+        #set(CMAKE_OSX_DEPLOYMENT_TARGET "10.12")
+    endif()
     message("Target Architecture not specified, not cross compiling")
 endif()
 
 # Set Compile Versions
-set(LIBRARY_BUILD_DATE 20241028)    # Binary Release Build Date
-set(LIBRARY_BUILD_RELEASE 1)        # Binary Release Build Number (increment if released on same day)
+set(LIBRARY_BUILD_DATE "20241028")    # Binary Release Build Date
+set(LIBRARY_BUILD_MAJOR_RELEASE 1)        # Binary Release Build Number (increment if released on same day)
+set(LIBRARY_BUILD_MINOR_RELEASE 1)        # Binary Release Build Number (increment if released on same day)
 set(LIBRARY_BUILD_INCREMENTAL 1)    # Binary Build Version - Increment for Each Build
 
 # Cache
@@ -27,7 +33,7 @@ if(CCACHE_PROGRAM)
 endif()
 
 # Configure CMAKE
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake_modules/")
@@ -46,7 +52,8 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/bin)
 set(EXECUTABLE_OUTPUT_PATH ${CMAKE_CURRENT_SOURCE_DIR}/bin)
 
-include(${CMAKE_CURRENT_SOURCE_DIR}/cmake_modules/gitversion.cmake)
+#This line Errors - TODO
+#include(${CMAKE_CURRENT_SOURCE_DIR}/cmake_modules/gitversion.cmake)
 set (CMAKE_PROJECT_VERSION_PATCH ${_commit_timestamp})
 
 # Configure Boost
@@ -64,16 +71,29 @@ if(AASDK_TEST)
     include(ExternalGtest)
 endif(AASDK_TEST)
 
-find_package(protobuf/aap_protobuf REQUIRED)
+find_package(aap_protobuf REQUIRED)
+
+# Building on a Mac requires Abseil
+if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")  # macOS
+    find_package(protobuf REQUIRED CONFIG)
+    find_package(absl REQUIRED)
+else ()
+    find_package(Protobuf REQUIRED)
+endif ()
+
+include(FindProtobuf)
+
 find_package(Boost REQUIRED COMPONENTS system log OPTIONAL_COMPONENTS unit_test_framework)
 find_package(libusb-1.0 REQUIRED)
-find_package(Protobuf REQUIRED)
+
 find_package(OpenSSL REQUIRED)
 
 include_directories(
         ${Boost_INCLUDE_DIRS}
         ${LIBUSB_1_INCLUDE_DIRS}
+        ${LIBUSB_INCLUDE_DIR}
         ${PROTOBUF_INCLUDE_DIR}
+        ${AAP_PROTOBUF_INCLUDE_DIR}
         ${OPENSSL_INCLUDE_DIR}
         ${GTEST_INCLUDE_DIRS}
         ${GMOCK_INCLUDE_DIRS}
@@ -91,23 +111,25 @@ add_library(aasdk SHARED
         ${source_files}
         ${include_files})
 
-target_include_directories(aasdk PRIVATE ${AAP_PROTOBUF_INCLUDE_DIRS})
+target_include_directories(aasdk PUBLIC ${AAP_PROTOBUF_INCLUDE_DIR})
 
 target_link_libraries(aasdk PUBLIC
-        aap_protobuf
+        libusb
         ${Boost_LIBRARIES}
+        ${AAP_PROTOBUF_LIB_DIR}
         ${LIBUSB_1_LIBRARIES}
         ${PROTOBUF_LIBRARIES}
         ${OPENSSL_LIBRARIES}
         ${WINSOCK2_LIBRARIES})
 
-set(LIBRARY_VERSION_STRING ${LIBRARY_BUILD_DATE}.${LIBRARY_BUILD_RELEASE}.${LIBRARY_BUILD_INCREMENTAL})
+
+set(LIBRARY_VERSION_STRING "${LIBRARY_BUILD_MAJOR_RELEASE}.${LIBRARY_BUILD_MINOR_RELEASE}.${LIBRARY_BUILD_INCREMENTAL}+${LIBRARY_BUILD_DATE}")
 message(INFO " Project Version: ${LIBRARY_VERSION_STRING}")
 set_target_properties(aasdk
         PROPERTIES VERSION ${LIBRARY_VERSION_STRING} SOVERSION ${LIBRARY_BUILD_INCREMENTAL})
 
 # Install rules
-install(TARGETS aasdk
+install(TARGETS aasdk libusb
         EXPORT aasdkTargets
         LIBRARY DESTINATION lib
         ARCHIVE DESTINATION lib
@@ -115,14 +137,14 @@ install(TARGETS aasdk
         INCLUDES DESTINATION include
 )
 
-#target_include_directories(aap_protobuf
+#target_include_directories(aasdk
 #        PUBLIC
-#        $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
+#        $<BUILD_INTERFACE:${PROTOBUF_SOURCES}>
 #        $<INSTALL_INTERFACE:include/aap_protobuf>
 #)
 
 # Install headers explicitly
-install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/aasdk
+install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/aasdk
         DESTINATION include
 )
 

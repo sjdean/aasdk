@@ -62,7 +62,7 @@
 
         virtual void onChannelError(const error::Error &e) = 0;
 
-        virtual void onVoiceSessionRequest(const aap_protobuf::channel::control::version::VoiceSessionNotification &request) = 0;
+        virtual void onVoiceSessionRequest(const aap_protobuf::channel::control::voice::VoiceSessionNotification &request) = 0;
       };
     }
 

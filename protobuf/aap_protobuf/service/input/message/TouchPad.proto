@@ -2,7 +2,7 @@ syntax="proto2";
 
 package aap_protobuf.service.input.message;
 
-message TouchPadConfig {
+message TouchPad {
     required int32 width = 1;
     required int32 height = 2;
     optional bool ui_navigation = 3;

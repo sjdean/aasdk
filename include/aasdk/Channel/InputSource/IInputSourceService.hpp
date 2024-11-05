@@ -19,18 +19,18 @@
 #pragma once
 
 #include <memory>
-
+#include "aasdk/Channel/Promise.hpp"
+#include "aasdk/Channel/IChannel.hpp"
+#include "aasdk/Messenger/ChannelId.hpp"
 #include <aap_protobuf/shared/MessageStatus.pb.h>
 #include <aap_protobuf/service/media/sink/message/BindingResponse.pb.h>
 #include <aap_protobuf/service/input/message/InputEventIndication.pb.h>
 #include <aap_protobuf/channel/ChannelOpenResponse.pb.h>
-#include "aasdk/Messenger/ChannelId.hpp"
-#include "aasdk/Channel/Promise.hpp"
 #include "IInputSourceServiceEventHandler.hpp"
 
 
 namespace aasdk::channel::inputsource {
-  class IInputSourceService {
+  class IInputSourceService : public virtual IChannel {
   public:
     typedef std::shared_ptr<IInputSourceService> Pointer;
 

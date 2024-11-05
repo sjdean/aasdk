@@ -27,6 +27,11 @@ namespace aasdk::channel {
 
   }
 
+  messenger::ChannelId Channel::getId() const
+  {
+    return channelId_;
+  }
+
   void Channel::send(messenger::Message::Pointer message, SendPromise::Pointer promise) {
 #if BOOST_VERSION < 106600
     auto sendPromise = messenger::SendPromise::defer(strand_.get_io_service());

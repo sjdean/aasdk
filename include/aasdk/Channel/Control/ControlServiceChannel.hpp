@@ -56,6 +56,8 @@ namespace aasdk::channel::control {
     void sendShutdownResponse(const aap_protobuf::channel::control::byebye::notification::ByeByeResponse &response,
                               SendPromise::Pointer promise) override;
 
+    void sendVoiceSessionFocusResponse(const aap_protobuf::channel::control::voice::VoiceSessionNotification &response,
+                                       SendPromise::Pointer promise) override;
     void sendNavigationFocusResponse(
         const aap_protobuf::channel::control::focus::navigation::notification::NavFocusNotification &response,
         SendPromise::Pointer promise) override;

@@ -19,15 +19,16 @@
 #pragma once
 
 #include <memory>
-#include "aasdk/Messenger/ChannelId.hpp"
 #include "aasdk/Channel/Promise.hpp"
+#include "aasdk/Channel/IChannel.hpp"
+#include "aasdk/Messenger/ChannelId.hpp"
 #include <aap_protobuf/channel/ChannelOpenResponse.pb.h>
 #include <aap_protobuf/service/wifiprojection/message/WifiCredentialsResponse.pb.h>
 #include "IWifiProjectionServiceEventHandler.hpp"
 
 namespace aasdk::channel::wifiprojection {
 
-  class IWifiProjectionService {
+  class IWifiProjectionService : public virtual IChannel {
   public:
     typedef std::shared_ptr<IWifiProjectionService> Pointer;
 

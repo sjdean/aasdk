@@ -16,16 +16,16 @@
 *  along with aasdk. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "aasdk/Channel/MediaSink/Audio/MediaAudioChannel.hpp"
+#pragma once
+
+#include "aasdk/Channel/MediaSink/Audio/AudioMediaSinkService.hpp"
+
+namespace aasdk::channel::mediasink::audio::channel {
+  using aasdk::channel::mediasink::audio::AudioMediaSinkService;
 
 
-namespace aasdk::channel::mediasink::audio {
-  MediaAudioChannel::MediaAudioChannel(boost::asio::io_service::strand &strand,
-                                       messenger::IMessenger::Pointer messenger)
-      : MediaSinkService(strand, std::move(messenger), messenger::ChannelId::MEDIA_SINK_MEDIA_AUDIO) {
-
-  }
+  class SystemAudioChannel : public AudioMediaSinkService {
+  public:
+    SystemAudioChannel(boost::asio::io_service::strand &strand, messenger::IMessenger::Pointer messenger);
+  };
 }
-
-
-

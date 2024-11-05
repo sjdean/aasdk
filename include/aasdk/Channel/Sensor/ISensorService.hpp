@@ -19,8 +19,9 @@
 #pragma once
 
 #include <memory>
-#include "aasdk/Messenger/ChannelId.hpp"
 #include "aasdk/Channel/Promise.hpp"
+#include "aasdk/Channel/IChannel.hpp"
+#include "aasdk/Messenger/ChannelId.hpp"
 #include <aap_protobuf/service/sensor/message/SensorStartResponseMessage.pb.h>
 #include <aap_protobuf/service/sensor/message/SensorBatch.pb.h>
 #include <aap_protobuf/channel/ChannelOpenResponse.pb.h>
@@ -28,7 +29,7 @@
 
 namespace aasdk::channel::sensor {
 
-  class ISensorService {
+  class ISensorService : public virtual IChannel {
   public:
     typedef std::shared_ptr<ISensorService> Pointer;
 

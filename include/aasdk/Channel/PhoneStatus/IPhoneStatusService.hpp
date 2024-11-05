@@ -1,15 +1,16 @@
 #pragma once
 
 #include <memory>
-#include "aasdk/Messenger/ChannelId.hpp"
 #include "aasdk/Channel/Promise.hpp"
+#include "aasdk/Channel/IChannel.hpp"
+#include "aasdk/Messenger/ChannelId.hpp"
 #include <aap_protobuf/channel/ChannelOpenResponse.pb.h>
 #include <aap_protobuf/service/wifiprojection/message/WifiCredentialsResponse.pb.h>
 #include "IPhoneStatusServiceEventHandler.hpp"
 
 namespace aasdk::channel::phonestatus {
 
-  class IPhoneStatusService {
+  class IPhoneStatusService : public virtual IChannel {
   public:
     typedef std::shared_ptr<IPhoneStatusService> Pointer;
 

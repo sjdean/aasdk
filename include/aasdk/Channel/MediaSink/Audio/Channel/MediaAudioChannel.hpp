@@ -18,11 +18,14 @@
 
 #pragma once
 
-#include "aasdk/Channel/MediaSink/MediaSinkService.hpp"
+#include "aasdk/Channel/MediaSink/Audio/AudioMediaSinkService.hpp"
 
-namespace aasdk::channel::mediasink::video {
-  class VideoChannel : public channel::mediasink::MediaSinkService {
+namespace aasdk::channel::mediasink::audio::channel {
+  using aasdk::channel::mediasink::audio::AudioMediaSinkService;
+
+
+  class MediaAudioChannel : public AudioMediaSinkService {
   public:
-    VideoChannel(boost::asio::io_service::strand &strand, messenger::IMessenger::Pointer messenger);
+    MediaAudioChannel(boost::asio::io_service::strand &strand, messenger::IMessenger::Pointer messenger);
   };
 }

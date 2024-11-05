@@ -17,30 +17,30 @@
 */
 
 #include <aap_protobuf/service/media/shared/message/MediaMessageId.pb.h>
-#include <aasdk/Channel//MediaSink//IMediaSinkServiceEventHandler.hpp>
-#include <aasdk/Channel/MediaSink/MediaSinkService.hpp>
+#include <aasdk/Channel/MediaSink/Audio/IAudioMediaSinkServiceEventHandler.hpp>
+#include <aasdk/Channel/MediaSink/Audio/AudioMediaSinkService.hpp>
 #include "aasdk/Common/Log.hpp"
 
 
-namespace aasdk::channel::mediasink {
+namespace aasdk::channel::mediasink::audio {
 
-  MediaSinkService::MediaSinkService(boost::asio::io_service::strand &strand,
+  AudioMediaSinkService::AudioMediaSinkService(boost::asio::io_service::strand &strand,
                                      messenger::IMessenger::Pointer messenger,
                                      messenger::ChannelId channelId)
-      : Channel(strand, std::move(messenger), messenger::ChannelId::MEDIA_SINK) {
+      : Channel(strand, std::move(messenger), channelId) {
 
   }
 
-  void MediaSinkService::receive(IMediaSinkServiceEventHandler::Pointer eventHandler) {
+  void AudioMediaSinkService::receive(IAudioMediaSinkServiceEventHandler::Pointer eventHandler) {
     auto receivePromise = messenger::ReceivePromise::defer(strand_);
     receivePromise->then(
-        std::bind(&MediaSinkService::messageHandler, this->shared_from_this(), std::placeholders::_1, eventHandler),
-        std::bind(&IMediaSinkServiceEventHandler::onChannelError, eventHandler, std::placeholders::_1));
+        std::bind(&AudioMediaSinkService::messageHandler, this->shared_from_this(), std::placeholders::_1, eventHandler),
+        std::bind(&IAudioMediaSinkServiceEventHandler::onChannelError, eventHandler, std::placeholders::_1));
 
     messenger_->enqueueReceive(channelId_, std::move(receivePromise));
   }
 
-  void MediaSinkService::sendChannelOpenResponse(const aap_protobuf::channel::ChannelOpenResponse &response,
+  void AudioMediaSinkService::sendChannelOpenResponse(const aap_protobuf::channel::ChannelOpenResponse &response,
                                                  SendPromise::Pointer promise) {
     auto message(std::make_shared<messenger::Message>(channelId_, messenger::EncryptionType::ENCRYPTED,
                                                       messenger::MessageType::CONTROL));
@@ -50,7 +50,7 @@ namespace aasdk::channel::mediasink {
     this->send(std::move(message), std::move(promise));
   }
 
-  void MediaSinkService::sendChannelSetupResponse(
+  void AudioMediaSinkService::sendChannelSetupResponse(
       const aap_protobuf::service::media::sink::message::MediaSinkChannelSetupResponse &response,
       SendPromise::Pointer promise) {
     auto message(std::make_shared<messenger::Message>(channelId_, messenger::EncryptionType::ENCRYPTED,
@@ -62,7 +62,7 @@ namespace aasdk::channel::mediasink {
     this->send(std::move(message), std::move(promise));
   }
 
-  void MediaSinkService::sendMediaAckIndication(
+  void AudioMediaSinkService::sendMediaAckIndication(
       const aap_protobuf::service::media::source::message::MediaSourceMediaAckIndication &indication,
       SendPromise::Pointer promise) {
     auto message(std::make_shared<messenger::Message>(channelId_, messenger::EncryptionType::ENCRYPTED,
@@ -74,8 +74,13 @@ namespace aasdk::channel::mediasink {
     this->send(std::move(message), std::move(promise));
   }
 
-  void MediaSinkService::messageHandler(messenger::Message::Pointer message,
-                                        IMediaSinkServiceEventHandler::Pointer eventHandler) {
+  void AudioMediaSinkService::registerMessageHandler(int messageId,
+                                                std::function<void(const common::DataConstBuffer&, IAudioMediaSinkServiceEventHandler::Pointer)> handler) {
+    messageHandlers_[messageId] = std::move(handler);
+  }
+
+  void AudioMediaSinkService::messageHandler(messenger::Message::Pointer message,
+                                        IAudioMediaSinkServiceEventHandler::Pointer eventHandler) {
     messenger::MessageId messageId(message->getPayload());
     common::DataConstBuffer payload(message->getPayload(), messageId.getSizeOf());
 
@@ -99,44 +104,45 @@ namespace aasdk::channel::mediasink {
         this->handleChannelOpenRequest(payload, std::move(eventHandler));
         break;
       default:
-        AASDK_LOG(error) << "[MediaSinkService] message not handled: " << messageId.getId();
+        //AASDK_LOG(error) << "[AudioMediaSinkService] ChannelId " << channelId;
+        AASDK_LOG(error) << "[AudioMediaSinkService] message not handled: " << messageId.getId();
         this->receive(std::move(eventHandler));
         break;
     }
   }
 
-  void MediaSinkService::handleChannelSetupRequest(const common::DataConstBuffer &payload,
-                                                   IMediaSinkServiceEventHandler::Pointer eventHandler) {
+  void AudioMediaSinkService::handleChannelSetupRequest(const common::DataConstBuffer &payload,
+                                                   IAudioMediaSinkServiceEventHandler::Pointer eventHandler) {
     aap_protobuf::channel::media::event::Setup request;
     if (request.ParseFromArray(payload.cdata, payload.size)) {
-      eventHandler->onSetup(request);
+      eventHandler->onMediaChannelSetupRequest(request);
     } else {
       eventHandler->onChannelError(error::Error(error::ErrorCode::PARSE_PAYLOAD));
     }
   }
 
-  void MediaSinkService::handleStartIndication(const common::DataConstBuffer &payload,
-                                               IMediaSinkServiceEventHandler::Pointer eventHandler) {
+  void AudioMediaSinkService::handleStartIndication(const common::DataConstBuffer &payload,
+                                               IAudioMediaSinkServiceEventHandler::Pointer eventHandler) {
     aap_protobuf::channel::media::event::Start indication;
     if (indication.ParseFromArray(payload.cdata, payload.size)) {
-      eventHandler->onStart(indication);
+      eventHandler->onMediaChannelStartIndication(indication);
     } else {
       eventHandler->onChannelError(error::Error(error::ErrorCode::PARSE_PAYLOAD));
     }
   }
 
-  void MediaSinkService::handleStopIndication(const common::DataConstBuffer &payload,
-                                              IMediaSinkServiceEventHandler::Pointer eventHandler) {
+  void AudioMediaSinkService::handleStopIndication(const common::DataConstBuffer &payload,
+                                              IAudioMediaSinkServiceEventHandler::Pointer eventHandler) {
     aap_protobuf::channel::media::event::Stop indication;
     if (indication.ParseFromArray(payload.cdata, payload.size)) {
-      eventHandler->onStop(indication);
+      eventHandler->onMediaChannelStopIndication(indication);
     } else {
       eventHandler->onChannelError(error::Error(error::ErrorCode::PARSE_PAYLOAD));
     }
   }
 
-  void MediaSinkService::handleChannelOpenRequest(const common::DataConstBuffer &payload,
-                                                  IMediaSinkServiceEventHandler::Pointer eventHandler) {
+  void AudioMediaSinkService::handleChannelOpenRequest(const common::DataConstBuffer &payload,
+                                                  IAudioMediaSinkServiceEventHandler::Pointer eventHandler) {
     aap_protobuf::channel::ChannelOpenRequest request;
     if (request.ParseFromArray(payload.cdata, payload.size)) {
       eventHandler->onChannelOpenRequest(request);
@@ -145,18 +151,16 @@ namespace aasdk::channel::mediasink {
     }
   }
 
-  void MediaSinkService::handleMediaWithTimestampIndication(const common::DataConstBuffer &payload,
-                                                            IMediaSinkServiceEventHandler::Pointer eventHandler) {
+  void AudioMediaSinkService::handleMediaWithTimestampIndication(const common::DataConstBuffer &payload,
+                                                            IAudioMediaSinkServiceEventHandler::Pointer eventHandler) {
     if (payload.size >= sizeof(messenger::Timestamp::ValueType)) {
       messenger::Timestamp timestamp(payload);
       eventHandler->onMediaWithTimestampIndication(timestamp.getValue(),
-                                                     common::DataConstBuffer(payload.cdata, payload.size,
-                                                                             sizeof(messenger::Timestamp::ValueType)));
+                                                   common::DataConstBuffer(payload.cdata, payload.size,
+                                                                           sizeof(messenger::Timestamp::ValueType)));
     } else {
       eventHandler->onChannelError(error::Error(error::ErrorCode::PARSE_PAYLOAD));
     }
   }
-
 }
-
 

@@ -4,19 +4,27 @@ cmake_minimum_required(VERSION 3.5)
 project(aap_protobuf)
 
 # Set Compile Versions
-set(AAP_PROTO_VERSION 1.6)          # Underlying AAP (Android Auto Projection Library Protocol)
-set(LIBRARY_BUILD_DATE 20241028)    # Binary Release Build Date
-set(LIBRARY_BUILD_RELEASE 1)        # Binary Release Build Number (increment if released on same day)
+set(LIBRARY_BUILD_DATE "202410231")    # Binary Release Build Date
+set(LIBRARY_BUILD_MAJOR_RELEASE 1)        # Binary Release Build Number (increment if released on same day)
+set(LIBRARY_BUILD_MINOR_RELEASE 1)        # Binary Release Build Number (increment if released on same day)
 set(LIBRARY_BUILD_INCREMENTAL 1)    # Binary Build Version - Increment for Each Build
+set(AAP_PROTO_VERSION 1.6)          # Underlying AAP (Android Auto Projection Library Protocol)
 
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 17)
 
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Require ProtoBuf library
-find_package(Protobuf REQUIRED)
-include(FindProtobuf)
+if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")  # macOS
+    # macOS specific command
+    find_package(protobuf REQUIRED CONFIG)
+    find_package(absl)
+else()
+    # Linux specific command
+    find_package(Protobuf REQUIRED)
+endif()
 
+include(FindProtobuf)
 
 # Turn off Path Appending
 set(PROTOBUF_GENERATE_CPP_APPEND_PATH OFF)
@@ -28,9 +36,8 @@ file(GLOB_RECURSE source_proto_files ${CMAKE_CURRENT_SOURCE_DIR}/*.proto)
 protobuf_generate_cpp(PROTO_SRCS PROTO_HDRS ${source_proto_files})
 
 # Generate Library
-add_library(aap_protobuf ${PROTO_SRCS} ${PROTO_HDRS})
+add_library(aap_protobuf SHARED ${PROTO_SRCS} ${PROTO_HDRS})
 target_link_libraries(aap_protobuf PUBLIC ${PROTOBUF_LIBRARIES})
-
 
 include_directories(
         ${CMAKE_CURRENT_BINARY_DIR}
@@ -38,8 +45,8 @@ include_directories(
         ${PROTOBUF_INCLUDE_DIR}
 )
 
-set(LIBRARY_BUILD_VERSION_STRING ${AAP_PROTO_VERSION}.${LIBRARY_BUILD_DATE}.${LIBRARY_BUILD_RELEASE})
-
+set(LIBRARY_BUILD_VERSION_STRING "${LIBRARY_BUILD_MAJOR_RELEASE}.${LIBRARY_BUILD_MINOR_RELEASE}.${LIBRARY_BUILD_INCREMENTAL}+${LIBRARY_BUILD_DATE}")
+message(INFO " Project Version: ${LIBRARY_BUILD_VERSION_STRING}")
 set_target_properties(aap_protobuf
         PROPERTIES
         VERSION ${LIBRARY_BUILD_VERSION_STRING}

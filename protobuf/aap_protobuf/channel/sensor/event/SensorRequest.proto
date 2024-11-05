@@ -24,6 +24,6 @@ package aap_protobuf.channel.sensor.event;
 
 message SensorRequest
 {
-    required service.sensor.message.SensorType sensor_type = 1;
+    required service.sensor.message.SensorType type = 1;
     required int64 min_update_period = 2;
 }

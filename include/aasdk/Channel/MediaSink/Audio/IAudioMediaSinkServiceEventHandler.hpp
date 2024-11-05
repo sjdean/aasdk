@@ -10,15 +10,15 @@
 #include "aasdk/Error/Error.hpp"
 #include <aap_protobuf/channel/control/focus/video/event/VideoFocusRequestNotification.pb.h>
 
-namespace aasdk::channel::mediasink::video {
+namespace aasdk::channel::mediasink::audio {
 
-  class IVideoMediaSinkServiceEventHandler {
+  class IAudioMediaSinkServiceEventHandler {
   public:
-    typedef std::shared_ptr<IVideoMediaSinkServiceEventHandler> Pointer;
+    typedef std::shared_ptr<IAudioMediaSinkServiceEventHandler> Pointer;
 
-    IVideoMediaSinkServiceEventHandler() = default;
+    IAudioMediaSinkServiceEventHandler() = default;
 
-    virtual ~IVideoMediaSinkServiceEventHandler() = default;
+    virtual ~IAudioMediaSinkServiceEventHandler() = default;
 
     virtual void onChannelOpenRequest(const aap_protobuf::channel::ChannelOpenRequest &request) = 0;
 
@@ -33,10 +33,9 @@ namespace aasdk::channel::mediasink::video {
 
     virtual void onMediaIndication(const common::DataConstBuffer &buffer) = 0;
 
-    virtual void onVideoFocusRequest(const aap_protobuf::channel::control::focus::video::event::VideoFocusRequestNotification &request) = 0;
-
     virtual void onChannelError(const error::Error &e) = 0;
-  };
+
+    };
 
 }
 

@@ -39,11 +39,13 @@ namespace aasdk::channel::mediasource {
     void
     sendChannelOpenResponse(const aap_protobuf::channel::ChannelOpenResponse &response, SendPromise::Pointer promise) override;
 
+    void sendChannelSetupResponse(const aap_protobuf::service::media::sink::message::MediaSinkChannelSetupResponse &response,
+                                  SendPromise::Pointer promise) override;
 
-    void sendAVInputOpenResponse(const aap_protobuf::service::media::source::message::MicrophoneResponse &response,
+    void sendMicrophoneOpenResponse(const aap_protobuf::service::media::source::message::MicrophoneResponse &response,
                                  SendPromise::Pointer promise) override;
 
-    void sendAVMediaWithTimestampIndication(messenger::Timestamp::ValueType, const common::Data &data,
+    void sendMediaSourceWithTimestampIndication(messenger::Timestamp::ValueType, const common::Data &data,
                                             SendPromise::Pointer promise) override;
 
     messenger::ChannelId channelId_;
