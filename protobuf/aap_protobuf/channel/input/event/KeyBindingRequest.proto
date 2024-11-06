@@ -1,0 +1,9 @@
+
+
+syntax="proto2";
+
+package aap_protobuf.channel.input.event;
+
+message KeyBindingRequest {
+    repeated int32 keycodes = 1 [packed = true];
+}

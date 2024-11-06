@@ -1,24 +1,8 @@
-/*
-*  This file is part of aasdk library project.
-*  Copyright (C) 2018 f1x.studio (Michal Szwaj)
-*
-*  aasdk is free software: you can redistribute it and/or modify
-*  it under the terms of the GNU General Public License as published by
-*  the Free Software Foundation; either version 3 of the License, or
-*  (at your option) any later version.
 
-*  aasdk is distributed in the hope that it will be useful,
-*  but WITHOUT ANY WARRANTY; without even the implied warranty of
-*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-*  GNU General Public License for more details.
-*
-*  You should have received a copy of the GNU General Public License
-*  along with aasdk. If not, see <http://www.gnu.org/licenses/>.
-*/
 
 syntax="proto2";
 
-import "aap_protobuf/service/ServiceDescriptor.proto";
+import "aap_protobuf/service/Service.proto";
 import "aap_protobuf/connection/ConnectionConfiguration.proto";
 import "aap_protobuf/channel/control/servicediscovery/notification/DriverPosition.proto";
 
@@ -26,7 +10,7 @@ package aap_protobuf.channel.control.servicediscovery.notification;
 
 message ServiceDiscoveryResponse
 {
-    repeated service.ServiceDescriptor channels = 1;
+    repeated service.Service channels = 1;
     optional string make = 2 [deprecated = true];
     optional string model = 3 [deprecated = true];
     optional string year = 4 [deprecated = true];

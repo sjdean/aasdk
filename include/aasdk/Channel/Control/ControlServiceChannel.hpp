@@ -1,20 +1,19 @@
-/*
-*  This file is part of aasdk library project.
-*  Copyright (C) 2018 f1x.studio (Michal Szwaj)
-*
-*  aasdk is free software: you can redistribute it and/or modify
-*  it under the terms of the GNU General Public License as published by
-*  the Free Software Foundation; either version 3 of the License, or
-*  (at your option) any later version.
-
-*  aasdk is distributed in the hope that it will be useful,
-*  but WITHOUT ANY WARRANTY; without even the implied warranty of
-*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-*  GNU General Public License for more details.
-*
-*  You should have received a copy of the GNU General Public License
-*  along with aasdk. If not, see <http://www.gnu.org/licenses/>.
-*/
+// This file is part of aasdk library project.
+// Copyright (C) 2018 f1x.studio (Michal Szwaj)
+// Copyright (C) 2024 CubeOne (Simon Dean - simon.dean@cubeone.co.uk)
+//
+// aasdk is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation; either version 3 of the License, or
+// (at your option) any later version.
+//
+// aasdk is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with aasdk. If not, see <http://www.gnu.org/licenses/>.
 
 #pragma once
 
@@ -47,8 +46,9 @@ namespace aasdk::channel::control {
         SendPromise::Pointer promise) override;
 
     void
-    sendAudioFocusResponse(const aap_protobuf::channel::control::focus::audio::notification::AudioFocusNotification &response,
-                           SendPromise::Pointer promise) override;
+    sendAudioFocusResponse(
+        const aap_protobuf::channel::control::focus::audio::notification::AudioFocusNotification &response,
+        SendPromise::Pointer promise) override;
 
     void sendShutdownRequest(const aap_protobuf::channel::control::byebye::event::ByeByeRequest &request,
                              SendPromise::Pointer promise) override;
@@ -58,12 +58,14 @@ namespace aasdk::channel::control {
 
     void sendVoiceSessionFocusResponse(const aap_protobuf::channel::control::voice::VoiceSessionNotification &response,
                                        SendPromise::Pointer promise) override;
+
     void sendNavigationFocusResponse(
         const aap_protobuf::channel::control::focus::navigation::notification::NavFocusNotification &response,
         SendPromise::Pointer promise) override;
 
     void
-    sendPingRequest(const aap_protobuf::channel::control::ping::PingRequest &request, SendPromise::Pointer promise) override;
+    sendPingRequest(const aap_protobuf::channel::control::ping::PingRequest &request,
+                    SendPromise::Pointer promise) override;
 
     void
     sendPingResponse(const aap_protobuf::channel::control::ping::PingResponse &response,

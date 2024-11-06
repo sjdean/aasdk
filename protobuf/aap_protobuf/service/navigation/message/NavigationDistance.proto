@@ -1,7 +1,5 @@
 syntax="proto2";
 
-package aap_protobuf.service.navigation.message;
-
 message NavigationDistance {
   optional int32 meters = 1;
   optional string display_value = 2;

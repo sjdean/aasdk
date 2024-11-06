@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.5)
 
 #Android Auto Projection Protocol Library
 project(aap_protobuf)
+message(STATUS "AASDK ProtoBuf Library")
 
 # Set Compile Versions
 set(LIBRARY_BUILD_DATE "202410231")    # Binary Release Build Date
@@ -17,6 +18,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # Require ProtoBuf library
 if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")  # macOS
     # macOS specific command
+    message(STATUS "Finding abseil for MacOS build")
     find_package(protobuf REQUIRED CONFIG)
     find_package(absl)
 else()
@@ -36,9 +38,15 @@ file(GLOB_RECURSE source_proto_files ${CMAKE_CURRENT_SOURCE_DIR}/*.proto)
 protobuf_generate_cpp(PROTO_SRCS PROTO_HDRS ${source_proto_files})
 
 # Generate Library
-add_library(aap_protobuf SHARED ${PROTO_SRCS} ${PROTO_HDRS})
-target_link_libraries(aap_protobuf PUBLIC ${PROTOBUF_LIBRARIES})
+if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")  # macOS
+    message(NOTICE "Will build STATIC Lib for MacOS")
+    add_library(aap_protobuf STATIC ${PROTO_SRCS} ${PROTO_HDRS})
+else()
+    message(NOTICE "Will build SHARED Lib")
+    add_library(aap_protobuf SHARED ${PROTO_SRCS} ${PROTO_HDRS})
+endif()
 
+target_link_libraries(aap_protobuf PUBLIC ${PROTOBUF_LIBRARIES})
 include_directories(
         ${CMAKE_CURRENT_BINARY_DIR}
         ${CMAKE_CURRENT_BINARY_DIR}/aap_protobuf
@@ -46,7 +54,7 @@ include_directories(
 )
 
 set(LIBRARY_BUILD_VERSION_STRING "${LIBRARY_BUILD_MAJOR_RELEASE}.${LIBRARY_BUILD_MINOR_RELEASE}.${LIBRARY_BUILD_INCREMENTAL}+${LIBRARY_BUILD_DATE}")
-message(INFO " Project Version: ${LIBRARY_BUILD_VERSION_STRING}")
+message(NOTICE " Project Version: ${LIBRARY_BUILD_VERSION_STRING}")
 set_target_properties(aap_protobuf
         PROPERTIES
         VERSION ${LIBRARY_BUILD_VERSION_STRING}

@@ -1,20 +1,19 @@
-/*
-*  This file is part of aasdk library project.
-*  Copyright (C) 2018 f1x.studio (Michal Szwaj)
-*
-*  aasdk is free software: you can redistribute it and/or modify
-*  it under the terms of the GNU General Public License as published by
-*  the Free Software Foundation; either version 3 of the License, or
-*  (at your option) any later version.
-
-*  aasdk is distributed in the hope that it will be useful,
-*  but WITHOUT ANY WARRANTY; without even the implied warranty of
-*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-*  GNU General Public License for more details.
-*
-*  You should have received a copy of the GNU General Public License
-*  along with aasdk. If not, see <http://www.gnu.org/licenses/>.
-*/
+// This file is part of aasdk library project.
+// Copyright (C) 2018 f1x.studio (Michal Szwaj)
+// Copyright (C) 2024 CubeOne (Simon Dean - simon.dean@cubeone.co.uk)
+//
+// aasdk is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation; either version 3 of the License, or
+// (at your option) any later version.
+//
+// aasdk is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with aasdk. If not, see <http://www.gnu.org/licenses/>.
 
 #include <aap_protobuf/service/mediaplayback/MediaPlaybackStatusMessageId.pb.h>
 #include "aasdk/Channel/MediaPlaybackStatus/MediaPlaybackStatusService.hpp"
@@ -34,6 +33,7 @@ namespace aasdk::channel::mediaplaybackstatus {
   }
 
   void MediaPlaybackStatusService::receive(IMediaPlaybackStatusServiceEventHandler::Pointer eventHandler) {
+    AASDK_LOG(debug) << "[MediaPlaybackStatusService] receive()";
     auto receivePromise = messenger::ReceivePromise::defer(strand_);
     receivePromise->then(
         std::bind(&MediaPlaybackStatusService::messageHandler, this->shared_from_this(), std::placeholders::_1,
@@ -45,11 +45,12 @@ namespace aasdk::channel::mediaplaybackstatus {
 
   void MediaPlaybackStatusService::sendChannelOpenResponse(const aap_protobuf::channel::ChannelOpenResponse &response,
                                                            SendPromise::Pointer promise) {
-    AASDK_LOG(info) << "[MediaStatusServiceChannel] service open response ";
+    AASDK_LOG(debug) << "[MediaPlaybackStatusService] sendChannelOpenResponse()";
     auto message(std::make_shared<messenger::Message>(channelId_, messenger::EncryptionType::ENCRYPTED,
                                                       messenger::MessageType::CONTROL));
     message->insertPayload(
-        messenger::MessageId(aap_protobuf::channel::control::ControlMessageType::MESSAGE_CHANNEL_OPEN_RESPONSE).getData());
+        messenger::MessageId(
+            aap_protobuf::channel::control::ControlMessageType::MESSAGE_CHANNEL_OPEN_RESPONSE).getData());
     message->insertPayload(response);
 
     this->send(std::move(message), std::move(promise));
@@ -58,6 +59,8 @@ namespace aasdk::channel::mediaplaybackstatus {
 
   void MediaPlaybackStatusService::messageHandler(messenger::Message::Pointer message,
                                                   IMediaPlaybackStatusServiceEventHandler::Pointer eventHandler) {
+    AASDK_LOG(debug) << "[MediaPlaybackStatusService] messageHandler()";
+
     messenger::MessageId messageId(message->getPayload());
     common::DataConstBuffer payload(message->getPayload(), messageId.getSizeOf());
 
@@ -75,7 +78,7 @@ namespace aasdk::channel::mediaplaybackstatus {
         break;
 
       default:
-        AASDK_LOG(error) << "[MediaPlaybackStatusService] message not handled: " << messageId.getId() << " : "
+        AASDK_LOG(error) << "[MediaPlaybackStatusService] Message Id not Handled: " << messageId.getId() << " : "
                          << dump(payload);
         this->receive(std::move(eventHandler));
         break;
@@ -86,7 +89,7 @@ namespace aasdk::channel::mediaplaybackstatus {
 
   void MediaPlaybackStatusService::handleMetadataUpdate(const common::DataConstBuffer &payload,
                                                         IMediaPlaybackStatusServiceEventHandler::Pointer eventHandler) {
-    //TODO: Check MetaData or Status
+    AASDK_LOG(debug) << "[MediaPlaybackStatusService] handleMetadataUpdate()";
     aap_protobuf::service::mediaplayback::message::MediaPlaybackMetadata metadata;
     if (metadata.ParseFromArray(payload.cdata, payload.size)) {
       eventHandler->onMetadataUpdate(metadata);
@@ -100,7 +103,7 @@ namespace aasdk::channel::mediaplaybackstatus {
 
   void MediaPlaybackStatusService::handlePlaybackUpdate(const common::DataConstBuffer &payload,
                                                         IMediaPlaybackStatusServiceEventHandler::Pointer eventHandler) {
-    //TODO: Check MetaData or Status
+    AASDK_LOG(debug) << "[MediaPlaybackStatusService] handlePlaybackUpdate()";
     aap_protobuf::service::mediaplayback::message::MediaPlaybackStatus playback;
     if (playback.ParseFromArray(payload.cdata, payload.size)) {
       eventHandler->onPlaybackUpdate(playback);
@@ -113,7 +116,7 @@ namespace aasdk::channel::mediaplaybackstatus {
 
   void MediaPlaybackStatusService::handleChannelOpenRequest(const common::DataConstBuffer &payload,
                                                             IMediaPlaybackStatusServiceEventHandler::Pointer eventHandler) {
-    AASDK_LOG(info) << "[MediaPlaybackStatusService] service open request ";
+    AASDK_LOG(debug) << "[MediaPlaybackStatusService] handleChannelOpenRequest()";
 
     aap_protobuf::channel::ChannelOpenRequest request;
     if (request.ParseFromArray(payload.cdata, payload.size)) {

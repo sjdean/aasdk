@@ -1,31 +1,15 @@
-/*
-*  This file is part of aasdk library project.
-*  Copyright (C) 2018 f1x.studio (Michal Szwaj)
-*
-*  aasdk is free software: you can redistribute it and/or modify
-*  it under the terms of the GNU General Public License as published by
-*  the Free Software Foundation; either version 3 of the License, or
-*  (at your option) any later version.
 
-*  aasdk is distributed in the hope that it will be useful,
-*  but WITHOUT ANY WARRANTY; without even the implied warranty of
-*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-*  GNU General Public License for more details.
-*
-*  You should have received a copy of the GNU General Public License
-*  along with aasdk. If not, see <http://www.gnu.org/licenses/>.
-*/
 
 syntax="proto2";
 
 option optimize_for=SPEED;
 
-import "aap_protobuf/service/sensor/SensorService.proto";
+import "aap_protobuf/service/sensor/SensorSourceService.proto";
 import "aap_protobuf/service/media/sink/MediaSinkService.proto";
 import "aap_protobuf/service/input/InputService.proto";
 import "aap_protobuf/service/media/source/MediaSourceService.proto";
 import "aap_protobuf/service/bluetooth/BluetoothService.proto";
-import "aap_protobuf/service/navigation/NavigationService.proto";
+import "aap_protobuf/service/navigation/NavigationStatusService.proto";
 import "aap_protobuf/service/vendorextension/VendorExtensionService.proto";
 import "aap_protobuf/service/wifiprojection/WifiProjectionService.proto";
 import "aap_protobuf/service/mediabrowser/MediaBrowserService.proto";
@@ -36,17 +20,17 @@ import "aap_protobuf/service/radio/RadioService.proto";
 
 package aap_protobuf.service;
 
-message ServiceDescriptor
+message Service
 {
-    required uint32 channel_id = 1;
-    optional sensor.SensorService sensor_service = 2;
+    required int32 id = 1;
+    optional sensor.SensorSourceService sensor_source_service = 2;
     optional media.sink.MediaSinkService media_sink_service = 3;
-    optional input.InputSourceService input_service = 4;
+    optional input.InputSourceService input_source_service = 4;
     optional media.source.MediaSourceService media_source_service = 5;
     optional bluetooth.BluetoothService bluetooth_service = 6;
     optional radio.RadioService radio_service = 7;
-    optional navigation.NavigationService navigation_service = 8;
-    optional mediaplayback.MediaPlaybackStatusService media_playback_status_service = 9;
+    optional navigation.NavigationStatusService navigation_status_service = 8;
+    optional mediaplayback.MediaPlaybackStatusService media_playback_service = 9;
     optional phonestatus.PhoneStatusService phone_status_service = 10;
     optional mediabrowser.MediaBrowserService media_browser_service = 11;
     optional vendorextension.VendorExtensionService vendor_extension_service = 12;

@@ -1,22 +1,22 @@
-/*
-*  This file is part of aasdk library project.
-*  Copyright (C) 2018 f1x.studio (Michal Szwaj)
-*
-*  aasdk is free software: you can redistribute it and/or modify
-*  it under the terms of the GNU General Public License as published by
-*  the Free Software Foundation; either version 3 of the License, or
-*  (at your option) any later version.
-
-*  aasdk is distributed in the hope that it will be useful,
-*  but WITHOUT ANY WARRANTY; without even the implied warranty of
-*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-*  GNU General Public License for more details.
-*
-*  You should have received a copy of the GNU General Public License
-*  along with aasdk. If not, see <http://www.gnu.org/licenses/>.
-*/
+// This file is part of aasdk library project.
+// Copyright (C) 2018 f1x.studio (Michal Szwaj)
+// Copyright (C) 2024 CubeOne (Simon Dean - simon.dean@cubeone.co.uk)
+//
+// aasdk is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation; either version 3 of the License, or
+// (at your option) any later version.
+//
+// aasdk is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with aasdk. If not, see <http://www.gnu.org/licenses/>.
 
 #pragma once
+
 #include "aasdk/Channel/Promise.hpp"
 #include "aasdk/Channel/IChannel.hpp"
 #include "aasdk/Messenger/ChannelId.hpp"
@@ -58,15 +58,17 @@ namespace aasdk::channel::control {
         SendPromise::Pointer promise) = 0;
 
     virtual void
-    sendAudioFocusResponse(const aap_protobuf::channel::control::focus::audio::notification::AudioFocusNotification &response,
-                           SendPromise::Pointer promise) = 0;
+    sendAudioFocusResponse(
+        const aap_protobuf::channel::control::focus::audio::notification::AudioFocusNotification &response,
+        SendPromise::Pointer promise) = 0;
 
     virtual void
     sendShutdownRequest(const aap_protobuf::channel::control::byebye::event::ByeByeRequest &request,
                         SendPromise::Pointer promise) = 0;
 
-    virtual void sendShutdownResponse(const aap_protobuf::channel::control::byebye::notification::ByeByeResponse &response,
-                                      SendPromise::Pointer promise) = 0;
+    virtual void
+    sendShutdownResponse(const aap_protobuf::channel::control::byebye::notification::ByeByeResponse &response,
+                         SendPromise::Pointer promise) = 0;
 
     virtual void
     sendNavigationFocusResponse(
@@ -81,7 +83,8 @@ namespace aasdk::channel::control {
     sendPingRequest(const aap_protobuf::channel::control::ping::PingRequest &request, SendPromise::Pointer promise) = 0;
 
     virtual void
-    sendPingResponse(const aap_protobuf::channel::control::ping::PingResponse &response, SendPromise::Pointer promise) = 0;
+    sendPingResponse(const aap_protobuf::channel::control::ping::PingResponse &response,
+                     SendPromise::Pointer promise) = 0;
   };
 }
 
