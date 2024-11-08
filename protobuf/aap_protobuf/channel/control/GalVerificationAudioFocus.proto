@@ -1,0 +1,9 @@
+syntax="proto2";
+
+package aap_protobuf.channel.control;
+
+message GalVerificationAudioFocus {
+  required AudioFocusStateType audio_focus_state = 1;
+  required int32 channel = 2;
+  optional bool unsolicited = 3;
+}

@@ -1,5 +1,3 @@
-
-
 syntax="proto2";
 
 import "aap_protobuf/channel/control/focus/audio/notification/AudioFocusStateType.proto";

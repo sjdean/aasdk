@@ -187,8 +187,11 @@ namespace aasdk {
       void ControlServiceChannel::messageHandler(messenger::Message::Pointer message,
                                                  IControlServiceChannelEventHandler::Pointer eventHandler) {
         AASDK_LOG(debug) << "[ControlServiceChannel] messageHandler()";
+
         messenger::MessageId messageId(message->getPayload());
         common::DataConstBuffer payload(message->getPayload(), messageId.getSizeOf());
+
+        AASDK_LOG(debug) << "[ControlServiceChannel] MessageId: " << messageId.getId();
 
         switch (messageId.getId()) {
           case aap_protobuf::channel::control::ControlMessageType::MESSAGE_VERSION_RESPONSE:
@@ -206,20 +209,23 @@ namespace aasdk {
           case aap_protobuf::channel::control::ControlMessageType::MESSAGE_PING_RESPONSE:
             this->handlePingResponse(payload, std::move(eventHandler));
             break;
+          case aap_protobuf::channel::control::ControlMessageType::MESSAGE_AUDIO_FOCUS_REQUEST:
+            this->handleAudioFocusRequest(payload, std::move(eventHandler));
+            break;
           case aap_protobuf::channel::control::ControlMessageType::MESSAGE_NAV_FOCUS_REQUEST:
             this->handleNavigationFocusRequest(payload, std::move(eventHandler));
+            break;
+          case aap_protobuf::channel::control::ControlMessageType::MESSAGE_VOICE_SESSION_NOTIFICATION:
+            this->handleVoiceSessionRequest(payload, std::move(eventHandler));
+            break;
+          case aap_protobuf::channel::control::ControlMessageType::MESSAGE_BATTERY_STATUS_NOTIFICATION:
+            this->handleBatteryStatusNotification(payload, std::move(eventHandler));
             break;
           case aap_protobuf::channel::control::ControlMessageType::MESSAGE_BYEBYE_REQUEST:
             this->handleShutdownRequest(payload, std::move(eventHandler));
             break;
           case aap_protobuf::channel::control::ControlMessageType::MESSAGE_BYEBYE_RESPONSE:
             this->handleShutdownResponse(payload, std::move(eventHandler));
-            break;
-          case aap_protobuf::channel::control::ControlMessageType::MESSAGE_VOICE_SESSION_NOTIFICATION:
-            this->handleVoiceSessionRequest(payload, std::move(eventHandler));
-            break;
-          case aap_protobuf::channel::control::ControlMessageType::MESSAGE_AUDIO_FOCUS_REQUEST:
-            this->handleAudioFocusRequest(payload, std::move(eventHandler));
             break;
           default:
             AASDK_LOG(error) << "[ControlServiceChannel] Message Id not Handled: " << messageId.getId();
@@ -271,6 +277,18 @@ namespace aasdk {
         aap_protobuf::channel::control::voice::VoiceSessionNotification request;
         if (request.ParseFromArray(payload.cdata, payload.size)) {
           eventHandler->onVoiceSessionRequest(request);
+        } else {
+          eventHandler->onChannelError(error::Error(error::ErrorCode::PARSE_PAYLOAD));
+        }
+      }
+
+      void ControlServiceChannel::handleBatteryStatusNotification(const common::DataConstBuffer &payload,
+                                                            IControlServiceChannelEventHandler::Pointer eventHandler) {
+        AASDK_LOG(debug) << "[ControlServiceChannel] handleBatteryStatusNotification()";
+        package aap_protobuf.channel.control;
+        aap_protobuf::channel::control::BatteryStatusNotification request;
+        if (request.ParseFroMArray(payload.cdata, payload.size)) {
+          eventHandler->onBatteryStatusNotification(request);
         } else {
           eventHandler->onChannelError(error::Error(error::ErrorCode::PARSE_PAYLOAD));
         }

@@ -103,6 +103,7 @@ namespace aasdk::channel::wifiprojection {
   void WifiProjectionService::handleWifiCredentialsRequest(const common::DataConstBuffer &payload,
                                                            IWifiProjectionServiceEventHandler::Pointer eventHandler) {
     AASDK_LOG(debug) << "[WifiProjectionService] handleWifiCredentialsRequest()";
+
     aap_protobuf::service::wifiprojection::message::WifiCredentialsRequest request;
     if (request.ParseFromArray(payload.cdata, payload.size)) {
       eventHandler->onWifiCredentialsRequest(request);

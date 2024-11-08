@@ -53,6 +53,20 @@ namespace aasdk::channel::mediasink::video {
     this->send(std::move(message), std::move(promise));
   }
 
+  // TODO MediaSinkChannelSetupResponse is analogous to Config:
+/*
+  message Config {
+      required Status status = 1;
+      enum Status {
+      MediaSinkChannelSetupStatus
+        STATUS_WAIT = 1;
+        STATUS_READY = 2;
+      }
+
+      optional uint32 max_unacked = 2;
+      repeated uint32 configuration_indices = 3;
+  }*/
+
   void VideoMediaSinkService::sendChannelSetupResponse(
       const aap_protobuf::service::media::sink::message::MediaSinkChannelSetupResponse &response,
       SendPromise::Pointer promise) {

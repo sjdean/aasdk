@@ -40,10 +40,10 @@ namespace aasdk::channel::inputsource {
   }
 
   void
-  InputSourceService::sendInputEventIndication(
-      const aap_protobuf::service::input::message::InputEventIndication &indication,
+  InputSourceService::sendInputReport(
+      const aap_protobuf::service::input::message::InputReport &indication,
       SendPromise::Pointer promise) {
-    AASDK_LOG(debug) << "[InputSourceService] sendInputEventIndication()";
+    AASDK_LOG(debug) << "[InputSourceService] sendInputReport()";
     auto message(std::make_shared<messenger::Message>(channelId_, messenger::EncryptionType::ENCRYPTED,
                                                       messenger::MessageType::SPECIFIC));
     message->insertPayload(messenger::MessageId(
@@ -54,9 +54,9 @@ namespace aasdk::channel::inputsource {
   }
 
   void
-  InputSourceService::sendBindingResponse(const aap_protobuf::service::media::sink::message::BindingResponse &response,
+  InputSourceService::sendKeyBindingResponse(const aap_protobuf::service::media::sink::message::KeyBindingResponse &response,
                                           SendPromise::Pointer promise) {
-    AASDK_LOG(debug) << "[InputSourceService] sendBindingResponse()";
+    AASDK_LOG(debug) << "[InputSourceService] sendKeyBindingResponse()";
     auto message(std::make_shared<messenger::Message>(channelId_, messenger::EncryptionType::ENCRYPTED,
                                                       messenger::MessageType::SPECIFIC));
     message->insertPayload(messenger::MessageId(
@@ -88,7 +88,7 @@ namespace aasdk::channel::inputsource {
 
     switch (messageId.getId()) {
       case aap_protobuf::service::input::message::InputChannelMessageId::INPUT_MESSAGE_KEY_BINDING_REQUEST:
-        this->handleBindingRequest(payload, std::move(eventHandler));
+        this->handleKeyBindingRequest(payload, std::move(eventHandler));
         break;
       case aap_protobuf::channel::control::ControlMessageType::MESSAGE_CHANNEL_OPEN_REQUEST:
         this->handleChannelOpenRequest(payload, std::move(eventHandler));
@@ -100,12 +100,12 @@ namespace aasdk::channel::inputsource {
     }
   }
 
-  void InputSourceService::handleBindingRequest(const common::DataConstBuffer &payload,
+  void InputSourceService::handleKeyBindingRequest(const common::DataConstBuffer &payload,
                                                 IInputSourceServiceEventHandler::Pointer eventHandler) {
-    AASDK_LOG(debug) << "[InputSourceService] handleBindingRequest()";
-    aap_protobuf::channel::input::event::BindingRequest request;
+    AASDK_LOG(debug) << "[InputSourceService] handleKeyBindingRequest()";
+    aap_protobuf::channel::input::event::KeyBindingRequest request;
     if (request.ParseFromArray(payload.cdata, payload.size)) {
-      eventHandler->onBindingRequest(request);
+      eventHandler->onKeyBindingRequest(request);
     } else {
       eventHandler->onChannelError(error::Error(error::ErrorCode::PARSE_PAYLOAD));
     }

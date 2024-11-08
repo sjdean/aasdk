@@ -1,5 +1,3 @@
-
-
 syntax="proto2";
 
 import "aap_protobuf/service/input/message/TouchEvent.proto";

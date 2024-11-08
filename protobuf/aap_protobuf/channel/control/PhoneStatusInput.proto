@@ -1,0 +1,9 @@
+syntax="proto2";
+
+package aap_protobuf.channel.control;
+
+message PhoneStatusInput {
+  required InstrumentClusterInput input = 1;
+  optional string caller_number = 2;
+  optional string caller_id = 3;
+}

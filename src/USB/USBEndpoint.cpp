@@ -18,7 +18,7 @@
 #include <aasdk/USB/USBEndpoint.hpp>
 #include <aasdk/USB/IUSBWrapper.hpp>
 #include <aasdk/Error/Error.hpp>
-
+#include <aasdk/Common/Log.hpp>
 
 namespace aasdk {
   namespace usb {
@@ -66,8 +66,10 @@ namespace aasdk {
       } else {
         auto *transfer = usbWrapper_.allocTransfer(0);
         if (transfer == nullptr) {
+          AASDK_LOG(debug) << "[USBEndpoint] Rejecting Promise " << endpointAddress_ << " size " << buffer.size;
           promise->reject(error::Error(error::ErrorCode::USB_TRANSFER_ALLOCATION));
         } else {
+          AASDK_LOG(debug) << "[USBEndpoint] Fill Bulk Transfer " << endpointAddress_ << " size " << buffer.size;
           usbWrapper_.fillBulkTransfer(transfer, handle_, endpointAddress_, buffer.data, buffer.size,
                                        reinterpret_cast<libusb_transfer_cb_fn>(&USBEndpoint::transferHandler), this,
                                        timeout);
@@ -88,6 +90,7 @@ namespace aasdk {
 
           transfers_.insert(std::make_pair(transfer, std::move(promise)));
         } else {
+          AASDK_LOG(debug) << "[USBEndpoint] USB Failure " << submitResult;
           promise->reject(error::Error(error::ErrorCode::USB_TRANSFER, submitResult));
           usbWrapper_.freeTransfer(transfer);
         }
@@ -111,19 +114,24 @@ namespace aasdk {
     }
 
     void USBEndpoint::transferHandler(libusb_transfer *transfer) {
+      AASDK_LOG(debug) << "[USBEndpoint] transferHandler();
       auto self = reinterpret_cast<USBEndpoint *>(transfer->user_data)->shared_from_this();
 
       self->strand_.dispatch([self, transfer]() mutable {
         if (self->transfers_.count(transfer) == 0) {
+          AASDK_LOG(debug) << "[USBEndpoint] No more transfers;
           return;
         }
 
         auto promise(std::move(self->transfers_.at(transfer)));
 
         if (transfer->status == LIBUSB_TRANSFER_COMPLETED) {
+          AASDK_LOG(debug) << "[Transport] Transfer Complete;
           promise->resolve(transfer->actual_length);
         } else {
-          auto error = transfer->status == LIBUSB_TRANSFER_CANCELLED ? error::Error(error::ErrorCode::OPERATION_ABORTED)
+          AASDK_LOG(debug) << "[Transport] Transfer Cancelled;
+          auto error = transfer->status ==
+              LIBUSB_TRANSFER_CANCELLED ? error::Error(error::ErrorCode::OPERATION_ABORTED)
                                                                      : error::Error(error::ErrorCode::USB_TRANSFER,
                                                                                     transfer->status);
           promise->reject(error);

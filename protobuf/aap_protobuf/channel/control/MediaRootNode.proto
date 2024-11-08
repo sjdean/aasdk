@@ -1,0 +1,8 @@
+syntax="proto2";
+
+package aap_protobuf.channel.control;
+
+message MediaRootNode {
+  required string path = 1;
+  repeated MediaSource media_sources = 2;
+}

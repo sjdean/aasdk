@@ -1,0 +1,9 @@
+syntax="proto2";
+
+package aap_protobuf.channel.control;
+
+message CarConnectedDevices {
+  repeated ConnectedDevice connected_devices = 1;
+  optional bool unsolicited = 2;
+  optional bool final_list = 3 [default = true];
+}

@@ -128,7 +128,7 @@ namespace aasdk::channel::navigationstatus {
   void NavigationStatusService::handleDistanceEvent(const common::DataConstBuffer &payload,
                                                     INavigationStatusServiceEventHandler::Pointer eventHandler) {
     AASDK_LOG(debug) << "[NavigationStatusService] handleDistanceEvent()";
-    aap_protobuf::channel::navigation::event::NavigationTurnDistanceEvent distanceEvent;
+    aap_protobuf::service::navigation::message::NavigationNextTurnDistanceEvent distanceEvent;
     if (distanceEvent.ParseFromArray(payload.cdata, payload.size)) {
       eventHandler->onDistanceEvent(distanceEvent);
     } else {

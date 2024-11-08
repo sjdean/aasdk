@@ -1,5 +1,3 @@
-
-
 syntax="proto2";
 
 import "aap_protobuf/service/sensor/message/LocationData.proto";
@@ -7,7 +5,7 @@ import "aap_protobuf/service/sensor/message/CompassData.proto";
 import "aap_protobuf/service/sensor/message/SpeedData.proto";
 import "aap_protobuf/service/sensor/message/RPMData.proto";
 import "aap_protobuf/service/sensor/message/OdometerData.proto";
-import "aap_protobuf/service/sensor/message/FuelLevelData.proto";
+import "aap_protobuf/service/sensor/message/FuelData.proto";
 import "aap_protobuf/service/sensor/message/ParkingBrakeData.proto";
 import "aap_protobuf/service/sensor/message/GearData.proto";
 import "aap_protobuf/service/sensor/message/DiagnosticsData.proto";
@@ -34,7 +32,7 @@ message SensorBatch {
     repeated SpeedData speed_data = 3;
     repeated RPMData rpm_data = 4;
     repeated OdometerData odometer_data = 5;
-    repeated FuelLevelData fuel_data = 6;
+    repeated FuelData fuel_data = 6;
     repeated ParkingBrakeData parking_brake_data = 7;
     repeated GearData gear_data = 8;
     repeated DiagnosticsData diagnostics_data = 9;

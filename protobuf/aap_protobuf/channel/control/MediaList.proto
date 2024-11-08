@@ -1,0 +1,16 @@
+message MediaList {
+  required string path = 1;
+
+  required Type type = 2;
+  enum Type {
+    UNKNOWN = 0;
+    PLAYLIST = 1;
+    ALBUM = 2;
+    ARTIST = 3;
+    STATION = 4;
+    GENRE = 5;
+  }
+
+  optional string name = 3;
+  optional bytes album_art = 4;
+}

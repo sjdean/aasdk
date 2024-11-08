@@ -1,5 +1,3 @@
-
-
 syntax="proto2";
 
 import "aap_protobuf/channel/control/byebye/event/ByeByeReason.proto";
