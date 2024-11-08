@@ -20,7 +20,6 @@
 #include "aasdk/Channel/Channel.hpp"
 #include "IRadioService.hpp"
 
-
 namespace aasdk::channel::radio {
 
 

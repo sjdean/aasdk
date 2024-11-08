@@ -18,7 +18,7 @@
 #pragma once
 
 #include <aap_protobuf/channel/ChannelOpenRequest.pb.h>
-#include <aap_protobuf/channel/navigation/event/NavigationTurnDistanceEvent.pb.h>
+#include <aap_protobuf/service/navigation/message/NavigationNextTurnDistanceEvent.pb.h>
 #include <aap_protobuf/channel/navigation/event/NavigationNextTurnEvent.pb.h>
 #include <aap_protobuf/channel/navigation/event/NavigationStatus.pb.h>
 #include "aasdk/Error/Error.hpp"
@@ -42,7 +42,7 @@ namespace aasdk::channel::navigationstatus {
     virtual void onTurnEvent(const aap_protobuf::channel::navigation::event::NavigationNextTurnEvent &turnEvent) = 0;
 
     virtual void
-    onDistanceEvent(const aap_protobuf::channel::navigation::event::NavigationTurnDistanceEvent &distanceEvent) = 0;
+    onDistanceEvent(const aap_protobuf::service::navigation::message::NavigationNextTurnDistanceEvent &distanceEvent) = 0;
   };
 
 }

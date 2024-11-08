@@ -19,7 +19,7 @@
 
 #include <stdint.h>
 #include <aap_protobuf/channel/ChannelOpenRequest.pb.h>
-#include <aap_protobuf/channel/input/event/BindingRequest.pb.h>
+#include <aap_protobuf/channel/input/event/KeyBindingRequest.pb.h>
 
 namespace aasdk::channel::inputsource {
 
@@ -33,7 +33,7 @@ namespace aasdk::channel::inputsource {
 
     virtual void onChannelOpenRequest(const aap_protobuf::channel::ChannelOpenRequest &request) = 0;
 
-    virtual void onBindingRequest(const aap_protobuf::channel::input::event::BindingRequest &request) = 0;
+    virtual void onKeyBindingRequest(const aap_protobuf::channel::input::event::KeyBindingRequest &request) = 0;
 
     virtual void onChannelError(const error::Error &e) = 0;
   };

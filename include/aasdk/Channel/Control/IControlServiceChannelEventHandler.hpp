@@ -54,9 +54,14 @@ namespace aasdk::channel::control {
     virtual void
     onByeByeResponse(const aap_protobuf::channel::control::byebye::notification::ByeByeResponse &response) = 0;
 
+    virtual void onBatteryStatusNotification(const aap_protobuf::channel::control::BatteryStatusNotification &notification) = 0;
+
     virtual void
     onNavigationFocusRequest(
         const aap_protobuf::channel::control::focus::navigation::event::NavFocusRequestNotification &request) = 0;
+
+    virtual void
+    onVoiceSessionRequest(const aap_protobuf::channel::control::voice::VoiceSessionNotification &request) = 0;
 
     virtual void onPingRequest(const aap_protobuf::channel::control::ping::PingRequest &request) = 0;
 
@@ -64,8 +69,7 @@ namespace aasdk::channel::control {
 
     virtual void onChannelError(const error::Error &e) = 0;
 
-    virtual void
-    onVoiceSessionRequest(const aap_protobuf::channel::control::voice::VoiceSessionNotification &request) = 0;
+
   };
 }
 

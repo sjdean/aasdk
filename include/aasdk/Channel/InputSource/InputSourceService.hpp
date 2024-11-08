@@ -36,10 +36,10 @@ namespace aasdk::channel::inputsource {
     sendChannelOpenResponse(const aap_protobuf::channel::ChannelOpenResponse &response,
                             SendPromise::Pointer promise) override;
 
-    void sendInputEventIndication(const aap_protobuf::service::input::message::InputEventIndication &indication,
+    void sendInputReport(const aap_protobuf::service::input::message::InputReport &indication,
                                   SendPromise::Pointer promise) override;
 
-    void sendBindingResponse(const aap_protobuf::service::media::sink::message::BindingResponse &response,
+    void sendKeyBindingResponse(const aap_protobuf::service::media::sink::message::KeyBindingResponse &response,
                              SendPromise::Pointer promise) override;
 
   private:
@@ -50,7 +50,7 @@ namespace aasdk::channel::inputsource {
     void messageHandler(messenger::Message::Pointer message, IInputSourceServiceEventHandler::Pointer eventHandler);
 
     void
-    handleBindingRequest(const common::DataConstBuffer &payload, IInputSourceServiceEventHandler::Pointer eventHandler);
+    handleKeyBindingRequest(const common::DataConstBuffer &payload, IInputSourceServiceEventHandler::Pointer eventHandler);
 
     void handleChannelOpenRequest(const common::DataConstBuffer &payload,
                                   IInputSourceServiceEventHandler::Pointer eventHandler);
