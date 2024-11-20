@@ -1,9 +1,0 @@
-syntax="proto2";
-
-package aap_protobuf.service.sensor.message;
-
-message OdometerData
-{
-    required int32 total_mileage = 1;
-    optional int32 trip_mileage = 2;
-}

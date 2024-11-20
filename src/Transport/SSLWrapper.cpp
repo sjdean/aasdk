@@ -34,7 +34,10 @@ namespace aasdk {
     }
 
     SSLWrapper::~SSLWrapper() {
-      FIPS_mode_set(0);
+
+      #ifdef FIPS_mode_set
+      FIPS_mode_set(0); // FIPS_mode_set removed in later versions of OpenSSL.
+      #endif
       ENGINE_cleanup();
       CONF_modules_unload(1);
       EVP_cleanup();

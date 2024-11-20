@@ -27,10 +27,6 @@ namespace aasdk::messenger {
         return "SENSOR";
       case ChannelId::MEDIA_SINK:
         return "MEDIA_SINK";
-      case ChannelId::MEDIA_SINK_AUDIO_SERVICE:
-        return "MEDIA_SINK_AUDIO_SERVICE";
-      case ChannelId::MEDIA_SINK_VIDEO_SERVICE:
-        return "MEDIA_SINK_VIDEO_SERVICE";
       case ChannelId::MEDIA_SINK_VIDEO:
         return "MEDIA_SINK_VIDEO";
       case ChannelId::MEDIA_SINK_MEDIA_AUDIO:
@@ -43,8 +39,6 @@ namespace aasdk::messenger {
         return "MEDIA_SINK_TELEPHONY_AUDIO";
       case ChannelId::INPUT_SOURCE:
         return "INPUT_SOURCE";
-      case ChannelId::MEDIA_SOURCE:
-        return "MEDIA_SOURCE";
       case ChannelId::MEDIA_SOURCE_MICROPHONE:
         return "MEDIA_SOURCE_MICROPHONE";
       case ChannelId::BLUETOOTH:

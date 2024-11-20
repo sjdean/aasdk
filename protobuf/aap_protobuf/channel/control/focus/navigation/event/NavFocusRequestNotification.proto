@@ -1,9 +1,0 @@
-syntax="proto2";
-
-import "aap_protobuf/channel/control/focus/navigation/shared/NavFocusType.proto";
-
-package aap_protobuf.channel.control.focus.navigation.event;
-
-message NavFocusRequestNotification {
-    optional shared.NavFocusType focus_type = 1;
-}

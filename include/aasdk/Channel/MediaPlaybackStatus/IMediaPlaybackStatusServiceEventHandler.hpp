@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include <aap_protobuf/channel/ChannelOpenRequest.pb.h>
+#include <aap_protobuf/service/control/message/ChannelOpenRequest.pb.h>
 #include <aap_protobuf/service/mediaplayback/message/MediaPlaybackMetadata.pb.h>
 #include <aap_protobuf/service/mediaplayback/message/MediaPlaybackStatus.pb.h>
 #include "aasdk/Error/Error.hpp"
@@ -33,7 +33,7 @@ namespace aasdk::channel::mediaplaybackstatus {
 
     virtual ~IMediaPlaybackStatusServiceEventHandler() = default;
 
-    virtual void onChannelOpenRequest(const aap_protobuf::channel::ChannelOpenRequest &request) = 0;
+    virtual void onChannelOpenRequest(const aap_protobuf::service::control::message::ChannelOpenRequest &request) = 0;
 
     virtual void onChannelError(const error::Error &e) = 0;
 

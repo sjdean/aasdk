@@ -1,8 +1,0 @@
-syntax="proto2";
-
-package aap_protobuf.channel.control;
-
-message UserSwitchResponse {
-  optional UserSwitchStatus status = 1;
-  optional ConnectedDevice selected_device = 2;
-}

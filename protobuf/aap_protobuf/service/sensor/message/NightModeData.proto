@@ -1,7 +1,0 @@
-syntax="proto2";
-
-package aap_protobuf.service.sensor.message;
-
-message NightModeData {
-    optional bool night_mode = 1;
-}

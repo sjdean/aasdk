@@ -5,7 +5,7 @@ if (AAP_PROTOBUF_LIB_DIRS AND AAP_PROTOBUF_INCLUDE_DIRS)
 else (AAP_PROTOBUF_LIB_DIRS AND AAP_PROTOBUF_INCLUDE_DIRS)
     find_path(AAP_PROTOBUF_INCLUDE_DIR
             NAMES
-            channel/ChannelCloseNotification.pb.h
+            channel/control/GalConstants.pb.h
             PATHS
             /usr/include
             /usr/local/include

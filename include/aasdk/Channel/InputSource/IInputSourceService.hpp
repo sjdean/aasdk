@@ -23,8 +23,8 @@
 #include "aasdk/Messenger/ChannelId.hpp"
 #include <aap_protobuf/shared/MessageStatus.pb.h>
 #include <aap_protobuf/service/media/sink/message/KeyBindingResponse.pb.h>
-#include <aap_protobuf/service/input/message/InputReport.pb.h>
-#include <aap_protobuf/channel/ChannelOpenResponse.pb.h>
+#include <aap_protobuf/service/inputsource/message/InputReport.pb.h>
+#include <aap_protobuf/service/control/message/ChannelOpenResponse.pb.h>
 #include "IInputSourceServiceEventHandler.hpp"
 
 
@@ -40,10 +40,10 @@ namespace aasdk::channel::inputsource {
     virtual void receive(IInputSourceServiceEventHandler::Pointer eventHandler) = 0;
 
     virtual void
-    sendChannelOpenResponse(const aap_protobuf::channel::ChannelOpenResponse &response,
+    sendChannelOpenResponse(const aap_protobuf::service::control::message::ChannelOpenResponse &response,
                             SendPromise::Pointer promise) = 0;
 
-    virtual void sendInputReport(const aap_protobuf::service::input::message::InputReport &indication,
+    virtual void sendInputReport(const aap_protobuf::service::inputsource::message::InputReport &indication,
                                           SendPromise::Pointer promise) = 0;
 
     virtual void sendKeyBindingResponse(const aap_protobuf::service::media::sink::message::KeyBindingResponse &response,

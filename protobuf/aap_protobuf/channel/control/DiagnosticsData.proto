@@ -1,7 +1,0 @@
-syntax="proto2";
-
-package aap_protobuf.channel.control;
-
-message DiagnosticsData {
-  optional bytes dtc = 1;
-}

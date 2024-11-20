@@ -17,8 +17,8 @@
 
 #pragma once
 
-#include <aap_protobuf/channel/sensor/event/SensorRequest.pb.h>
-#include <aap_protobuf/channel/ChannelOpenRequest.pb.h>
+#include <aap_protobuf/service/sensorsource/message/SensorRequest.pb.h>
+#include <aap_protobuf/service/control/message/ChannelOpenRequest.pb.h>
 #include "aasdk/Error/Error.hpp"
 
 namespace aasdk::channel::sensorsource {
@@ -31,9 +31,9 @@ namespace aasdk::channel::sensorsource {
 
     virtual ~ISensorSourceServiceEventHandler() = default;
 
-    virtual void onChannelOpenRequest(const aap_protobuf::channel::ChannelOpenRequest &request) = 0;
+    virtual void onChannelOpenRequest(const aap_protobuf::service::control::message::ChannelOpenRequest &request) = 0;
 
-    virtual void onSensorStartRequest(const aap_protobuf::channel::sensor::event::SensorRequest &request) = 0;
+    virtual void onSensorStartRequest(const aap_protobuf::service::sensorsource::message::SensorRequest &request) = 0;
 
     virtual void onChannelError(const error::Error &e) = 0;
   };

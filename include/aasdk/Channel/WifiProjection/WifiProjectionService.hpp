@@ -34,7 +34,7 @@ namespace aasdk::channel::wifiprojection {
     void receive(IWifiProjectionServiceEventHandler::Pointer eventHandler) override;
 
     void
-    sendChannelOpenResponse(const aap_protobuf::channel::ChannelOpenResponse &response,
+    sendChannelOpenResponse(const aap_protobuf::service::control::message::ChannelOpenResponse &response,
                             SendPromise::Pointer promise) override;
 
     void

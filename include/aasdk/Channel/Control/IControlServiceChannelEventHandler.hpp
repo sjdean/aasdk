@@ -19,14 +19,14 @@
 
 #include <aasdk/Error/Error.hpp>
 #include <aasdk/Common/Data.hpp>
-#include <aap_protobuf/channel/control/byebye/notification/ByeByeResponse.pb.h>
-#include <aap_protobuf/channel/control/servicediscovery/event/ServiceDiscoveryRequest.pb.h>
-#include <aap_protobuf/channel/control/focus/audio/event/AudioFocusRequest.pb.h>
-#include <aap_protobuf/channel/control/focus/navigation/event/NavFocusRequestNotification.pb.h>
-#include <aap_protobuf/channel/control/ping/PingRequest.pb.h>
-#include <aap_protobuf/channel/control/ping/PingResponse.pb.h>
-#include <aap_protobuf/channel/control/voice/VoiceSessionNotification.pb.h>
-
+#include <aap_protobuf/service/control/message/AudioFocusRequest.pb.h>
+#include <aap_protobuf/service//control/message/BatteryStatusNotification.pb.h>
+#include <aap_protobuf/service/control/message/ByeByeResponse.pb.h>
+#include <aap_protobuf/service/control/message/NavFocusRequestNotification.pb.h>
+#include <aap_protobuf/service/control/message/PingRequest.pb.h>
+#include <aap_protobuf/service/control/message/PingResponse.pb.h>
+#include <aap_protobuf/service/control/message/ServiceDiscoveryRequest.pb.h>
+#include <aap_protobuf/service/control/message/VoiceSessionNotification.pb.h>
 
 namespace aasdk::channel::control {
 
@@ -44,28 +44,28 @@ namespace aasdk::channel::control {
     virtual void onHandshake(const common::DataConstBuffer &payload) = 0;
 
     virtual void onServiceDiscoveryRequest(
-        const aap_protobuf::channel::control::servicediscovery::event::ServiceDiscoveryRequest &request) = 0;
+        const aap_protobuf::service::control::message::ServiceDiscoveryRequest &request) = 0;
 
     virtual void
-    onAudioFocusRequest(const aap_protobuf::channel::control::focus::audio::event::AudioFocusRequest &request) = 0;
+    onAudioFocusRequest(const aap_protobuf::service::control::message::AudioFocusRequest &request) = 0;
 
-    virtual void onByeByeRequest(const aap_protobuf::channel::control::byebye::event::ByeByeRequest &request) = 0;
+    virtual void onByeByeRequest(const aap_protobuf::service::control::message::ByeByeRequest &request) = 0;
 
     virtual void
-    onByeByeResponse(const aap_protobuf::channel::control::byebye::notification::ByeByeResponse &response) = 0;
+    onByeByeResponse(const aap_protobuf::service::control::message::ByeByeResponse &response) = 0;
 
-    virtual void onBatteryStatusNotification(const aap_protobuf::channel::control::BatteryStatusNotification &notification) = 0;
+    virtual void onBatteryStatusNotification(const aap_protobuf::service::control::message::BatteryStatusNotification &notification) = 0;
 
     virtual void
     onNavigationFocusRequest(
-        const aap_protobuf::channel::control::focus::navigation::event::NavFocusRequestNotification &request) = 0;
+        const aap_protobuf::service::control::message::NavFocusRequestNotification &request) = 0;
 
     virtual void
-    onVoiceSessionRequest(const aap_protobuf::channel::control::voice::VoiceSessionNotification &request) = 0;
+    onVoiceSessionRequest(const aap_protobuf::service::control::message::VoiceSessionNotification &request) = 0;
 
-    virtual void onPingRequest(const aap_protobuf::channel::control::ping::PingRequest &request) = 0;
+    virtual void onPingRequest(const aap_protobuf::service::control::message::PingRequest &request) = 0;
 
-    virtual void onPingResponse(const aap_protobuf::channel::control::ping::PingResponse &response) = 0;
+    virtual void onPingResponse(const aap_protobuf::service::control::message::PingResponse &response) = 0;
 
     virtual void onChannelError(const error::Error &e) = 0;
 

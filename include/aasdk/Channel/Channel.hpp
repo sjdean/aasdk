@@ -21,7 +21,7 @@
 #include "aasdk/Messenger/IMessenger.hpp"
 #include "aasdk/Channel/Promise.hpp"
 #include "aasdk/Channel/IChannel.hpp"
-#include <aap_protobuf/channel/control/ControlMessageType.pb.h>
+#include <aap_protobuf/service/control/ControlMessageType.pb.h>
 
 namespace aasdk {
   namespace channel {

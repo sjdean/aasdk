@@ -32,12 +32,16 @@ namespace aasdk::channel::bluetooth {
     void receive(IBluetoothServiceEventHandler::Pointer eventHandler) override;
 
     void
-    sendChannelOpenResponse(const aap_protobuf::channel::ChannelOpenResponse &response,
+    sendChannelOpenResponse(const aap_protobuf::service::control::message::ChannelOpenResponse &response,
                             SendPromise::Pointer promise) override;
 
     void
     sendBluetoothPairingResponse(const aap_protobuf::service::bluetooth::message::BluetoothPairingResponse &response,
                                  SendPromise::Pointer promise) override;
+
+    void sendBluetoothAuthenticationData(
+        const aap_protobuf::service::bluetooth::message::BluetoothAuthenticationData &response,
+        SendPromise::Pointer promise) override;
 
   private:
     using std::enable_shared_from_this<BluetoothService>::shared_from_this;
@@ -51,6 +55,9 @@ namespace aasdk::channel::bluetooth {
 
     void handleBluetoothPairingRequest(const common::DataConstBuffer &payload,
                                        IBluetoothServiceEventHandler::Pointer eventHandler);
+
+    void handleBluetoothAuthenticationResult(const common::DataConstBuffer &payload,
+                                           IBluetoothServiceEventHandler::Pointer eventHandler);
   };
 
 }

@@ -1,9 +1,0 @@
-syntax="proto2";
-
-package aap_protobuf.service.sensor.message;
-
-message DeadReckoningData
-{
-    optional int32 steering_angle = 1;
-    repeated int32 wheel_speed = 2;
-}

@@ -1,6 +1,6 @@
 syntax="proto2";
 
-package aap_protobuf.channel.control;
+package aap_protobuf.service.control.message;
 
 message GalVerificationScreenCaptureRequest {
 

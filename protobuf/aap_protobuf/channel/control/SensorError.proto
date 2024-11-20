@@ -1,8 +1,0 @@
-syntax="proto2";
-
-package aap_protobuf.channel.control;
-
-message SensorError {
-  required SensorType sensor_type = 1;
-  required SensorErrorType sensor_error_type = 2;
-}

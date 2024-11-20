@@ -21,7 +21,7 @@
 #include "aasdk/Channel/Promise.hpp"
 #include "aasdk/Channel/IChannel.hpp"
 #include "aasdk/Messenger/ChannelId.hpp"
-#include <aap_protobuf/channel/ChannelOpenResponse.pb.h>
+#include <aap_protobuf/service/control/message/ChannelOpenResponse.pb.h>
 #include <aap_protobuf/service/wifiprojection/message/WifiCredentialsResponse.pb.h>
 #include "IVendorExtensionServiceEventHandler.hpp"
 
@@ -38,7 +38,7 @@ namespace aasdk::channel::vendorextension {
     virtual void receive(IVendorExtensionServiceEventHandler::Pointer eventHandler) = 0;
 
     virtual void
-    sendChannelOpenResponse(const aap_protobuf::channel::ChannelOpenResponse &response,
+    sendChannelOpenResponse(const aap_protobuf::service::control::message::ChannelOpenResponse &response,
                             SendPromise::Pointer promise) = 0;
 
   };

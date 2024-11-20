@@ -20,7 +20,6 @@
 #include "aasdk/Channel/Channel.hpp"
 #include "IInputSourceService.hpp"
 
-
 namespace aasdk::channel::inputsource {
 
   class InputSourceService
@@ -33,10 +32,10 @@ namespace aasdk::channel::inputsource {
     void receive(IInputSourceServiceEventHandler::Pointer eventHandler) override;
 
     void
-    sendChannelOpenResponse(const aap_protobuf::channel::ChannelOpenResponse &response,
+    sendChannelOpenResponse(const aap_protobuf::service::control::message::ChannelOpenResponse &response,
                             SendPromise::Pointer promise) override;
 
-    void sendInputReport(const aap_protobuf::service::input::message::InputReport &indication,
+    void sendInputReport(const aap_protobuf::service::inputsource::message::InputReport &indication,
                                   SendPromise::Pointer promise) override;
 
     void sendKeyBindingResponse(const aap_protobuf::service::media::sink::message::KeyBindingResponse &response,

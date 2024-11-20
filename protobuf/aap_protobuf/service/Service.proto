@@ -2,12 +2,12 @@ syntax="proto2";
 
 option optimize_for=SPEED;
 
-import "aap_protobuf/service/sensor/SensorSourceService.proto";
+import "aap_protobuf/service/sensorsource/SensorSourceService.proto";
 import "aap_protobuf/service/media/sink/MediaSinkService.proto";
-import "aap_protobuf/service/input/InputService.proto";
+import "aap_protobuf/service/inputsource/InputSourceService.proto";
 import "aap_protobuf/service/media/source/MediaSourceService.proto";
 import "aap_protobuf/service/bluetooth/BluetoothService.proto";
-import "aap_protobuf/service/navigation/NavigationStatusService.proto";
+import "aap_protobuf/service/navigationstatus/NavigationStatusService.proto";
 import "aap_protobuf/service/vendorextension/VendorExtensionService.proto";
 import "aap_protobuf/service/wifiprojection/WifiProjectionService.proto";
 import "aap_protobuf/service/mediabrowser/MediaBrowserService.proto";
@@ -21,13 +21,13 @@ package aap_protobuf.service;
 message Service
 {
     required int32 id = 1;
-    optional sensor.SensorSourceService sensor_source_service = 2;
+    optional sensorsource.SensorSourceService sensor_source_service = 2;
     optional media.sink.MediaSinkService media_sink_service = 3;
-    optional input.InputSourceService input_source_service = 4;
+    optional inputsource.InputSourceService input_source_service = 4;
     optional media.source.MediaSourceService media_source_service = 5;
     optional bluetooth.BluetoothService bluetooth_service = 6;
     optional radio.RadioService radio_service = 7;
-    optional navigation.NavigationStatusService navigation_status_service = 8;
+    optional navigationstatus.NavigationStatusService navigation_status_service = 8;
     optional mediaplayback.MediaPlaybackStatusService media_playback_service = 9;
     optional phonestatus.PhoneStatusService phone_status_service = 10;
     optional mediabrowser.MediaBrowserService media_browser_service = 11;

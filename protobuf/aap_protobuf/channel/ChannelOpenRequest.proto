@@ -1,9 +1,0 @@
-syntax="proto2";
-
-package aap_protobuf.channel;
-
-message ChannelOpenRequest
-{
-    required sint32 priority = 1;
-    required int32 service_id = 2;
-}

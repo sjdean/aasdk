@@ -1,8 +1,0 @@
-syntax="proto2";
-
-package aap_protobuf.channel.control;
-
-message MediaBrowserInput {
-  required InstrumentClusterInput input = 1;
-  required string path = 2;
-}

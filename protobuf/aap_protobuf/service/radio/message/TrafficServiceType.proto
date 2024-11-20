@@ -2,7 +2,7 @@ syntax="proto2";
 
 option optimize_for=SPEED;
 
-package aap_protobuf.service.radio;
+package aap_protobuf.service.radio.message;
 
 enum TrafficServiceType {
     NO_TRAFFIC_SERVICE = 0;

@@ -18,8 +18,8 @@
 #pragma once
 
 #include <stdint.h>
-#include <aap_protobuf/channel/ChannelOpenRequest.pb.h>
-#include <aap_protobuf/channel/input/event/KeyBindingRequest.pb.h>
+#include <aap_protobuf/service/control/message/ChannelOpenRequest.pb.h>
+#include <aap_protobuf/service/media/sink/message/KeyBindingRequest.pb.h>
 
 namespace aasdk::channel::inputsource {
 
@@ -31,9 +31,9 @@ namespace aasdk::channel::inputsource {
 
     virtual ~IInputSourceServiceEventHandler() = default;
 
-    virtual void onChannelOpenRequest(const aap_protobuf::channel::ChannelOpenRequest &request) = 0;
+    virtual void onChannelOpenRequest(const aap_protobuf::service::control::message::ChannelOpenRequest &request) = 0;
 
-    virtual void onKeyBindingRequest(const aap_protobuf::channel::input::event::KeyBindingRequest &request) = 0;
+    virtual void onKeyBindingRequest(const aap_protobuf::service::media::sink::message::KeyBindingRequest &request) = 0;
 
     virtual void onChannelError(const error::Error &e) = 0;
   };

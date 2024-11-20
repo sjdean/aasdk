@@ -36,11 +36,11 @@ namespace aasdk::channel::mediasource {
     void receive(IMediaSourceServiceEventHandler::Pointer eventHandler) override;
 
     void
-    sendChannelOpenResponse(const aap_protobuf::channel::ChannelOpenResponse &response,
+    sendChannelOpenResponse(const aap_protobuf::service::control::message::ChannelOpenResponse &response,
                             SendPromise::Pointer promise) override;
 
     void
-    sendChannelSetupResponse(const aap_protobuf::service::media::sink::message::MediaSinkChannelSetupResponse &response,
+    sendChannelSetupResponse(const aap_protobuf::service::media::shared::message::Config &response,
                              SendPromise::Pointer promise) override;
 
     void sendMicrophoneOpenResponse(const aap_protobuf::service::media::source::message::MicrophoneResponse &response,

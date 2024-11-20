@@ -17,10 +17,10 @@
 
 #pragma once
 
-#include <aap_protobuf/channel/ChannelOpenRequest.pb.h>
-#include <aap_protobuf/service/navigation/message/NavigationNextTurnDistanceEvent.pb.h>
-#include <aap_protobuf/channel/navigation/event/NavigationNextTurnEvent.pb.h>
-#include <aap_protobuf/channel/navigation/event/NavigationStatus.pb.h>
+#include <aap_protobuf/service/control/message/ChannelOpenRequest.pb.h>
+#include <aap_protobuf/service/navigationstatus/message/NavigationNextTurnDistanceEvent.pb.h>
+#include <aap_protobuf/service/navigationstatus/message/NavigationNextTurnEvent.pb.h>
+#include <aap_protobuf/service/navigationstatus/message/NavigationStatus.pb.h>
 #include "aasdk/Error/Error.hpp"
 
 namespace aasdk::channel::navigationstatus {
@@ -33,16 +33,16 @@ namespace aasdk::channel::navigationstatus {
 
     virtual ~INavigationStatusServiceEventHandler() = default;
 
-    virtual void onChannelOpenRequest(const aap_protobuf::channel::ChannelOpenRequest &request) = 0;
+    virtual void onChannelOpenRequest(const aap_protobuf::service::control::message::ChannelOpenRequest &request) = 0;
 
     virtual void onChannelError(const error::Error &e) = 0;
 
-    virtual void onStatusUpdate(const aap_protobuf::channel::navigation::event::NavigationStatus &navStatus) = 0;
+    virtual void onStatusUpdate(const aap_protobuf::service::navigationstatus::message::NavigationStatus &navStatus) = 0;
 
-    virtual void onTurnEvent(const aap_protobuf::channel::navigation::event::NavigationNextTurnEvent &turnEvent) = 0;
+    virtual void onTurnEvent(const aap_protobuf::service::navigationstatus::message::NavigationNextTurnEvent &turnEvent) = 0;
 
     virtual void
-    onDistanceEvent(const aap_protobuf::service::navigation::message::NavigationNextTurnDistanceEvent &distanceEvent) = 0;
+    onDistanceEvent(const aap_protobuf::service::navigationstatus::message::NavigationNextTurnDistanceEvent &distanceEvent) = 0;
   };
 
 }

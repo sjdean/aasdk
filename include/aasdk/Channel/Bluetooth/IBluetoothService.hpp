@@ -21,8 +21,9 @@
 #include "aasdk/Channel/Promise.hpp"
 #include "aasdk/Channel/IChannel.hpp"
 #include "aasdk/Messenger/ChannelId.hpp"
-#include <aap_protobuf/channel/ChannelOpenResponse.pb.h>
+#include <aap_protobuf/service/control/message/ChannelOpenResponse.pb.h>
 #include <aap_protobuf/service/bluetooth/message/BluetoothPairingResponse.pb.h>
+#include <aap_protobuf/service/bluetooth/message/BluetoothAuthenticationData.pb.h>
 #include "IBluetoothServiceEventHandler.hpp"
 
 namespace aasdk::channel::bluetooth {
@@ -38,8 +39,12 @@ namespace aasdk::channel::bluetooth {
     virtual void receive(IBluetoothServiceEventHandler::Pointer eventHandler) = 0;
 
     virtual void
-    sendChannelOpenResponse(const aap_protobuf::channel::ChannelOpenResponse &response,
+    sendChannelOpenResponse(const aap_protobuf::service::control::message::ChannelOpenResponse &response,
                             SendPromise::Pointer promise) = 0;
+
+    virtual void sendBluetoothAuthenticationData(
+        const aap_protobuf::service::bluetooth::message::BluetoothAuthenticationData &response,
+        SendPromise::Pointer promise) = 0;
 
     virtual void
     sendBluetoothPairingResponse(const aap_protobuf::service::bluetooth::message::BluetoothPairingResponse &response,

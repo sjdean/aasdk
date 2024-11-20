@@ -1,11 +1,11 @@
 syntax="proto2";
 
-import "aap_protobuf/channel/bluetooth/event/BluetoothPairingMethod.proto";
+import "aap_protobuf/service/bluetooth/message/BluetoothPairingMethod.proto";
 
 package aap_protobuf.service.bluetooth;
 
 message BluetoothService
 {
     required string car_address = 1;
-    repeated channel.bluetooth.event.BluetoothPairingMethod supported_pairing_methods = 2 [packed = true];
+    repeated message.BluetoothPairingMethod supported_pairing_methods = 2 [packed = true];
 }

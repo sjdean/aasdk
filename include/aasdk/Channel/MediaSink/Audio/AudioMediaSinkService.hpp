@@ -34,16 +34,16 @@ namespace aasdk::channel::mediasink::audio {
     void receive(IAudioMediaSinkServiceEventHandler::Pointer eventHandler) override;
 
     void
-    sendChannelOpenResponse(const aap_protobuf::channel::ChannelOpenResponse &response,
+    sendChannelOpenResponse(const aap_protobuf::service::control::message::ChannelOpenResponse &response,
                             SendPromise::Pointer promise) override;
 
     void
-    sendChannelSetupResponse(const aap_protobuf::service::media::sink::message::MediaSinkChannelSetupResponse &response,
+    sendChannelSetupResponse(const aap_protobuf::service::media::shared::message::Config &response,
                              SendPromise::Pointer promise) override;
 
     void
     sendMediaAckIndication(
-        const aap_protobuf::service::media::source::message::MediaSourceMediaAckIndication &indication,
+        const aap_protobuf::service::media::source::message::Ack &indication,
         SendPromise::Pointer promise) override;
 
 

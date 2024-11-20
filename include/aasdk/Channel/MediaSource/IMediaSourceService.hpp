@@ -24,8 +24,9 @@
 #include <aap_protobuf/service/media/source/message/MicrophoneResponse.pb.h>
 #include <aap_protobuf/service/media/source/message/MicrophoneResponse.pb.h>
 #include <aap_protobuf/service/media/source/message/MicrophoneRequest.pb.h>
-#include <aap_protobuf/service/media/sink/message/MediaSinkChannelSetupResponse.pb.h>
-#include <aap_protobuf/channel/ChannelOpenResponse.pb.h>
+#include <aap_protobuf/service/media/shared/message/Setup.pb.h>
+#include <aap_protobuf/service/media/shared/message/Config.pb.h>
+#include <aap_protobuf/service/control/message/ChannelOpenResponse.pb.h>
 #include "aasdk/Messenger/Timestamp.hpp"
 #include "IMediaSourceServiceEventHandler.hpp"
 
@@ -43,11 +44,11 @@ namespace aasdk::channel::mediasource {
     virtual void receive(IMediaSourceServiceEventHandler::Pointer eventHandler) = 0;
 
     virtual void
-    sendChannelOpenResponse(const aap_protobuf::channel::ChannelOpenResponse &response,
+    sendChannelOpenResponse(const aap_protobuf::service::control::message::ChannelOpenResponse &response,
                             SendPromise::Pointer promise) = 0;
 
     virtual void
-    sendChannelSetupResponse(const aap_protobuf::service::media::sink::message::MediaSinkChannelSetupResponse &response,
+    sendChannelSetupResponse(const aap_protobuf::service::media::shared::message::Config &response,
                              SendPromise::Pointer promise) = 0;
 
     virtual void sendMediaSourceWithTimestampIndication(messenger::Timestamp::ValueType, const common::Data &data,

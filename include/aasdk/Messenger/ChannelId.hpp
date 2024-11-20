@@ -19,22 +19,24 @@
 
 #include <string>
 
+/*
+ * TODO: Switch to Dynamic ChannelId's - P5
+ * In AA, Channel Id's are dynamic. We use ChannelId here for a static implementation, which, while acceptable,
+ * may cause more channels to be open than needs to be. OpenAuto should register a ChannelId and ChannelName
+ * (for debugging) with AASDK.
+ */
 
 namespace aasdk::messenger {
   enum class ChannelId {
     CONTROL,
     SENSOR,
     MEDIA_SINK,
-    MEDIA_SINK_AUDIO,
     MEDIA_SINK_VIDEO,
-    MEDIA_SINK_VIDEO_SERVICE,
-    MEDIA_SINK_AUDIO_SERVICE,
     MEDIA_SINK_MEDIA_AUDIO,
     MEDIA_SINK_GUIDANCE_AUDIO,
     MEDIA_SINK_SYSTEM_AUDIO,
     MEDIA_SINK_TELEPHONY_AUDIO,
     INPUT_SOURCE,
-    MEDIA_SOURCE,
     MEDIA_SOURCE_MICROPHONE,
     BLUETOOTH,
     RADIO,

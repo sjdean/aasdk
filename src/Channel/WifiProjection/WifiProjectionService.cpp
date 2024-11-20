@@ -41,14 +41,14 @@ namespace aasdk::channel::wifiprojection {
     messenger_->enqueueReceive(channelId_, std::move(receivePromise));
   }
 
-  void WifiProjectionService::sendChannelOpenResponse(const aap_protobuf::channel::ChannelOpenResponse &response,
+  void WifiProjectionService::sendChannelOpenResponse(const aap_protobuf::service::control::message::ChannelOpenResponse &response,
                                                       SendPromise::Pointer promise) {
     AASDK_LOG(debug) << "[WifiProjectionService] sendChannelOpenResponse()";
     auto message(std::make_shared<messenger::Message>(channelId_, messenger::EncryptionType::ENCRYPTED,
                                                       messenger::MessageType::CONTROL));
     message->insertPayload(
         messenger::MessageId(
-            aap_protobuf::channel::control::ControlMessageType::MESSAGE_CHANNEL_OPEN_RESPONSE).getData());
+            aap_protobuf::service::control::message::ControlMessageType::MESSAGE_CHANNEL_OPEN_RESPONSE).getData());
     message->insertPayload(response);
 
     this->send(std::move(message), std::move(promise));
@@ -76,7 +76,7 @@ namespace aasdk::channel::wifiprojection {
     common::DataConstBuffer payload(message->getPayload(), messageId.getSizeOf());
 
     switch (messageId.getId()) {
-      case aap_protobuf::channel::control::ControlMessageType::MESSAGE_CHANNEL_OPEN_REQUEST:
+      case aap_protobuf::service::control::message::ControlMessageType::MESSAGE_CHANNEL_OPEN_REQUEST:
         this->handleChannelOpenRequest(payload, std::move(eventHandler));
         break;
       case aap_protobuf::service::wifiprojection::WifiProjectionMessageId::WIFI_MESSAGE_CREDENTIALS_REQUEST:
@@ -92,7 +92,7 @@ namespace aasdk::channel::wifiprojection {
   void WifiProjectionService::handleChannelOpenRequest(const common::DataConstBuffer &payload,
                                                        IWifiProjectionServiceEventHandler::Pointer eventHandler) {
     AASDK_LOG(debug) << "[WifiProjectionService] handleChannelOpenRequest()";
-    aap_protobuf::channel::ChannelOpenRequest request;
+    aap_protobuf::service::control::message::ChannelOpenRequest request;
     if (request.ParseFromArray(payload.cdata, payload.size)) {
       eventHandler->onChannelOpenRequest(request);
     } else {

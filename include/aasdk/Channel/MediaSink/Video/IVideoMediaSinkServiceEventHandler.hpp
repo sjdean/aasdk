@@ -18,14 +18,15 @@
 #pragma once
 
 #include <stdint.h>
-#include <aap_protobuf/channel/media/event/Setup.pb.h>
-#include <aap_protobuf/channel/media/event/Start.pb.h>
-#include <aap_protobuf/channel/media/event/Stop.pb.h>
-#include <aap_protobuf/channel/ChannelOpenRequest.pb.h>
+#include <aap_protobuf/service/media/shared/message/Setup.pb.h>
+#include <aap_protobuf/service/media/shared/message/Start.pb.h>
+#include <aap_protobuf/service/media/shared/message/Stop.pb.h>
+#include <aap_protobuf/service/media/shared/message/Config.pb.h>
+#include <aap_protobuf/service/control/message/ChannelOpenRequest.pb.h>
 #include "aasdk/Messenger/Timestamp.hpp"
 #include "aasdk/Common/Data.hpp"
 #include "aasdk/Error/Error.hpp"
-#include <aap_protobuf/channel/control/focus/video/event/VideoFocusRequestNotification.pb.h>
+#include <aap_protobuf/service/media/video/message/VideoFocusRequestNotification.pb.h>
 
 namespace aasdk::channel::mediasink::video {
 
@@ -37,13 +38,13 @@ namespace aasdk::channel::mediasink::video {
 
     virtual ~IVideoMediaSinkServiceEventHandler() = default;
 
-    virtual void onChannelOpenRequest(const aap_protobuf::channel::ChannelOpenRequest &request) = 0;
+    virtual void onChannelOpenRequest(const aap_protobuf::service::control::message::ChannelOpenRequest &request) = 0;
 
-    virtual void onMediaChannelSetupRequest(const aap_protobuf::channel::media::event::Setup &request) = 0;
+    virtual void onMediaChannelSetupRequest(const aap_protobuf::service::media::shared::message::Setup &request) = 0;
 
-    virtual void onMediaChannelStartIndication(const aap_protobuf::channel::media::event::Start &indication) = 0;
+    virtual void onMediaChannelStartIndication(const aap_protobuf::service::media::shared::message::Start &indication) = 0;
 
-    virtual void onMediaChannelStopIndication(const aap_protobuf::channel::media::event::Stop &indication) = 0;
+    virtual void onMediaChannelStopIndication(const aap_protobuf::service::media::shared::message::Stop &indication) = 0;
 
     virtual void
     onMediaWithTimestampIndication(messenger::Timestamp::ValueType, const common::DataConstBuffer &buffer) = 0;
@@ -51,7 +52,7 @@ namespace aasdk::channel::mediasink::video {
     virtual void onMediaIndication(const common::DataConstBuffer &buffer) = 0;
 
     virtual void onVideoFocusRequest(
-        const aap_protobuf::channel::control::focus::video::event::VideoFocusRequestNotification &request) = 0;
+        const aap_protobuf::service::media::video::message::VideoFocusRequestNotification &request) = 0;
 
     virtual void onChannelError(const error::Error &e) = 0;
   };

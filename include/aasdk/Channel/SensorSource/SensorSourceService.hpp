@@ -31,13 +31,13 @@ namespace aasdk::channel::sensorsource {
     void receive(ISensorSourceServiceEventHandler::Pointer eventHandler) override;
 
     void
-    sendChannelOpenResponse(const aap_protobuf::channel::ChannelOpenResponse &response,
+    sendChannelOpenResponse(const aap_protobuf::service::control::message::ChannelOpenResponse &response,
                             SendPromise::Pointer promise) override;
 
-    void sendSensorEventIndication(const aap_protobuf::service::sensor::message::SensorBatch &indication,
+    void sendSensorEventIndication(const aap_protobuf::service::sensorsource::message::SensorBatch &indication,
                                    SendPromise::Pointer promise) override;
 
-    void sendSensorStartResponse(const aap_protobuf::service::sensor::message::SensorStartResponseMessage &response,
+    void sendSensorStartResponse(const aap_protobuf::service::sensorsource::message::SensorStartResponseMessage &response,
                                  SendPromise::Pointer promise) override;
 
   private:

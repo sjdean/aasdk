@@ -1,29 +1,26 @@
 cmake_minimum_required(VERSION 3.5.1)
 
 project(aasdk)
+message(STATUS "AASDK Library")
+message(STATUS "Cross Compiling?")
 
 # Cross Compiling Architecture
 if( TARGET_ARCH STREQUAL "amd64" )
-    message("Building for amd64")
+    message(STATUS "...amd64")
     set(CPACK_DEBIAN_PACKAGE_ARCHITECTURE "amd64")
 elseif( TARGET_ARCH STREQUAL "armhf" )
-    message("Building for armhf")
+    message(STATUS "...armhf")
     set(CMAKE_C_COMPILER /usr/bin/arm-linux-gnueabihf-gcc-8)
     set(CMAKE_CXX_COMPILER /usr/bin/arm-linux-gnueabihf-g++-8)
     set(CPACK_DEBIAN_PACKAGE_ARCHITECTURE "armhf")
 else()
-    if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")  # macOS
-        # macOS specific command
-        #set(CMAKE_OSX_ARCHITECTURES "x86_64")
-        #set(CMAKE_OSX_DEPLOYMENT_TARGET "10.12")
-    endif()
-    message("Target Architecture not specified, not cross compiling")
+    message(STATUS "...not cross compiling")
 endif()
 
 # Set Compile Versions
-set(LIBRARY_BUILD_DATE "20241028")    # Binary Release Build Date
-set(LIBRARY_BUILD_MAJOR_RELEASE 1)        # Binary Release Build Number (increment if released on same day)
-set(LIBRARY_BUILD_MINOR_RELEASE 1)        # Binary Release Build Number (increment if released on same day)
+set(LIBRARY_BUILD_DATE "20241120")    # Binary Release Build Date
+set(LIBRARY_BUILD_MAJOR_RELEASE 2)        # Binary Release Build Number (increment if released on same day)
+set(LIBRARY_BUILD_MINOR_RELEASE 0)        # Binary Release Build Number (increment if released on same day)
 set(LIBRARY_BUILD_INCREMENTAL 1)    # Binary Build Version - Increment for Each Build
 
 # Cache
@@ -32,7 +29,9 @@ if(CCACHE_PROGRAM)
     set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE "${CCACHE_PROGRAM}")
 endif()
 
+
 # Configure CMAKE
+message(STATUS "Configuring CMAKE")
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
@@ -40,6 +39,14 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake_modules/
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS_INIT} -fPIC -Wall -pedantic")
 set(CMAKE_CXX_FLAGS_DEBUG "-g -O0")
 set(CMAKE_CXX_FLAGS_RELEASE "-g -O3")
+
+# Default to Release mode unless overridden with -DCMAKE_BUILD_TYPE=Debug on cmake command
+if(NOT CMAKE_BUILD_TYPE)
+    message(STATUS "Forcing Release build type")
+    set(CMAKE_BUILD_TYPE Release CACHE STRING "Choose the type of build." FORCE)
+    # Set the possible values of build type for cmake-gui
+    set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release" "MinSizeRel" "RelWithDebInfo")
+endif()
 
 # Paths
 set(sources_directory ${CMAKE_CURRENT_SOURCE_DIR}/src)
@@ -52,8 +59,6 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/bin)
 set(EXECUTABLE_OUTPUT_PATH ${CMAKE_CURRENT_SOURCE_DIR}/bin)
 
-#This line Errors - TODO
-#include(${CMAKE_CURRENT_SOURCE_DIR}/cmake_modules/gitversion.cmake)
 set (CMAKE_PROJECT_VERSION_PATCH ${_commit_timestamp})
 
 # Configure Boost
@@ -62,6 +67,11 @@ set(Boost_USE_MULTITHREADED ON)
 set(Boost_USE_STATIC_RUNTIME OFF)
 
 add_definitions(-DBOOST_ALL_DYN_LINK)
+
+if(CMAKE_BUILD_TYPE STREQUAL "Release")
+    message(STATUS "Disabling Boost DEBUG logs")
+    add_definitions(-DNDEBUG)
+endif()
 
 if(WIN32)
     set(WINSOCK2_LIBRARIES "ws2_32")
@@ -75,6 +85,7 @@ find_package(aap_protobuf REQUIRED)
 
 # Building on a Mac requires Abseil
 if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")  # macOS
+    message(STATUS "MacOS System Detected")
     find_package(protobuf REQUIRED CONFIG)
     find_package(absl REQUIRED)
 else ()
@@ -85,13 +96,10 @@ include(FindProtobuf)
 
 find_package(Boost REQUIRED COMPONENTS system log OPTIONAL_COMPONENTS unit_test_framework)
 find_package(libusb-1.0 REQUIRED)
-
 find_package(OpenSSL REQUIRED)
 
 include_directories(
         ${Boost_INCLUDE_DIRS}
-        ${LIBUSB_1_INCLUDE_DIRS}
-        ${LIBUSB_INCLUDE_DIR}
         ${PROTOBUF_INCLUDE_DIR}
         ${AAP_PROTOBUF_INCLUDE_DIR}
         ${OPENSSL_INCLUDE_DIR}
@@ -107,24 +115,30 @@ file(GLOB_RECURSE tests_include_files ${include_ut_directory}/*.hpp)
 
 list(REMOVE_ITEM source_files ${tests_source_files})
 
-add_library(aasdk SHARED
-        ${source_files}
-        ${include_files})
-
+if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")  # macOS
+    message(NOTICE "Configuring STATIC Library for MacOS")
+    add_library(aasdk STATIC
+            ${source_files}
+            ${include_files})
+else()
+    message(NOTICE "Configuring SHARED Library")
+    add_library(aasdk SHARED
+            ${source_files}
+            ${include_files})
+endif()
 target_include_directories(aasdk PUBLIC ${AAP_PROTOBUF_INCLUDE_DIR})
 
 target_link_libraries(aasdk PUBLIC
         libusb
         ${Boost_LIBRARIES}
-        ${AAP_PROTOBUF_LIB_DIR}
-        ${LIBUSB_1_LIBRARIES}
         ${PROTOBUF_LIBRARIES}
+        ${AAP_PROTOBUF_LIB_DIR}
         ${OPENSSL_LIBRARIES}
         ${WINSOCK2_LIBRARIES})
 
 
 set(LIBRARY_VERSION_STRING "${LIBRARY_BUILD_MAJOR_RELEASE}.${LIBRARY_BUILD_MINOR_RELEASE}.${LIBRARY_BUILD_INCREMENTAL}+${LIBRARY_BUILD_DATE}")
-message(INFO " Project Version: ${LIBRARY_VERSION_STRING}")
+message(STATUS "Project Version: ${LIBRARY_VERSION_STRING}")
 set_target_properties(aasdk
         PROPERTIES VERSION ${LIBRARY_VERSION_STRING} SOVERSION ${LIBRARY_BUILD_INCREMENTAL})
 
@@ -136,12 +150,6 @@ install(TARGETS aasdk libusb
         RUNTIME DESTINATION bin
         INCLUDES DESTINATION include
 )
-
-#target_include_directories(aasdk
-#        PUBLIC
-#        $<BUILD_INTERFACE:${PROTOBUF_SOURCES}>
-#        $<INSTALL_INTERFACE:include/aap_protobuf>
-#)
 
 # Install headers explicitly
 install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/aasdk

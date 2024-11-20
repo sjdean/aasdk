@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include <aap_protobuf/channel/ChannelOpenRequest.pb.h>
+#include <aap_protobuf/service/control/message/ChannelOpenRequest.pb.h>
 #include "aasdk/Error/Error.hpp"
 
 namespace aasdk::channel::radio {
@@ -31,7 +31,7 @@ namespace aasdk::channel::radio {
 
     virtual ~IRadioServiceEventHandler() = default;
 
-    virtual void onChannelOpenRequest(const aap_protobuf::channel::ChannelOpenRequest &request) = 0;
+    virtual void onChannelOpenRequest(const aap_protobuf::service::control::message::ChannelOpenRequest &request) = 0;
 
     virtual void onChannelError(const error::Error &e) = 0;
   };

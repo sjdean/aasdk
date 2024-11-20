@@ -17,8 +17,10 @@
 
 #pragma once
 
-#include <aap_protobuf/channel/bluetooth/event/BluetoothPairingRequest.pb.h>
-#include <aap_protobuf/channel/ChannelOpenRequest.pb.h>
+#include <aap_protobuf/service/bluetooth/message/BluetoothPairingRequest.pb.h>
+#include <aap_protobuf/service/bluetooth/message/BluetoothAuthenticationData.pb.h>
+#include <aap_protobuf/service/bluetooth/message/BluetoothAuthenticationResult.pb.h>
+#include <aap_protobuf/service/control/message/ChannelOpenRequest.pb.h>
 #include "aasdk/Error/Error.hpp"
 
 namespace aasdk::channel::bluetooth {
@@ -31,10 +33,13 @@ namespace aasdk::channel::bluetooth {
 
     virtual ~IBluetoothServiceEventHandler() = default;
 
-    virtual void onChannelOpenRequest(const aap_protobuf::channel::ChannelOpenRequest &request) = 0;
+    virtual void onChannelOpenRequest(const aap_protobuf::service::control::message::ChannelOpenRequest &request) = 0;
 
     virtual void
-    onBluetoothPairingRequest(const aap_protobuf::channel::bluetooth::event::BluetoothPairingRequest &request) = 0;
+    onBluetoothPairingRequest(const aap_protobuf::service::bluetooth::message::BluetoothPairingRequest &request) = 0;
+
+    virtual void
+    onBluetoothAuthenticationResult(const aap_protobuf::service::bluetooth::message::BluetoothAuthenticationResult &request) = 0;
 
     virtual void onChannelError(const error::Error &e) = 0;
   };

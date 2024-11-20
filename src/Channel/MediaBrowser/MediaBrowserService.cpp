@@ -45,14 +45,14 @@ namespace aasdk::channel::mediabrowser {
     messenger_->enqueueReceive(channelId_, std::move(receivePromise));
   }
 
-  void MediaBrowserService::sendChannelOpenResponse(const aap_protobuf::channel::ChannelOpenResponse &response,
+  void MediaBrowserService::sendChannelOpenResponse(const aap_protobuf::service::control::message::ChannelOpenResponse &response,
                                                     SendPromise::Pointer promise) {
     AASDK_LOG(debug) << "[MediaBrowserService] sendChannelOpenResponse()";
     auto message(std::make_shared<messenger::Message>(channelId_, messenger::EncryptionType::ENCRYPTED,
                                                       messenger::MessageType::CONTROL));
     message->insertPayload(
         messenger::MessageId(
-            aap_protobuf::channel::control::ControlMessageType::MESSAGE_CHANNEL_OPEN_RESPONSE).getData());
+            aap_protobuf::service::control::message::ControlMessageType::MESSAGE_CHANNEL_OPEN_RESPONSE).getData());
     message->insertPayload(response);
 
     this->send(std::move(message), std::move(promise));
@@ -66,14 +66,14 @@ namespace aasdk::channel::mediabrowser {
     common::DataConstBuffer payload(message->getPayload(), messageId.getSizeOf());
 
     switch (messageId.getId()) {
-      case aap_protobuf::channel::control::ControlMessageType::MESSAGE_CHANNEL_OPEN_REQUEST:
+      case aap_protobuf::service::control::message::ControlMessageType::MESSAGE_CHANNEL_OPEN_REQUEST:
         this->handleChannelOpenRequest(payload, std::move(eventHandler));
-      case aap_protobuf::service::mediabrowser::MEDIA_ROOT_NODE:
-      case aap_protobuf::service::mediabrowser::MEDIA_SOURCE_NODE:
-      case aap_protobuf::service::mediabrowser::MEDIA_LIST_NODE:
-      case aap_protobuf::service::mediabrowser::MEDIA_SONG_NODE:
-      case aap_protobuf::service::mediabrowser::MEDIA_GET_NODE:
-      case aap_protobuf::service::mediabrowser::MEDIA_BROWSE_INPUT:
+      case aap_protobuf::service::mediabrowser::MediaBrowserMessageId::MEDIA_ROOT_NODE:
+      case aap_protobuf::service::mediabrowser::MediaBrowserMessageId::MEDIA_SOURCE_NODE:
+      case aap_protobuf::service::mediabrowser::MediaBrowserMessageId::MEDIA_LIST_NODE:
+      case aap_protobuf::service::mediabrowser::MediaBrowserMessageId::MEDIA_SONG_NODE:
+      case aap_protobuf::service::mediabrowser::MediaBrowserMessageId::MEDIA_GET_NODE:
+      case aap_protobuf::service::mediabrowser::MediaBrowserMessageId::MEDIA_BROWSE_INPUT:
       default:
         AASDK_LOG(error) << "[MediaBrowserService] Message Id not Handled: " << messageId.getId();
         this->receive(std::move(eventHandler));
@@ -84,7 +84,7 @@ namespace aasdk::channel::mediabrowser {
   void MediaBrowserService::handleChannelOpenRequest(const common::DataConstBuffer &payload,
                                                      IMediaBrowserServiceEventHandler::Pointer eventHandler) {
     AASDK_LOG(debug) << "[MediaBrowserService] handleChannelOpenRequest()";
-    aap_protobuf::channel::ChannelOpenRequest request;
+    aap_protobuf::service::control::message::ChannelOpenRequest request;
     if (request.ParseFromArray(payload.cdata, payload.size)) {
       eventHandler->onChannelOpenRequest(request);
     } else {

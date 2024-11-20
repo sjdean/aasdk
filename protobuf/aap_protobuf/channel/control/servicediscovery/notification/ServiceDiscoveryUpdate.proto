@@ -1,9 +1,0 @@
-syntax="proto2";
-
-import "aap_protobuf/service/Service.proto";
-
-package aap_protobuf.channel.control.servicediscovery.notification;
-
-message ServiceDiscoveryUpdate {
-  optional service.Service service = 1;
-}

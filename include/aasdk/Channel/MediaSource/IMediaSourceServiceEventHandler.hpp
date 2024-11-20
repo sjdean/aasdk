@@ -17,12 +17,13 @@
 
 #pragma once
 
-#include <aap_protobuf/channel/media/event/Setup.pb.h>
-#include <aap_protobuf/channel/media/event/Start.pb.h>
-#include <aap_protobuf/channel/media/event/Stop.pb.h>
-#include <aap_protobuf/service/media/source/message/MediaSourceMediaAckIndication.pb.h>
+#include <aap_protobuf/service/media/shared/message/Setup.pb.h>
+#include <aap_protobuf/service/media/shared/message/Start.pb.h>
+#include <aap_protobuf/service/media/shared/message/Stop.pb.h>
+#include <aap_protobuf/service/media/source/message/Ack.pb.h>
+#include <aap_protobuf/service/media/shared/message/Config.pb.h>
 #include <aap_protobuf/service/media/source/message/MicrophoneRequest.pb.h>
-#include <aap_protobuf/channel/ChannelOpenRequest.pb.h>
+#include <aap_protobuf/service/control/message/ChannelOpenRequest.pb.h>
 #include "aasdk/Error/Error.hpp"
 
 
@@ -36,16 +37,16 @@ namespace aasdk::channel::mediasource {
 
     virtual ~IMediaSourceServiceEventHandler() = default;
 
-    virtual void onChannelOpenRequest(const aap_protobuf::channel::ChannelOpenRequest &request) = 0;
+    virtual void onChannelOpenRequest(const aap_protobuf::service::control::message::ChannelOpenRequest &request) = 0;
 
-    virtual void onMediaChannelSetupRequest(const aap_protobuf::channel::media::event::Setup &request) = 0;
+    virtual void onMediaChannelSetupRequest(const aap_protobuf::service::media::shared::message::Setup &request) = 0;
 
     virtual void
     onMediaSourceOpenRequest(const aap_protobuf::service::media::source::message::MicrophoneRequest &request) = 0;
 
     virtual void
     onMediaChannelAckIndication(
-        const aap_protobuf::service::media::source::message::MediaSourceMediaAckIndication &indication) = 0;
+        const aap_protobuf::service::media::source::message::Ack &indication) = 0;
 
     virtual void onChannelError(const error::Error &e) = 0;
   };

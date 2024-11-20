@@ -20,7 +20,7 @@
 #include "aasdk/Messenger/MessageId.hpp"
 #include "aasdk/Channel/Channel.hpp"
 #include "IVideoMediaSinkService.hpp"
-#include <aap_protobuf/channel/control/focus/video/notification/VideoFocusNotification.pb.h>
+#include <aap_protobuf/service/media/video/message/VideoFocusNotification.pb.h>
 
 namespace aasdk::channel::mediasink::video {
 
@@ -35,20 +35,20 @@ namespace aasdk::channel::mediasink::video {
     void receive(IVideoMediaSinkServiceEventHandler::Pointer eventHandler) override;
 
     void
-    sendChannelOpenResponse(const aap_protobuf::channel::ChannelOpenResponse &response,
+    sendChannelOpenResponse(const aap_protobuf::service::control::message::ChannelOpenResponse &response,
                             SendPromise::Pointer promise) override;
 
     void
-    sendChannelSetupResponse(const aap_protobuf::service::media::sink::message::MediaSinkChannelSetupResponse &response,
+    sendChannelSetupResponse(const aap_protobuf::service::media::shared::message::Config &response,
                              SendPromise::Pointer promise) override;
 
     void
     sendMediaAckIndication(
-        const aap_protobuf::service::media::source::message::MediaSourceMediaAckIndication &indication,
+        const aap_protobuf::service::media::source::message::Ack &indication,
         SendPromise::Pointer promise) override;
 
     void sendVideoFocusIndication(
-        const aap_protobuf::channel::control::focus::video::notification::VideoFocusNotification &indication,
+        const aap_protobuf::service::media::video::message::VideoFocusNotification &indication,
         SendPromise::Pointer promise) override;
 
   protected:

@@ -1,7 +1,0 @@
-syntax="proto2";
-
-package aap_protobuf.channel.control.auth;
-
-message AuthResponse {
-    required int32 status = 1;
-}

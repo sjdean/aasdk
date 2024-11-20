@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with aasdk. If not, see <http://www.gnu.org/licenses/>.
 
-#include <aap_protobuf/service/media/shared/message/MediaMessageId.pb.h>
+#include <aap_protobuf/service/media/sink/MediaMessageId.pb.h>
 #include "aasdk/Messenger/Timestamp.hpp"
 #include "aasdk/Channel/MediaSource/IMediaSourceServiceEventHandler.hpp"
 #include "aasdk/Channel/MediaSource/MediaSourceService.hpp"
@@ -41,14 +41,14 @@ namespace aasdk::channel::mediasource {
     messenger_->enqueueReceive(channelId_, std::move(receivePromise));
   }
 
-  void MediaSourceService::sendChannelOpenResponse(const aap_protobuf::channel::ChannelOpenResponse &response,
+  void MediaSourceService::sendChannelOpenResponse(const aap_protobuf::service::control::message::ChannelOpenResponse &response,
                                                    SendPromise::Pointer promise) {
     AASDK_LOG(debug) << "[MediaSourceService] sendChannelOpenResponse()";
     auto message(std::make_shared<messenger::Message>(channelId_, messenger::EncryptionType::ENCRYPTED,
                                                       messenger::MessageType::CONTROL));
     message->insertPayload(
         messenger::MessageId(
-            aap_protobuf::channel::control::ControlMessageType::MESSAGE_CHANNEL_OPEN_RESPONSE).getData());
+            aap_protobuf::service::control::message::ControlMessageType::MESSAGE_CHANNEL_OPEN_RESPONSE).getData());
     message->insertPayload(response);
 
     this->send(std::move(message), std::move(promise));
@@ -56,14 +56,14 @@ namespace aasdk::channel::mediasource {
 
 
   void MediaSourceService::sendChannelSetupResponse(
-      const aap_protobuf::service::media::sink::message::MediaSinkChannelSetupResponse &response,
+      const aap_protobuf::service::media::shared::message::Config &response,
       SendPromise::Pointer promise) {
     AASDK_LOG(debug) << "[MediaSourceService] sendChannelSetupResponse()";
     auto message(std::make_shared<messenger::Message>(channelId_, messenger::EncryptionType::ENCRYPTED,
                                                       messenger::MessageType::SPECIFIC));
     message->insertPayload(
         messenger::MessageId(
-            aap_protobuf::service::media::shared::message::MediaMessageId::MEDIA_MESSAGE_SETUP).getData());
+            aap_protobuf::service::media::sink::MediaMessageId::MEDIA_MESSAGE_SETUP).getData());
     message->insertPayload(response);
 
     this->send(std::move(message), std::move(promise));
@@ -76,16 +76,16 @@ namespace aasdk::channel::mediasource {
     common::DataConstBuffer payload(message->getPayload(), messageId.getSizeOf());
 
     switch (messageId.getId()) {
-      case aap_protobuf::channel::control::ControlMessageType::MESSAGE_CHANNEL_OPEN_REQUEST:
+      case aap_protobuf::service::control::message::ControlMessageType::MESSAGE_CHANNEL_OPEN_REQUEST:
         this->handleChannelOpenRequest(payload, std::move(eventHandler));
         break;
-      case aap_protobuf::service::media::shared::message::MediaMessageId::MEDIA_MESSAGE_SETUP:
+      case aap_protobuf::service::media::sink::MediaMessageId::MEDIA_MESSAGE_SETUP:
         this->handleAVChannelSetupRequest(payload, std::move(eventHandler));
         break;
-      case aap_protobuf::service::media::shared::message::MediaMessageId::MEDIA_MESSAGE_MICROPHONE_REQUEST:
+      case aap_protobuf::service::media::sink::MediaMessageId::MEDIA_MESSAGE_MICROPHONE_REQUEST:
         this->handleAVInputOpenRequest(payload, std::move(eventHandler));
         break;
-      case aap_protobuf::service::media::shared::message::MediaMessageId::MEDIA_MESSAGE_ACK:
+      case aap_protobuf::service::media::sink::MediaMessageId::MEDIA_MESSAGE_ACK:
         this->handleAVMediaAckIndication(payload, std::move(eventHandler));
         break;
       default:
@@ -102,7 +102,7 @@ namespace aasdk::channel::mediasource {
                                                       messenger::MessageType::SPECIFIC));
 
     message->insertPayload(messenger::MessageId(
-        aap_protobuf::service::media::shared::message::MediaMessageId::MEDIA_MESSAGE_MICROPHONE_REQUEST).getData());
+        aap_protobuf::service::media::sink::MediaMessageId::MEDIA_MESSAGE_MICROPHONE_REQUEST).getData());
     message->insertPayload(response);
 
     this->send(std::move(message), std::move(promise));
@@ -115,7 +115,7 @@ namespace aasdk::channel::mediasource {
     auto message(std::make_shared<messenger::Message>(channelId_, messenger::EncryptionType::ENCRYPTED,
                                                       messenger::MessageType::SPECIFIC));
     message->insertPayload(messenger::MessageId(
-        aap_protobuf::service::media::shared::message::MediaMessageId::MEDIA_MESSAGE_CODEC_CONFIG).getData());
+        aap_protobuf::service::media::sink::MediaMessageId::MEDIA_MESSAGE_CODEC_CONFIG).getData());
 
     auto timestampData = messenger::Timestamp(timestamp).getData();
     message->insertPayload(std::move(timestampData));
@@ -127,7 +127,7 @@ namespace aasdk::channel::mediasource {
   void MediaSourceService::handleAVChannelSetupRequest(const common::DataConstBuffer &payload,
                                                        IMediaSourceServiceEventHandler::Pointer eventHandler) {
     AASDK_LOG(debug) << "[MediaSourceService] handleAVChannelSetupRequest()";
-    aap_protobuf::channel::media::event::Setup request;
+    aap_protobuf::service::media::shared::message::Setup request;
     if (request.ParseFromArray(payload.cdata, payload.size)) {
       eventHandler->onMediaChannelSetupRequest(request);
     } else {
@@ -149,7 +149,7 @@ namespace aasdk::channel::mediasource {
   void MediaSourceService::handleAVMediaAckIndication(const common::DataConstBuffer &payload,
                                                       IMediaSourceServiceEventHandler::Pointer eventHandler) {
     AASDK_LOG(debug) << "[MediaSourceService] handleAVMediaAckIndication()";
-    aap_protobuf::service::media::source::message::MediaSourceMediaAckIndication indication;
+    aap_protobuf::service::media::source::message::Ack indication;
     if (indication.ParseFromArray(payload.cdata, payload.size)) {
       eventHandler->onMediaChannelAckIndication(indication);
     } else {
@@ -160,7 +160,7 @@ namespace aasdk::channel::mediasource {
   void MediaSourceService::handleChannelOpenRequest(const common::DataConstBuffer &payload,
                                                     IMediaSourceServiceEventHandler::Pointer eventHandler) {
     AASDK_LOG(debug) << "[MediaSourceService] handleChannelOpenRequest()";
-    aap_protobuf::channel::ChannelOpenRequest request;
+    aap_protobuf::service::control::message::ChannelOpenRequest request;
     if (request.ParseFromArray(payload.cdata, payload.size)) {
       eventHandler->onChannelOpenRequest(request);
     } else {

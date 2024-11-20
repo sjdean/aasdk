@@ -1,9 +1,0 @@
-syntax="proto2";
-
-package aap_protobuf.service.sensor.message;
-
-message HVACData
-{
-    optional int32 target_temperature = 1;
-    optional int32 current_temperature = 2;
-}

@@ -23,11 +23,12 @@
 #include "aasdk/Channel/Promise.hpp"
 #include "aasdk/Channel/IChannel.hpp"
 #include "aasdk/Messenger/ChannelId.hpp"
-#include <aap_protobuf/service/media/sink/message/MediaSinkChannelSetupResponse.pb.h>
-#include <aap_protobuf/service/media/source/message/MediaSourceMediaAckIndication.pb.h>
-#include <aap_protobuf/channel/control/focus/video/notification/VideoFocusNotification.pb.h>
-#include <aap_protobuf/channel/control/focus/video/event/VideoFocusRequestNotification.pb.h>
-#include <aap_protobuf/channel/ChannelOpenResponse.pb.h>
+#include <aap_protobuf/service/media/shared/message/Setup.pb.h>
+#include <aap_protobuf/service/media/shared/message/Config.pb.h>
+#include <aap_protobuf/service/media/source/message/Ack.pb.h>
+#include <aap_protobuf/service/media/video/message/VideoFocusNotification.pb.h>
+#include <aap_protobuf/service/media/video/message/VideoFocusRequestNotification.pb.h>
+#include <aap_protobuf/service/control/message/ChannelOpenResponse.pb.h>
 
 namespace aasdk::channel::mediasink::audio {
 
@@ -42,16 +43,16 @@ namespace aasdk::channel::mediasink::audio {
     virtual void receive(IAudioMediaSinkServiceEventHandler::Pointer eventHandler) = 0;
 
     virtual void
-    sendChannelOpenResponse(const aap_protobuf::channel::ChannelOpenResponse &response,
+    sendChannelOpenResponse(const aap_protobuf::service::control::message::ChannelOpenResponse &response,
                             SendPromise::Pointer promise) = 0;
 
     virtual void
-    sendChannelSetupResponse(const aap_protobuf::service::media::sink::message::MediaSinkChannelSetupResponse &response,
+    sendChannelSetupResponse(const aap_protobuf::service::media::shared::message::Config &response,
                              SendPromise::Pointer promise) = 0;
 
     virtual void
     sendMediaAckIndication(
-        const aap_protobuf::service::media::source::message::MediaSourceMediaAckIndication &indication,
+        const aap_protobuf::service::media::source::message::Ack &indication,
         SendPromise::Pointer promise) = 0;
 
   };
