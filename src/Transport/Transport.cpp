@@ -26,17 +26,18 @@ namespace aasdk {
         : receiveStrand_(ioService), sendStrand_(ioService) {}
 
     void Transport::receive(size_t size, ReceivePromise::Pointer promise) {
-      AASDK_LOG(debug) << "[Transport] Receiving Message....";
+      AASDK_LOG(debug) << "[Transport] receive()";
       receiveStrand_.dispatch([this, self = this->shared_from_this(), size, promise = std::move(promise)]() mutable {
         receiveQueue_.emplace_back(std::make_pair(size, std::move(promise)));
 
         if (receiveQueue_.size() == 1) {
           try {
-            AASDK_LOG(debug) << "[Transport] Distribute Data";
+            AASDK_LOG(debug) << "[Transport] Distribute received data.";
             this->distributeReceivedData();
           }
           catch (const error::Error &e) {
-            AASDK_LOG(debug) << "[Transport] Error....";
+            // Due to the design of the messaging system, we don't really need to raise an error - debug it is
+            AASDK_LOG(debug) << "[Transport] Reject receive promise.";
             this->rejectReceivePromises(e);
           }
         }
@@ -45,30 +46,29 @@ namespace aasdk {
 
     void Transport::receiveHandler(size_t bytesTransferred) {
       try {
-        AASDK_LOG(debug) << "[Transport] Committing to Data Sink....";
+        AASDK_LOG(debug) << "[Transport] receiveHandler()";
         receivedDataSink_.commit(bytesTransferred);
         this->distributeReceivedData();
       }
       catch (const error::Error &e) {
-        AASDK_LOG(debug) << "[Transport] Reject Promise 2";
+        // Due to the design of the messaging system, we don't really need to raise an error - debug it is
+        AASDK_LOG(debug) << "[Transport] Rejecting promise.";
         this->rejectReceivePromises(e);
       }
     }
 
     void Transport::distributeReceivedData() {
-      AASDK_LOG(debug) << "[Transport] Distributing....";
+      AASDK_LOG(debug) << "[Transport] distributeReceivedData()";
       for (auto queueElement = receiveQueue_.begin(); queueElement != receiveQueue_.end();) {
-        AASDK_LOG(debug) << "[Transport] Process Queue";
         if (receivedDataSink_.getAvailableSize() < queueElement->first) {
-          AASDK_LOG(debug) << "[Transport] Receiving from Buffer";
+          AASDK_LOG(debug) << "[Transport] Receiving from buffer.";
           auto buffer = receivedDataSink_.fill();
           this->enqueueReceive(std::move(buffer));
 
           break;
         } else {
-          AASDK_LOG(debug) << "[Transport] Consume....";
           auto data(receivedDataSink_.consume(queueElement->first));
-          AASDK_LOG(debug) << "[Transport] Resolving Message....";
+          AASDK_LOG(debug) << "[Transport] Resolve and clear message.";
           queueElement->second->resolve(std::move(data));
           queueElement = receiveQueue_.erase(queueElement);
         }

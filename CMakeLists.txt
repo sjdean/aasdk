@@ -18,10 +18,10 @@ else()
 endif()
 
 # Set Compile Versions
-set(LIBRARY_BUILD_DATE "20241120")    # Binary Release Build Date
-set(LIBRARY_BUILD_MAJOR_RELEASE 2)        # Binary Release Build Number (increment if released on same day)
+set(LIBRARY_BUILD_DATE "20241121")    # Binary Release Build Date
+set(LIBRARY_BUILD_MAJOR_RELEASE 4)        # Binary Release Build Number (increment if released on same day)
 set(LIBRARY_BUILD_MINOR_RELEASE 0)        # Binary Release Build Number (increment if released on same day)
-set(LIBRARY_BUILD_INCREMENTAL 1)    # Binary Build Version - Increment for Each Build
+set(LIBRARY_BUILD_INCREMENTAL 0)    # Binary Build Version - Increment for Each Build
 
 # Cache
 find_program(CCACHE_PROGRAM ccache)

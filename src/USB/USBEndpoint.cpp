@@ -119,17 +119,17 @@ namespace aasdk {
 
       self->strand_.dispatch([self, transfer]() mutable {
         if (self->transfers_.count(transfer) == 0) {
-          AASDK_LOG(debug) << "[USBEndpoint] No more transfers";
+          AASDK_LOG(debug) << "[USBEndpoint] No more transfers.";
           return;
         }
 
         auto promise(std::move(self->transfers_.at(transfer)));
 
         if (transfer->status == LIBUSB_TRANSFER_COMPLETED) {
-          AASDK_LOG(debug) << "[Transport] Transfer Complete";
+          AASDK_LOG(debug) << "[Transport] Transfer Complete.";
           promise->resolve(transfer->actual_length);
         } else {
-          AASDK_LOG(debug) << "[Transport] Transfer Cancelled";
+          AASDK_LOG(debug) << "[Transport] Transfer Cancelled.";
           auto error = transfer->status ==
               LIBUSB_TRANSFER_CANCELLED ? error::Error(error::ErrorCode::OPERATION_ABORTED)
                                                                      : error::Error(error::ErrorCode::USB_TRANSFER,

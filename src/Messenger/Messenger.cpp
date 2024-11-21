@@ -34,14 +34,14 @@ namespace aasdk::messenger {
     receiveStrand_.dispatch([this, self = this->shared_from_this(), channelId, promise = std::move(promise)]() mutable {
       //If there's any messages on the service, resolve. The service will call enqueueReceive again.
       if (!channelReceiveMessageQueue_.empty(channelId)) {
-        AASDK_LOG(debug) << "[Messenger::enqueueReceive] Queue not Empty. Resolve first.";
+        AASDK_LOG(debug) << "[Messenger::enqueueReceive] Message queue not empty, resolving message first.";
         promise->resolve(std::move(channelReceiveMessageQueue_.pop(channelId)));
       } else {
-        AASDK_LOG(debug) << "[Messenger::enqueueReceive] Push Promise";
+        AASDK_LOG(debug) << "[Messenger::enqueueReceive] Push promise to queue.";
         channelReceivePromiseQueue_.push(channelId, std::move(promise));
 
         if (channelReceivePromiseQueue_.size() == 1) {
-          AASDK_LOG(debug) << "[Messenger::enqueueReceive] If we only have one promise, then we'll process now...";
+          AASDK_LOG(debug) << "[Messenger::enqueueReceive] Processing promise.";
           auto inStreamPromise = ReceivePromise::defer(receiveStrand_);
           inStreamPromise->then(
               std::bind(&Messenger::inStreamMessageHandler, this->shared_from_this(), std::placeholders::_1),
@@ -65,21 +65,21 @@ namespace aasdk::messenger {
 
   void Messenger::inStreamMessageHandler(Message::Pointer message) {
     auto channelId = message->getChannelId();
-    AASDK_LOG(debug) << "[Messenger::inStreamMessageHandler] Resolve ChannelId "
+    AASDK_LOG(debug) << "[Messenger::inStreamMessageHandler] Handling message for ChannelId "
                      << channelIdToString(message->getChannelId());
 
     // If there's a promise on the queue, we resolve the promise with this message....
     if (channelReceivePromiseQueue_.isPending(channelId)) {
-      AASDK_LOG(debug) << "[Messenger::inStreamMessageHandler] Pop and Resolve ";
+      AASDK_LOG(debug) << "[Messenger::inStreamMessageHandler] Pop and resolve message for message queue.";
       channelReceivePromiseQueue_.pop(channelId)->resolve(std::move(message));
     } else {
-      AASDK_LOG(debug) << "[Messenger::inStreamMessageHandler] Push ";
+      AASDK_LOG(debug) << "[Messenger::inStreamMessageHandler] Pushing message to receive queue.";
       // Or we push the message to the Message Queue for when we do get a promise
       channelReceiveMessageQueue_.push(std::move(message));
     }
 
     if (!channelReceivePromiseQueue_.empty()) {
-      AASDK_LOG(debug) << "[Messenger::inStreamMessageHandler] Queue to Receive Next Message";
+      AASDK_LOG(debug) << "[Messenger::inStreamMessageHandler] Initiate queue for receiving.";
       auto inStreamPromise = ReceivePromise::defer(receiveStrand_);
       inStreamPromise->then(
           std::bind(&Messenger::inStreamMessageHandler, this->shared_from_this(), std::placeholders::_1),
