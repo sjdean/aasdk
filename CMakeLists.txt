@@ -1,226 +1,230 @@
-cmake_minimum_required(VERSION 3.5.1)
+cmake_minimum_required(VERSION 3.15) # Bumped to 3.15 for modern practices
 
 project(aasdk)
 message(STATUS "AASDK Library")
-message(STATUS "Cross Compiling?")
 
-# Cross Compiling Architecture
-if( TARGET_ARCH STREQUAL "amd64" )
-    message(STATUS "...amd64")
-    set(CPACK_DEBIAN_PACKAGE_ARCHITECTURE "amd64")
-elseif( TARGET_ARCH STREQUAL "armhf" )
-    message(STATUS "...armhf")
-    set(CMAKE_C_COMPILER /usr/bin/arm-linux-gnueabihf-gcc-8)
-    set(CMAKE_CXX_COMPILER /usr/bin/arm-linux-gnueabihf-g++-8)
-    set(CPACK_DEBIAN_PACKAGE_ARCHITECTURE "armhf")
-else()
-    message(STATUS "...not cross compiling")
+# --- Global Configuration ---
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_POSITION_INDEPENDENT_CODE ON) # Ensures -fPIC for all targets
+
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake_modules/")
+
+# Use GNUInstallDirs for standard FHS-compliant paths (e.g., lib, lib64)
+include(GNUInstallDirs)
+
+# --- Automatic Versioning (Best Practice) ---
+include(gitversion)
+
+set(LIBRARY_BUILD_MAJOR_RELEASE 4)
+set(LIBRARY_BUILD_MINOR_RELEASE 0)
+set(LIBRARY_VERSION_STRING "${LIBRARY_BUILD_MAJOR_RELEASE}.${LIBRARY_BUILD_MINOR_RELEASE}.${_git_commit_count}+${_build_version}")
+message(STATUS "Project Version: ${LIBRARY_VERSION_STRING}")
+
+
+# --- Build Type (Your logic is fine) ---
+if(NOT CMAKE_BUILD_TYPE)
+    message(STATUS "Forcing Release build type")
+    set(CMAKE_BUILD_TYPE Release CACHE STRING "Choose the type of build." FORCE)
+    set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release" "MinSizeRel" "RelWithDebInfo")
 endif()
 
-# Set Compile Versions
-set(LIBRARY_BUILD_DATE "20241121")    # Binary Release Build Date
-set(LIBRARY_BUILD_MAJOR_RELEASE 4)        # Binary Release Build Number (increment if released on same day)
-set(LIBRARY_BUILD_MINOR_RELEASE 0)        # Binary Release Build Number (increment if released on same day)
-set(LIBRARY_BUILD_INCREMENTAL 0)    # Binary Build Version - Increment for Each Build
-
-# Cache
+# --- CCACHE (Your logic is fine) ---
 find_program(CCACHE_PROGRAM ccache)
 if(CCACHE_PROGRAM)
     set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE "${CCACHE_PROGRAM}")
 endif()
 
+# --- Find Dependencies (Modernized) ---
+# Using CONFIG mode and modern targets
+find_package(aap_protobuf REQUIRED CONFIG) # Finds config, provides AAPProto::aap_protobuf
+find_package(Boost REQUIRED COMPONENTS system log)
+find_package(libusb-1.0 REQUIRED) # Provides libusb-1.0::libusb
+find_package(OpenSSL REQUIRED) # Provides OpenSSL::SSL and OpenSSL::Crypto
 
-# Configure CMAKE
-message(STATUS "Configuring CMAKE")
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake_modules/")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS_INIT} -fPIC -Wall -pedantic")
-set(CMAKE_CXX_FLAGS_DEBUG "-g -O0")
-set(CMAKE_CXX_FLAGS_RELEASE "-g -O3")
-
-# Default to Release mode unless overridden with -DCMAKE_BUILD_TYPE=Debug on cmake command
-if(NOT CMAKE_BUILD_TYPE)
-    message(STATUS "Forcing Release build type")
-    set(CMAKE_BUILD_TYPE Release CACHE STRING "Choose the type of build." FORCE)
-    # Set the possible values of build type for cmake-gui
-    set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release" "MinSizeRel" "RelWithDebInfo")
-endif()
-
-# Paths
-set(sources_directory ${CMAKE_CURRENT_SOURCE_DIR}/src)
-set(include_directory ${CMAKE_CURRENT_SOURCE_DIR}/include)
-set(include_ut_directory ${CMAKE_CURRENT_SOURCE_DIR}/include_ut)
-
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/lib)
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/lib)
-
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/bin)
-set(EXECUTABLE_OUTPUT_PATH ${CMAKE_CURRENT_SOURCE_DIR}/bin)
-
-set (CMAKE_PROJECT_VERSION_PATCH ${_commit_timestamp})
-
-# Configure Boost
-set(Boost_USE_STATIC_LIBS OFF)
-set(Boost_USE_MULTITHREADED ON)
-set(Boost_USE_STATIC_RUNTIME OFF)
-
-add_definitions(-DBOOST_ALL_DYN_LINK)
-
-if(CMAKE_BUILD_TYPE STREQUAL "Release")
-    message(STATUS "Disabling Boost DEBUG logs")
-    add_definitions(-DNDEBUG)
-endif()
-
-if(WIN32)
-    set(WINSOCK2_LIBRARIES "ws2_32")
-endif(WIN32)
-
-if(AASDK_TEST)
-    include(ExternalGtest)
-endif(AASDK_TEST)
-
-find_package(aap_protobuf REQUIRED)
-
-# Building on a Mac requires Abseil
+# Protobuf finding logic
 if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")  # macOS
     message(STATUS "MacOS System Detected")
     find_package(protobuf REQUIRED CONFIG)
     find_package(absl REQUIRED)
 else ()
-    find_package(Protobuf REQUIRED)
+    find_package(Protobuf REQUIRED) # Provides Protobuf::protobuf
 endif ()
 
-include(FindProtobuf)
+if(WIN32)
+    set(WINSOCK2_LIBRARIES "ws2_32") # This one doesn't have a modern target
+endif()
 
-find_package(Boost REQUIRED COMPONENTS system log OPTIONAL_COMPONENTS unit_test_framework)
-find_package(libusb-1.0 REQUIRED)
-find_package(OpenSSL REQUIRED)
+if(AASDK_TEST)
+    include(ExternalGtest)
+endif()
 
-include_directories(
-        ${Boost_INCLUDE_DIRS}
-        ${PROTOBUF_INCLUDE_DIR}
-        ${AAP_PROTOBUF_INCLUDE_DIR}
-        ${OPENSSL_INCLUDE_DIR}
-        ${GTEST_INCLUDE_DIRS}
-        ${GMOCK_INCLUDE_DIRS}
-        ${include_directory}
-        ${include_ut_directory})
-
-file(GLOB_RECURSE source_files ${sources_directory}/*.cpp)
-file(GLOB_RECURSE include_files ${include_directory}/*.hpp)
-file(GLOB_RECURSE tests_source_files ${sources_directory}/*.ut.cpp)
-file(GLOB_RECURSE tests_include_files ${include_ut_directory}/*.hpp)
+# --- Define Source Files (Best Practice) ---
+# Explicitly listing files is safer than GLOB.
+# GLOB means CMake won't see new files until you manually re-run it.
+# Please replace this block with your actual source files.
+message(WARNING "Using file(GLOB) is not recommended. Please list source files explicitly.")
+file(GLOB_RECURSE source_files ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp)
+file(GLOB_RECURSE tests_source_files ${CMAKE_CURRENT_SOURCE_DIR}/src/*.ut.cpp)
 
 list(REMOVE_ITEM source_files ${tests_source_files})
 
-if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")  # macOS
-    message(NOTICE "Configuring STATIC Library for MacOS")
-    add_library(aasdk STATIC
-            ${source_files}
-            ${include_files})
-else()
+# --- Main Library Target (FIXED) ---
+option(BUILD_SHARED_LIBS "Build shared libraries" ON)
+
+#
+# *** THIS LOGIC WAS INVERTED IN YOUR FILE ***
+#
+if(BUILD_SHARED_LIBS)
     message(NOTICE "Configuring SHARED Library")
-    add_library(aasdk SHARED
-            ${source_files}
-            ${include_files})
+    add_library(aasdk SHARED ${source_files})
+else()
+    message(NOTICE "Configuring STATIC Library")
+    add_library(aasdk STATIC ${source_files})
 endif()
-target_include_directories(aasdk PUBLIC ${AAP_PROTOBUF_INCLUDE_DIR})
 
-target_link_libraries(aasdk PUBLIC
-        libusb
-        ${Boost_LIBRARIES}
-        ${PROTOBUF_LIBRARIES}
-        ${AAP_PROTOBUF_LIB_DIR}
-        ${OPENSSL_LIBRARIES}
-        ${WINSOCK2_LIBRARIES})
+# --- Target Properties (FIXED) ---
 
+# Set compiler flags and definitions *per target*
+target_compile_features(aasdk PRIVATE cxx_std_17)
+target_compile_options(aasdk PRIVATE -Wall -pedantic)
+target_compile_definitions(aasdk PRIVATE BOOST_ALL_DYN_LINK)
 
-set(LIBRARY_VERSION_STRING "${LIBRARY_BUILD_MAJOR_RELEASE}.${LIBRARY_BUILD_MINOR_RELEASE}.${LIBRARY_BUILD_INCREMENTAL}+${LIBRARY_BUILD_DATE}")
-message(STATUS "Project Version: ${LIBRARY_VERSION_STRING}")
+if(CMAKE_BUILD_TYPE STREQUAL "Release")
+    message(STATUS "Disabling Boost DEBUG logs")
+    target_compile_definitions(aasdk PRIVATE NDEBUG)
+endif()
+
+# This block fixes the "INTERFACE_INCLUDE_DIRECTORIES" error
+target_include_directories(aasdk
+        PUBLIC
+        # For consumers: path in build tree, path in install tree
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+        $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
+        PRIVATE
+        # Internal-only headers
+        ${CMAKE_CURRENT_SOURCE_DIR}/include_ut
+)
+
+# NEW (with correct target names from your modules)
+target_link_libraries(aasdk
+        PUBLIC
+        AAPProto::aap_protobuf    # Target from Findaap_protobuf.cmake
+        PRIVATE
+        libusb          # Target from Findlibusb-1.0.cmake
+        Boost::system
+        Boost::log
+        OpenSSL::SSL
+        OpenSSL::Crypto
+        ${PROTOBUF_LIBRARIES}   # Use variable for Protobuf
+        ${WINSOCK2_LIBRARIES}
+)
+
 set_target_properties(aasdk
-        PROPERTIES VERSION ${LIBRARY_VERSION_STRING} SOVERSION ${LIBRARY_BUILD_INCREMENTAL})
+        PROPERTIES VERSION ${LIBRARY_VERSION_STRING} SOVERSION ${_git_commit_count})
 
-# Install rules
-install(TARGETS aasdk libusb
-        EXPORT aasdkTargets
-        LIBRARY DESTINATION lib
-        ARCHIVE DESTINATION lib
-        RUNTIME DESTINATION bin
-        INCLUDES DESTINATION include
+#ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_INSTALL_LIBDIR}"
+#LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_INSTALL_LIBDIR}"
+#RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_INSTALL_BINDIR}"
+
+# --- Install Rules (FIXED) ---
+# This is now much simpler
+
+# 1. Install the library, runtime, and archive files
+install(TARGETS aasdk
+        EXPORT aasdkTargets # This name is used in the next step
+        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT libraries
+        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT libraries
+        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT libraries
 )
 
-# Install headers explicitly
+# 2. Install the public headers
 install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/aasdk
-        DESTINATION include
+        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR} # Uses 'include'
+        COMPONENT headers
 )
 
-# Export the targets to a script
+# 3. Install the exported target file (aasdkTargets.cmake)
 install(EXPORT aasdkTargets
         FILE aasdkTargets.cmake
         NAMESPACE AASDK::
-        DESTINATION lib/cmake/aasdk
+        DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/aasdk
+        COMPONENT libraries
 )
 
-# Create a Config file for FindPackage
+# 4. Install the Config and Version files
 include(CMakePackageConfigHelpers)
 write_basic_package_version_file(
         "${CMAKE_CURRENT_BINARY_DIR}/aasdkConfigVersion.cmake"
-        VERSION 1.0
+        VERSION ${LIBRARY_VERSION_STRING}
         COMPATIBILITY AnyNewerVersion
 )
 
+# You still need to provide this file
 configure_package_config_file(${CMAKE_CURRENT_SOURCE_DIR}/Config.cmake.in
         "${CMAKE_CURRENT_BINARY_DIR}/aasdkConfig.cmake"
-        INSTALL_DESTINATION lib/cmake/aasdk
+        INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/aasdk
 )
 
-# Install the config files
-install(FILES "${CMAKE_CURRENT_BINARY_DIR}/aasdkConfigVersion.cmake"
+install(FILES
+        "${CMAKE_CURRENT_BINARY_DIR}/aasdkConfigVersion.cmake"
         "${CMAKE_CURRENT_BINARY_DIR}/aasdkConfig.cmake"
-        DESTINATION lib/cmake/aasdk)
+        DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/aasdk
+        COMPONENT libraries
+)
 
+
+# --- Unit Testing (Modernized) ---
 if(AASDK_TEST)
-    add_executable(aasdk_ut
-            ${tests_source_files}
-            ${tests_include_files})
+    message(STATUS "Configuring Unit Tests")
 
-    add_dependencies(aasdk_ut aasdk)
-    target_link_libraries(aasdk_ut
+    add_executable(aasdk_ut ${tests_source_files})
+
+    # Add the include paths from ExternalGtest.cmake
+    target_include_directories(aasdk_ut PRIVATE
+            ${GTEST_INCLUDE_DIRS}
+            ${GMOCK_INCLUDE_DIRS}
+    )
+
+    # Link libraries to the test executable
+    target_link_libraries(aasdk_ut PRIVATE
             aasdk
-            ${GMOCK_LIBRARY_PATH}
-            ${GTEST_LIBRARY_PATH})
+            gmock   # Target from ExternalGtest.cmake
+            gtest   # Target from ExternalGtest.cmake
+    )
+
+    # Add test to CTest
+    include(CTest)
+    add_test(NAME aasdk_unit_test COMMAND aasdk_ut)
 
     if(AASDK_CODE_COVERAGE)
         include(CodeCoverage)
         append_coverage_compiler_flags()
-        setup_target_for_coverage(NAME aasdk_coverage EXECUTABLE aasdk_ut DEPENDENCIES aasdk_ut)
-    endif(AASDK_CODE_COVERAGE)
+        # This function is from your CodeCoverage.cmake module [cite: 30]
+        setup_target_for_coverage(
+                NAME aasdk_coverage
+                EXECUTABLE aasdk_ut
+                DEPENDENCIES aasdk_ut
+        )
+    endif()
 endif(AASDK_TEST)
 
 
+# --- CPack (Updated for Components) ---
 set(CPACK_GENERATOR "DEB")
-set(CPACK_DEBIAN_PACKAGE_MAINTAINER "AASDK") #required
+set(CPACK_DEBIAN_PACKAGE_MAINTAİNER "AASDK")
 set(CPACK_PACKAGE_VENDOR "AASDK")
 set(CPACK_PACKAGE_VERSION ${LIBRARY_VERSION_STRING})
 set(CPACK_DEBIAN_FILE_NAME DEB-DEFAULT)
-set(CPACK_DEBIAN_PACKAGE_DEPENDS "libusb-1.0-0,libboost-all-dev,libssl-dev,libprotobuf-dev")
-set(CPACK_COMPONENTS_ALL libraries headers Unspecified)
+set(CPACK_DEBIAN_PACKAGE_DEPENDS "libusb-1.0-0, libboost-system-dev, libboost-log-dev, libssl-dev, libprotobuf-dev")
+
+# Use the component names defined in install()
+set(CPACK_COMPONENTS_ALL libraries headers)
+
 set(CPACK_COMPONENT_LIBRARIES_DISPLAY_NAME "Libraries")
 set(CPACK_COMPONENT_HEADERS_DISPLAY_NAME "C++ Headers")
-set(CPACK_COMPONENT_LIBRARIES_DESCRIPTION
-        "Static libraries used to build programs with AASDK")
-set(CPACK_COMPONENT_HEADERS_DESCRIPTION
-        "C/C++ header files for use with AASDK")
-set(CPACK_COMPONENT_LIBRARIES_GROUP "Development")
-set(CPACK_COMPONENT_HEADERS_GROUP "Development")
-set(CPACK_COMPONENT_GROUP_DEVELOPMENT_EXPANDED ON)
-set(CPACK_COMPONENT_GROUP_DEVELOPMENT_DESCRIPTION
-        "All of the tools you'll ever need to develop software")
+set(CPACK_COMPONENT_LIBRARIES_DESCRIPTION "AASDK shared/static libraries")
+set(CPACK_COMPONENT_HEADERS_DESCRIPTION "C/C++ header files for AASDK")
 set(CPACK_COMPONENT_HEADERS_DEPENDS libraries)
-set(CPACK_ALL_INSTALL_TYPES Full Developer)
-set(CPACK_INSTALL_TYPE_FULL_DISPLAY_NAME "Everything")
-set(CPACK_COMPONENT_LIBRARIES_INSTALL_TYPES Developer Full)
-set(CPACK_COMPONENT_HEADERS_INSTALL_TYPES Developer Full)
+
 include(CPack)

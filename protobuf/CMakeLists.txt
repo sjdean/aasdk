@@ -4,16 +4,18 @@ cmake_minimum_required(VERSION 3.5)
 project(aap_protobuf)
 message(STATUS "AASDK ProtoBuf Library")
 
+message(STATUS "Cross Compiling?")
+
 # Set Compile Versions
-set(LIBRARY_BUILD_DATE "20241121")    # Binary Release Build Date
+set(LIBRARY_BUILD_DATE "20251105")    # Binary Release Build Date
 set(LIBRARY_BUILD_MAJOR_RELEASE 4)        # Binary Release Build Number (increment if released on same day)
 set(LIBRARY_BUILD_MINOR_RELEASE 0)        # Binary Release Build Number (increment if released on same day)
-set(LIBRARY_BUILD_INCREMENTAL 0)    # Binary Build Version - Increment for Each Build
+set(LIBRARY_BUILD_INCREMENTAL 1)    # Binary Build Version - Increment for Each Build
 set(AAP_PROTO_VERSION 1.6)          # Underlying AAP (Android Auto Projection Library Protocol)
 
 set(CMAKE_CXX_STANDARD 17)
-
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 # Default to Release mode unless overridden with -DCMAKE_BUILD_TYPE=Debug on cmake command
 if(NOT CMAKE_BUILD_TYPE)
@@ -46,12 +48,16 @@ file(GLOB_RECURSE source_proto_files ${CMAKE_CURRENT_SOURCE_DIR}/*.proto)
 protobuf_generate_cpp(PROTO_SRCS PROTO_HDRS ${source_proto_files})
 
 # Generate Library
-if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")  # macOS
-    message(NOTICE "Configuring STATIC Library for MacOS")
-    add_library(aap_protobuf STATIC ${PROTO_SRCS} ${PROTO_HDRS})
-else()
+# Use the standard BUILD_SHARED_LIBS option instead of a platform-specific hack
+# This defaults to ON (shared), but the user can pass -DBUILD_SHARED_LIBS=OFF
+option(BUILD_SHARED_LIBS "Build shared libraries" ON)
+
+if(BUILD_SHARED_LIBS)
     message(NOTICE "Configuring SHARED Library")
     add_library(aap_protobuf SHARED ${PROTO_SRCS} ${PROTO_HDRS})
+else()
+    message(NOTICE "Configuring STATIC Library")
+    add_library(aap_protobuf STATIC ${PROTO_SRCS} ${PROTO_HDRS})
 endif()
 
 target_link_libraries(aap_protobuf PUBLIC ${PROTOBUF_LIBRARIES})

@@ -1,5 +1,5 @@
 # cmake/gitversion.cmake
-cmake_minimum_required(VERSION 3.0.0)
+cmake_minimum_required(VERSION 3.15)
 
 message(STATUS "Resolving GIT Version")
 
@@ -28,6 +28,13 @@ if(GIT_FOUND)
     OUTPUT_VARIABLE _commit_timestamp
     ERROR_QUIET
     OUTPUT_STRIP_TRAILING_WHITESPACE
+  )
+  execute_process(
+          COMMAND ${GIT_EXECUTABLE} rev-list --count HEAD
+          WORKING_DIRECTORY "${local_dir}"
+          OUTPUT_VARIABLE _git_commit_count
+          ERROR_QUIET
+          OUTPUT_STRIP_TRAILING_WHITESPACE
   )
   message( STATUS "GIT hash: ${_build_version}; branch: ${_build_branch}; Commit epoch: ${_commit_timestamp};")
   execute_process(

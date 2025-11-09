@@ -40,9 +40,26 @@ else (AAP_PROTOBUF_LIB_DIRS AND AAP_PROTOBUF_INCLUDE_DIRS)
         message(STATUS "SUCCESS. Found: aap_protobuf:")
         message(STATUS " - Includes: ${AAP_PROTOBUF_INCLUDE_DIRS}")
         message(STATUS " - Libraries: ${AAP_PROTOBUF_LIB_DIRS}")
-        add_library(aap_protobuf INTERFACE)
+
+        # Get the directory *containing* the library
+        get_filename_component(AAP_PROTOBUF_LIBRARY_DIR ${AAP_PROTOBUF_LIB_DIR} DIRECTORY)
+        message(STATUS " - Lib Dir:  ${AAP_PROTOBUF_LIBRARY_DIR}")
+
+        # Create the INTERFACE target (if it doesn't exist)
+        if(NOT TARGET aap_protobuf)
+            add_library(aap_protobuf INTERFACE)
+        endif()
+
+        # Tell the target where the include files are
         target_include_directories(aap_protobuf SYSTEM INTERFACE ${AAP_PROTOBUF_INCLUDE_DIR})
+
+        # Tell the target to add the library's *directory* to the linker search path
+        # This adds "-L/usr/local/lib" and is the main fix.
+        target_link_directories(aap_protobuf INTERFACE ${AAP_PROTOBUF_LIBRARY_DIR})
+
+        # Tell the target the name of the library file
         target_link_libraries(aap_protobuf INTERFACE ${AAP_PROTOBUF_LIB_DIR})
+
     else (AAP_PROTOBUF_FOUND)
         message(STATUS " - Includes: ${AAP_PROTOBUF_INCLUDE_DIRS}")
         message(STATUS " - Libraries: ${AAP_PROTOBUF_LIB_DIRS}")
