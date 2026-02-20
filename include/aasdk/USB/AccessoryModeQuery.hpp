@@ -25,24 +25,22 @@
 #include <aasdk/USB/IAccessoryModeQuery.hpp>
 
 
-namespace aasdk {
-  namespace usb {
+namespace aasdk::usb {
 
-    class AccessoryModeQuery : public IAccessoryModeQuery, boost::noncopyable {
-    public:
-      AccessoryModeQuery(boost::asio::io_service &ioService, IUSBEndpoint::Pointer usbEndpoint);
+  class AccessoryModeQuery : public IAccessoryModeQuery, boost::noncopyable {
+  public:
+    AccessoryModeQuery(boost::asio::io_service &ioService, IUSBEndpoint::Pointer usbEndpoint);
 
-      void cancel() override;
+    void cancel() override;
 
-    protected:
-      boost::asio::io_service::strand strand_;
-      IUSBEndpoint::Pointer usbEndpoint_;
-      common::Data data_;
-      Promise::Pointer promise_;
+  protected:
+    boost::asio::io_service::strand strand_;
+    IUSBEndpoint::Pointer usbEndpoint_;
+    common::Data data_;
+    Promise::Pointer promise_;
 
-      static constexpr uint32_t cTransferTimeoutMs = 1000;
-      static constexpr uint32_t USB_TYPE_VENDOR = 0x40;
-    };
+    static constexpr uint32_t cTransferTimeoutMs = 1000;
+    static constexpr uint32_t USB_TYPE_VENDOR = 0x40;
+  };
 
-  }
 }

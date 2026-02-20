@@ -22,24 +22,22 @@
 #include <aasdk/USB/AccessoryModeSendStringType.hpp>
 
 
-namespace aasdk {
-  namespace usb {
+namespace aasdk::usb {
 
-    class AccessoryModeSendStringQuery
-        : public AccessoryModeQuery, public std::enable_shared_from_this<AccessoryModeSendStringQuery> {
-    public:
-      AccessoryModeSendStringQuery(boost::asio::io_service &ioService, IUSBWrapper &usbWrapper,
-                                   IUSBEndpoint::Pointer usbEndpoint,
-                                   AccessoryModeSendStringType sendStringType, const std::string &queryValue);
+  class AccessoryModeSendStringQuery
+      : public AccessoryModeQuery, public std::enable_shared_from_this<AccessoryModeSendStringQuery> {
+  public:
+    AccessoryModeSendStringQuery(boost::asio::io_service &ioService, IUSBWrapper &usbWrapper,
+                                 IUSBEndpoint::Pointer usbEndpoint,
+                                 AccessoryModeSendStringType sendStringType, const std::string &queryValue);
 
-      void start(Promise::Pointer promise) override;
+    void start(Promise::Pointer promise) override;
 
-    private:
-      using std::enable_shared_from_this<AccessoryModeSendStringQuery>::shared_from_this;
+  private:
+    using std::enable_shared_from_this<AccessoryModeSendStringQuery>::shared_from_this;
 
-      AccessoryModeSendStringType sendStringType_;
-      static constexpr uint32_t ACC_REQ_SEND_STRING = 52;
-    };
+    AccessoryModeSendStringType sendStringType_;
+    static constexpr uint32_t ACC_REQ_SEND_STRING = 52;
+  };
 
-  }
 }

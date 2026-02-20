@@ -2,8 +2,8 @@ syntax="proto2";
 
 import "aap_protobuf/service/sensorsource/message/SensorBatch.proto";
 
-package aap_protobuf.service.control.message;
+package aap_protobuf.channel.control;
 
 message GalVerificationSetSensor {
-  optional sensorsource.message.SensorBatch sensors = 1;
+  optional service.sensorsource.message.SensorBatch sensors = 1;
 }

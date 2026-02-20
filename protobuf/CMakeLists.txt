@@ -7,10 +7,10 @@ message(STATUS "AASDK ProtoBuf Library")
 message(STATUS "Cross Compiling?")
 
 # Set Compile Versions
-set(LIBRARY_BUILD_DATE "20251105")    # Binary Release Build Date
+set(LIBRARY_BUILD_DATE "20251125")    # Binary Release Build Date
 set(LIBRARY_BUILD_MAJOR_RELEASE 4)        # Binary Release Build Number (increment if released on same day)
 set(LIBRARY_BUILD_MINOR_RELEASE 0)        # Binary Release Build Number (increment if released on same day)
-set(LIBRARY_BUILD_INCREMENTAL 1)    # Binary Build Version - Increment for Each Build
+set(LIBRARY_BUILD_INCREMENTAL 2)    # Binary Build Version - Increment for Each Build
 set(AAP_PROTO_VERSION 1.6)          # Underlying AAP (Android Auto Projection Library Protocol)
 
 set(CMAKE_CXX_STANDARD 17)

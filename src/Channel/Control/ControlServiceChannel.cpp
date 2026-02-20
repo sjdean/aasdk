@@ -243,7 +243,7 @@ namespace aasdk {
 
         aap_protobuf::shared::MessageStatus status = static_cast<aap_protobuf::shared::MessageStatus>(boost::endian::big_to_native(
             versionResponse[2]));
-        AASDK_LOG(info) << "[ControlServiceChannel] Handling Version - Major: " << versionResponse[0] << " Minor: "
+        AASDK_LOG(debug) << "[ControlServiceChannel] Handling Version - Major: " << versionResponse[0] << " Minor: "
                         << versionResponse[1] << "Status: " << status;
 
         eventHandler->onVersionResponse(versionResponse[0], versionResponse[1], status);

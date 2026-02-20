@@ -2,9 +2,9 @@ syntax="proto2";
 
 import "aap_protobuf/service/media/shared/message/Config.proto";
 
-package aap_protobuf.service.control.message;
+package aap_protobuf.channel.control;
 
 message GalVerificationMediaSinkStatus {
   required int32 channel = 1;
-  required media.shared.message.Config.Status status = 2;
+  required service.media.shared.message.Config.Status status = 2;
 }

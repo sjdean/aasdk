@@ -1,6 +1,6 @@
 syntax="proto2";
 
-package aap_protobuf.shared;
+package aap_protobuf.channel.control;
 
 enum SessionConfiguration {
   UI_CONFIG_HIDE_CLOCK = 1;

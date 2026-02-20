@@ -20,15 +20,13 @@
 #include <aasdk/USB/IAccessoryModeQueryChain.hpp>
 
 
-namespace aasdk {
-  namespace usb {
+namespace aasdk::usb {
 
-    class IAccessoryModeQueryChainFactory {
-    public:
-      virtual ~IAccessoryModeQueryChainFactory() = default;
+  class IAccessoryModeQueryChainFactory {
+  public:
+    virtual ~IAccessoryModeQueryChainFactory() = default;
 
-      virtual IAccessoryModeQueryChain::Pointer create() = 0;
-    };
+    virtual IAccessoryModeQueryChain::Pointer create() = 0;
+  };
 
-  }
 }

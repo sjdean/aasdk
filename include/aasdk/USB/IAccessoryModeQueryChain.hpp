@@ -23,22 +23,20 @@
 #include <aasdk/IO/Promise.hpp>
 
 
-namespace aasdk {
-  namespace usb {
+namespace aasdk::usb {
 
-    class IAccessoryModeQueryChain {
-    public:
-      typedef std::shared_ptr<IAccessoryModeQueryChain> Pointer;
-      typedef io::Promise<DeviceHandle> Promise;
+  class IAccessoryModeQueryChain {
+  public:
+    typedef std::shared_ptr<IAccessoryModeQueryChain> Pointer;
+    typedef io::Promise<DeviceHandle> Promise;
 
-      IAccessoryModeQueryChain() = default;
+    IAccessoryModeQueryChain() = default;
 
-      virtual ~IAccessoryModeQueryChain() = default;
+    virtual ~IAccessoryModeQueryChain() = default;
 
-      virtual void start(DeviceHandle handle, Promise::Pointer promise) = 0;
+    virtual void start(DeviceHandle handle, Promise::Pointer promise) = 0;
 
-      virtual void cancel() = 0;
-    };
+    virtual void cancel() = 0;
+  };
 
-  }
 }

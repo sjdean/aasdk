@@ -24,44 +24,42 @@
 #include <aasdk/USB/IUSBEndpoint.hpp>
 
 
-namespace aasdk {
-  namespace usb {
+namespace aasdk::usb {
 
-    class USBEndpoint : public IUSBEndpoint,
-                        public std::enable_shared_from_this<USBEndpoint>,
-                        boost::noncopyable {
-    public:
-      USBEndpoint(IUSBWrapper &usbWrapper, boost::asio::io_service &ioService, DeviceHandle handle,
-                  uint8_t endpointAddress = 0x00);
+  class USBEndpoint : public IUSBEndpoint,
+                      public std::enable_shared_from_this<USBEndpoint>,
+                      boost::noncopyable {
+  public:
+    USBEndpoint(IUSBWrapper &usbWrapper, boost::asio::io_service &ioService, DeviceHandle handle,
+                uint8_t endpointAddress = 0x00);
 
-      void controlTransfer(common::DataBuffer buffer, uint32_t timeout, Promise::Pointer promise) override;
+    void controlTransfer(common::DataBuffer buffer, uint32_t timeout, Promise::Pointer promise) override;
 
-      void bulkTransfer(common::DataBuffer buffer, uint32_t timeout, Promise::Pointer promise) override;
+    void bulkTransfer(common::DataBuffer buffer, uint32_t timeout, Promise::Pointer promise) override;
 
-      void interruptTransfer(common::DataBuffer buffer, uint32_t timeout, Promise::Pointer promise) override;
+    void interruptTransfer(common::DataBuffer buffer, uint32_t timeout, Promise::Pointer promise) override;
 
-      uint8_t getAddress() override;
+    uint8_t getAddress() override;
 
-      void cancelTransfers() override;
+    void cancelTransfers() override;
 
-      DeviceHandle getDeviceHandle() const override;
+    DeviceHandle getDeviceHandle() const override;
 
-    private:
-      typedef std::unordered_map<libusb_transfer *, Promise::Pointer> Transfers;
+  private:
+    typedef std::unordered_map<libusb_transfer *, Promise::Pointer> Transfers;
 
-      using std::enable_shared_from_this<USBEndpoint>::shared_from_this;
+    using std::enable_shared_from_this<USBEndpoint>::shared_from_this;
 
-      void transfer(libusb_transfer *transfer, Promise::Pointer promise);
+    void transfer(libusb_transfer *transfer, Promise::Pointer promise);
 
-      static void transferHandler(libusb_transfer *transfer);
+    static void transferHandler(libusb_transfer *transfer);
 
-      IUSBWrapper &usbWrapper_;
-      boost::asio::io_service::strand strand_;
-      DeviceHandle handle_;
-      uint8_t endpointAddress_;
-      Transfers transfers_;
-      std::shared_ptr<USBEndpoint> self_;
-    };
+    IUSBWrapper &usbWrapper_;
+    boost::asio::io_service::strand strand_;
+    DeviceHandle handle_;
+    uint8_t endpointAddress_;
+    Transfers transfers_;
+    std::shared_ptr<USBEndpoint> self_;
+  };
 
-  }
 }

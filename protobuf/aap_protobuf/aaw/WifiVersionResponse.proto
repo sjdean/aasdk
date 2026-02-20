@@ -3,8 +3,8 @@ syntax="proto2";
 package aap_protobuf.aaw;
 
 message WifiVersionResponse {
-  required uint32 unknown_value_a = 1;
-  required uint32 unknown_value_b = 2;
-  optional string unknown_value_c = 3;
-  required uint32 unknown_value_d = 4;
+  required int32 major_version = 1;
+  required int32 minor_version = 2;
+  optional int32 patch_version = 3 [default = 0];
+  optional int32 features = 4 [default = 0]; // Bitfield for feature flags
 }

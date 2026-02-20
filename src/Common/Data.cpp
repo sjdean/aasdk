@@ -22,7 +22,6 @@
 #include <sstream>
 #include <iomanip>
 
-
 namespace aasdk {
   namespace common {
 

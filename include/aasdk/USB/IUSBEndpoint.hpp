@@ -23,30 +23,28 @@
 #include <aasdk/IO/Promise.hpp>
 
 
-namespace aasdk {
-  namespace usb {
+namespace aasdk::usb {
 
-    class IUSBEndpoint {
-    public:
-      typedef std::shared_ptr<IUSBEndpoint> Pointer;
-      typedef io::Promise<size_t> Promise;
+  class IUSBEndpoint {
+  public:
+    typedef std::shared_ptr<IUSBEndpoint> Pointer;
+    typedef io::Promise<size_t> Promise;
 
-      IUSBEndpoint() = default;
+    IUSBEndpoint() = default;
 
-      virtual ~IUSBEndpoint() = default;
+    virtual ~IUSBEndpoint() = default;
 
-      virtual uint8_t getAddress() = 0;
+    virtual uint8_t getAddress() = 0;
 
-      virtual void controlTransfer(common::DataBuffer buffer, uint32_t timeout, Promise::Pointer promise) = 0;
+    virtual void controlTransfer(common::DataBuffer buffer, uint32_t timeout, Promise::Pointer promise) = 0;
 
-      virtual void bulkTransfer(common::DataBuffer buffer, uint32_t timeout, Promise::Pointer promise) = 0;
+    virtual void bulkTransfer(common::DataBuffer buffer, uint32_t timeout, Promise::Pointer promise) = 0;
 
-      virtual void interruptTransfer(common::DataBuffer buffer, uint32_t timeout, Promise::Pointer promise) = 0;
+    virtual void interruptTransfer(common::DataBuffer buffer, uint32_t timeout, Promise::Pointer promise) = 0;
 
-      virtual void cancelTransfers() = 0;
+    virtual void cancelTransfers() = 0;
 
-      virtual DeviceHandle getDeviceHandle() const = 0;
-    };
+    virtual DeviceHandle getDeviceHandle() const = 0;
+  };
 
-  }
 }

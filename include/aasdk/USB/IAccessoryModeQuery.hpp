@@ -24,22 +24,20 @@
 #include <aasdk/USB/IUSBEndpoint.hpp>
 
 
-namespace aasdk {
-  namespace usb {
+namespace aasdk::usb {
 
-    class IAccessoryModeQuery {
-    public:
-      typedef std::shared_ptr<IAccessoryModeQuery> Pointer;
-      typedef io::Promise<IUSBEndpoint::Pointer> Promise;
+  class IAccessoryModeQuery {
+  public:
+    typedef std::shared_ptr<IAccessoryModeQuery> Pointer;
+    typedef io::Promise<IUSBEndpoint::Pointer> Promise;
 
-      IAccessoryModeQuery() = default;
+    IAccessoryModeQuery() = default;
 
-      virtual ~IAccessoryModeQuery() = default;
+    virtual ~IAccessoryModeQuery() = default;
 
-      virtual void start(Promise::Pointer promise) = 0;
+    virtual void start(Promise::Pointer promise) = 0;
 
-      virtual void cancel() = 0;
-    };
+    virtual void cancel() = 0;
+  };
 
-  }
 }

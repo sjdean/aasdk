@@ -21,17 +21,15 @@
 #include <functional>
 
 
-namespace aasdk {
-  namespace usb {
+namespace aasdk::usb {
 
-    enum class AccessoryModeSendStringType {
-      MANUFACTURER,
-      MODEL,
-      DESCRIPTION,
-      VERSION,
-      URI,
-      SERIAL
-    };
+  enum class AccessoryModeSendStringType {
+    MANUFACTURER,
+    MODEL,
+    DESCRIPTION,
+    VERSION,
+    URI,
+    SERIAL
+  };
 
-  }
 }

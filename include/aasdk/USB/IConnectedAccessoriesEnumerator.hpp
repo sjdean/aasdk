@@ -21,20 +21,18 @@
 #include <aasdk/IO/Promise.hpp>
 
 
-namespace aasdk {
-  namespace usb {
+namespace aasdk::usb {
 
-    class IConnectedAccessoriesEnumerator {
-    public:
-      typedef std::shared_ptr<IConnectedAccessoriesEnumerator> Pointer;
-      typedef io::Promise<bool> Promise;
+  class IConnectedAccessoriesEnumerator {
+  public:
+    typedef std::shared_ptr<IConnectedAccessoriesEnumerator> Pointer;
+    typedef io::Promise<bool> Promise;
 
-      virtual ~IConnectedAccessoriesEnumerator() = default;
+    virtual ~IConnectedAccessoriesEnumerator() = default;
 
-      virtual void enumerate(Promise::Pointer promise) = 0;
+    virtual void enumerate(Promise::Pointer promise) = 0;
 
-      virtual void cancel() = 0;
-    };
+    virtual void cancel() = 0;
+  };
 
-  }
 }

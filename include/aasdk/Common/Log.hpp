@@ -20,3 +20,11 @@
 #include <boost/log/trivial.hpp>
 
 #define AASDK_LOG(severity) BOOST_LOG_TRIVIAL(severity) << "[AASDK] "
+
+#ifdef NDEBUG
+    #define AASDK_LOG(severity) \
+    if constexpr (boost::log::trivial::severity > boost::log::trivial::debug) \
+    BOOST_LOG_TRIVIAL(severity) << "[AASDK] "
+#else
+    #define AASDK_LOG(severity) BOOST_LOG_TRIVIAL(severity) << "[AASDK] "
+#endif

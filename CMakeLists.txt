@@ -17,7 +17,7 @@ include(GNUInstallDirs)
 include(gitversion)
 
 set(LIBRARY_BUILD_MAJOR_RELEASE 4)
-set(LIBRARY_BUILD_MINOR_RELEASE 0)
+set(LIBRARY_BUILD_MINOR_RELEASE 1)
 set(LIBRARY_VERSION_STRING "${LIBRARY_BUILD_MAJOR_RELEASE}.${LIBRARY_BUILD_MINOR_RELEASE}.${_git_commit_count}+${_build_version}")
 message(STATUS "Project Version: ${LIBRARY_VERSION_STRING}")
 

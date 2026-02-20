@@ -24,22 +24,20 @@
 #include <aasdk/IO/Promise.hpp>
 
 
-namespace aasdk {
-  namespace usb {
+namespace aasdk::usb {
 
-    class IUSBHub {
-    public:
-      typedef std::shared_ptr<IUSBHub> Pointer;
-      typedef io::Promise<DeviceHandle> Promise;
+  class IUSBHub {
+  public:
+    typedef std::shared_ptr<IUSBHub> Pointer;
+    typedef io::Promise<DeviceHandle> Promise;
 
-      IUSBHub() = default;
+    IUSBHub() = default;
 
-      virtual ~IUSBHub() = default;
+    virtual ~IUSBHub() = default;
 
-      virtual void start(Promise::Pointer promise) = 0;
+    virtual void start(Promise::Pointer promise) = 0;
 
-      virtual void cancel() = 0;
-    };
+    virtual void cancel() = 0;
+  };
 
-  }
 }

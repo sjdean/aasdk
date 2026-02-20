@@ -1,6 +1,6 @@
 syntax="proto2";
 
-package aap_protobuf.service.control.message;
+package aap_protobuf.channel.control;
 
 message GoogleDiagnosticsBugReportRequest {
   required int32 token = 1;

@@ -2,6 +2,9 @@ syntax="proto2";
 
 package aap_protobuf.aaw;
 
+// Empty message for requesting protocol version
 message WifiVersionRequest {
-
+  optional int32 supported_major_version = 1 [default = 2]; // Current implementation supports v2
+  optional int32 supported_minor_version = 2 [default = 0];
+  optional int32 features = 3 [default = 0]; // Bitfield for feature flags
 }
