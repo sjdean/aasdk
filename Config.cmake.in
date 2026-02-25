@@ -1,3 +1,6 @@
-set(AASDK_INCLUDE_DIRS @CMAKE_INSTALL_FULL_INCLUDEDIR@)
-set(AASDK_LIB_DIRS @CMAKE_INSTALL_FULL_LIBDIR@)
+@PACKAGE_INIT@
+include(CMakeFindDependencyMacro)
+find_dependency(aap_protobuf REQUIRED CONFIG)
+find_dependency(Boost REQUIRED COMPONENTS system log)
+find_dependency(OpenSSL REQUIRED)
 include("${CMAKE_CURRENT_LIST_DIR}/aasdkTargets.cmake")

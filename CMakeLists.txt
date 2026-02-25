@@ -1,230 +1,276 @@
-cmake_minimum_required(VERSION 3.15) # Bumped to 3.15 for modern practices
+cmake_minimum_required(VERSION 3.16)
 
-project(aasdk)
-message(STATUS "AASDK Library")
-
-# --- Global Configuration ---
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_POSITION_INDEPENDENT_CODE ON) # Ensures -fPIC for all targets
-
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake_modules/")
-
-# Use GNUInstallDirs for standard FHS-compliant paths (e.g., lib, lib64)
-include(GNUInstallDirs)
-
-# --- Automatic Versioning (Best Practice) ---
-include(gitversion)
-
+# ─── Version (single source of truth) ────────────────────────────────────────
+# Numeric triplet only — used for library VERSION/SOVERSION and CMake package.
+# Display string (with date/git) is separate and never used for file naming.
+set(LIBRARY_BUILD_DATE          "20260225")
 set(LIBRARY_BUILD_MAJOR_RELEASE 4)
 set(LIBRARY_BUILD_MINOR_RELEASE 1)
-set(LIBRARY_VERSION_STRING "${LIBRARY_BUILD_MAJOR_RELEASE}.${LIBRARY_BUILD_MINOR_RELEASE}.${_git_commit_count}+${_build_version}")
-message(STATUS "Project Version: ${LIBRARY_VERSION_STRING}")
+set(LIBRARY_BUILD_INCREMENTAL   3)
 
+set(LIBRARY_BUILD_VERSION_STRING
+        "${LIBRARY_BUILD_MAJOR_RELEASE}.${LIBRARY_BUILD_MINOR_RELEASE}.${LIBRARY_BUILD_INCREMENTAL}+${LIBRARY_BUILD_DATE}")
 
-# --- Build Type (Your logic is fine) ---
-if(NOT CMAKE_BUILD_TYPE)
-    message(STATUS "Forcing Release build type")
-    set(CMAKE_BUILD_TYPE Release CACHE STRING "Choose the type of build." FORCE)
-    set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release" "MinSizeRel" "RelWithDebInfo")
+# Pass the numeric triplet into CMake's project() so it flows into
+# write_basic_package_version_file automatically.
+# Never use LIBRARY_BUILD_VERSION_STRING here — the '+' breaks file naming.
+project(aasdk
+        VERSION "${LIBRARY_BUILD_MAJOR_RELEASE}.${LIBRARY_BUILD_MINOR_RELEASE}.${LIBRARY_BUILD_INCREMENTAL}"
+        DESCRIPTION "Android Auto SDK Library"
+        LANGUAGES CXX
+)
+
+# ─── Language standard ────────────────────────────────────────────────────────
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+
+# ─── Module path ─────────────────────────────────────────────────────────────
+list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake_modules/")
+
+# ─── GNU install dirs (required for Yocto sysroot correctness) ───────────────
+include(GNUInstallDirs)
+
+# ─── Default build type ───────────────────────────────────────────────────────
+if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
+    message(STATUS "Defaulting to Release build")
+    set(CMAKE_BUILD_TYPE Release CACHE STRING "Build type" FORCE)
+    set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS
+            "Debug" "Release" "MinSizeRel" "RelWithDebInfo")
 endif()
 
-# --- CCACHE (Your logic is fine) ---
+message(STATUS "Build type      : ${CMAKE_BUILD_TYPE}")
+message(STATUS "System          : ${CMAKE_SYSTEM_NAME} / ${CMAKE_SYSTEM_PROCESSOR}")
+if(CMAKE_CROSSCOMPILING)
+    message(STATUS "Cross-compiling : YES (target: ${CMAKE_SYSTEM_PROCESSOR})")
+endif()
+
+# ─── Git metadata (display only — never used in file/library names) ───────────
+# Gracefully degrade when .git is absent (Yocto work dir, CI tarballs, etc.)
+find_package(Git QUIET)
+if(Git_FOUND)
+    execute_process(
+            COMMAND "${GIT_EXECUTABLE}" rev-parse --short HEAD
+            WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
+            OUTPUT_VARIABLE   _git_short_hash
+            ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE
+    )
+endif()
+if(NOT _git_short_hash OR _git_short_hash STREQUAL "")
+    set(_git_short_hash "unknown")
+endif()
+
+# Append git hash to the display string if available.
+# LIBRARY_BUILD_VERSION_STRING is used only in message() and generated headers.
+if(NOT _git_short_hash STREQUAL "unknown")
+    set(LIBRARY_BUILD_VERSION_STRING
+            "${LIBRARY_BUILD_MAJOR_RELEASE}.${LIBRARY_BUILD_MINOR_RELEASE}.${LIBRARY_BUILD_INCREMENTAL}+${LIBRARY_BUILD_DATE}.g${_git_short_hash}")
+endif()
+message(STATUS "aasdk version   : ${LIBRARY_BUILD_VERSION_STRING}")
+
+# ─── ccache ───────────────────────────────────────────────────────────────────
 find_program(CCACHE_PROGRAM ccache)
 if(CCACHE_PROGRAM)
+    message(STATUS "ccache          : ${CCACHE_PROGRAM}")
     set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE "${CCACHE_PROGRAM}")
 endif()
 
-# --- Find Dependencies (Modernized) ---
-# Using CONFIG mode and modern targets
-find_package(aap_protobuf REQUIRED CONFIG) # Finds config, provides AAPProto::aap_protobuf
+# ─── Dependencies ─────────────────────────────────────────────────────────────
+
+# aap_protobuf — provides AAPProto::aap_protobuf
+# Its Config.cmake.in handles finding protobuf transitively and correctly
+# per-sysroot. Do NOT separately find or link Protobuf here — doing so with
+# ${PROTOBUF_LIBRARIES} is what caused the original Yocto path bake-in error.
+find_package(aap_protobuf REQUIRED CONFIG)
+
+# Boost
 find_package(Boost REQUIRED COMPONENTS system log)
-find_package(libusb-1.0 REQUIRED) # Provides libusb-1.0::libusb
-find_package(OpenSSL REQUIRED) # Provides OpenSSL::SSL and OpenSSL::Crypto
 
-# Protobuf finding logic
-if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")  # macOS
-    message(STATUS "MacOS System Detected")
-    find_package(protobuf REQUIRED CONFIG)
-    find_package(absl REQUIRED)
-else ()
-    find_package(Protobuf REQUIRED) # Provides Protobuf::protobuf
-endif ()
+# OpenSSL
+find_package(OpenSSL REQUIRED)
 
+# libusb — try modern config mode first, fall back to pkg-config.
+# The target name varies by platform so we normalise it into LIBUSB_TARGET.
+find_package(libusb-1.0 QUIET CONFIG)
+if(libusb-1.0_FOUND OR TARGET libusb-1.0::libusb-1.0)
+    set(LIBUSB_TARGET libusb-1.0::libusb-1.0)
+    message(STATUS "libusb-1.0 found via config mode")
+else()
+    find_package(PkgConfig REQUIRED)
+    pkg_check_modules(libusb REQUIRED IMPORTED_TARGET libusb-1.0)
+    set(LIBUSB_TARGET PkgConfig::libusb)
+    message(STATUS "libusb-1.0 found via pkg-config")
+endif()
+
+# Winsock (Windows only)
 if(WIN32)
-    set(WINSOCK2_LIBRARIES "ws2_32") # This one doesn't have a modern target
+    set(PLATFORM_LINK_LIBS ws2_32)
 endif()
 
-if(AASDK_TEST)
-    include(ExternalGtest)
+# ─── Source files ─────────────────────────────────────────────────────────────
+# CONFIGURE_DEPENDS causes CMake to re-glob when files are added/removed.
+# Yocto's do_configure re-runs cmake before do_compile so this is safe here.
+file(GLOB_RECURSE _all_sources  CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
+file(GLOB_RECURSE _test_sources CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/src/*.ut.cpp")
+list(REMOVE_ITEM _all_sources ${_test_sources})
+
+if(NOT _all_sources)
+    message(FATAL_ERROR "No source files found under ${CMAKE_CURRENT_SOURCE_DIR}/src/")
 endif()
 
-# --- Define Source Files (Best Practice) ---
-# Explicitly listing files is safer than GLOB.
-# GLOB means CMake won't see new files until you manually re-run it.
-# Please replace this block with your actual source files.
-message(WARNING "Using file(GLOB) is not recommended. Please list source files explicitly.")
-file(GLOB_RECURSE source_files ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp)
-file(GLOB_RECURSE tests_source_files ${CMAKE_CURRENT_SOURCE_DIR}/src/*.ut.cpp)
-
-list(REMOVE_ITEM source_files ${tests_source_files})
-
-# --- Main Library Target (FIXED) ---
+# ─── Library target ───────────────────────────────────────────────────────────
 option(BUILD_SHARED_LIBS "Build shared libraries" ON)
 
-#
-# *** THIS LOGIC WAS INVERTED IN YOUR FILE ***
-#
+# add_library() respects BUILD_SHARED_LIBS automatically when no STATIC/SHARED
+# keyword is given — no if/else needed.
+add_library(aasdk ${_all_sources})
+
 if(BUILD_SHARED_LIBS)
-    message(NOTICE "Configuring SHARED Library")
-    add_library(aasdk SHARED ${source_files})
+    message(STATUS "Library type    : SHARED")
 else()
-    message(NOTICE "Configuring STATIC Library")
-    add_library(aasdk STATIC ${source_files})
+    message(STATUS "Library type    : STATIC")
 endif()
 
-# --- Target Properties (FIXED) ---
-
-# Set compiler flags and definitions *per target*
+# ─── Compiler options (cross-platform) ───────────────────────────────────────
 target_compile_features(aasdk PRIVATE cxx_std_17)
-target_compile_options(aasdk PRIVATE -Wall -pedantic)
-target_compile_definitions(aasdk PRIVATE BOOST_ALL_DYN_LINK)
 
-if(CMAKE_BUILD_TYPE STREQUAL "Release")
-    message(STATUS "Disabling Boost DEBUG logs")
-    target_compile_definitions(aasdk PRIVATE NDEBUG)
-endif()
+# Semicolons required as separators inside generator expressions — spaces work
+# in Makefiles/Ninja but silently fail with Xcode and Visual Studio generators.
+target_compile_options(aasdk PRIVATE
+        $<$<CXX_COMPILER_ID:GNU,Clang,AppleClang>:-Wall;-Wextra;-pedantic>
+        $<$<CXX_COMPILER_ID:MSVC>:/W4>
+)
 
-# This block fixes the "INTERFACE_INCLUDE_DIRECTORIES" error
+target_compile_definitions(aasdk PRIVATE
+        BOOST_ALL_DYN_LINK
+        $<$<CONFIG:Release>:NDEBUG>    # Disables Boost debug logging in Release
+)
+
+# ─── Include directories (target-scoped only) ─────────────────────────────────
 target_include_directories(aasdk
         PUBLIC
-        # For consumers: path in build tree, path in install tree
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
         $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
         PRIVATE
-        # Internal-only headers
         ${CMAKE_CURRENT_SOURCE_DIR}/include_ut
 )
 
-# NEW (with correct target names from your modules)
+# ─── Link libraries ───────────────────────────────────────────────────────────
+# AAPProto::aap_protobuf brings in protobuf transitively via its Config.cmake.in
+# using find_dependency(), which resolves against the consumer's own sysroot.
+# Do NOT also link ${PROTOBUF_LIBRARIES} — that raw path variable is what caused
+# the 'missing libprotobuf.so' Yocto error.
 target_link_libraries(aasdk
         PUBLIC
-        AAPProto::aap_protobuf    # Target from Findaap_protobuf.cmake
+        AAPProto::aap_protobuf
         PRIVATE
-        libusb          # Target from Findlibusb-1.0.cmake
+        ${LIBUSB_TARGET}
         Boost::system
         Boost::log
         OpenSSL::SSL
         OpenSSL::Crypto
-        ${PROTOBUF_LIBRARIES}   # Use variable for Protobuf
-        ${WINSOCK2_LIBRARIES}
+        ${PLATFORM_LINK_LIBS}
 )
 
-set_target_properties(aasdk
-        PROPERTIES VERSION ${LIBRARY_VERSION_STRING} SOVERSION ${_git_commit_count})
+# ─── Version properties ───────────────────────────────────────────────────────
+# VERSION  : numeric triplet — names the .so file (e.g. libaasdk.so.4.1.1)
+# SOVERSION: ABI major only — bump only on breaking ABI changes
+# Do NOT use LIBRARY_BUILD_VERSION_STRING here — the '+' breaks the linker.
+set_target_properties(aasdk PROPERTIES
+        VERSION   "${LIBRARY_BUILD_MAJOR_RELEASE}.${LIBRARY_BUILD_MINOR_RELEASE}.${LIBRARY_BUILD_INCREMENTAL}"
+        SOVERSION "${LIBRARY_BUILD_MAJOR_RELEASE}"
+)
 
-#ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_INSTALL_LIBDIR}"
-#LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_INSTALL_LIBDIR}"
-#RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_INSTALL_BINDIR}"
-
-# --- Install Rules (FIXED) ---
-# This is now much simpler
-
-# 1. Install the library, runtime, and archive files
+# ─── Install rules ────────────────────────────────────────────────────────────
 install(TARGETS aasdk
-        EXPORT aasdkTargets # This name is used in the next step
-        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT libraries
-        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT libraries
-        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT libraries
+        EXPORT   aasdkTargets
+        ARCHIVE  DESTINATION "${CMAKE_INSTALL_LIBDIR}"   COMPONENT libraries
+        LIBRARY  DESTINATION "${CMAKE_INSTALL_LIBDIR}"   COMPONENT libraries
+        RUNTIME  DESTINATION "${CMAKE_INSTALL_BINDIR}"   COMPONENT libraries
 )
 
-# 2. Install the public headers
-install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/aasdk
-        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR} # Uses 'include'
-        COMPONENT headers
+install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/include/aasdk"
+        DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"
+        COMPONENT   headers
 )
 
-# 3. Install the exported target file (aasdkTargets.cmake)
 install(EXPORT aasdkTargets
-        FILE aasdkTargets.cmake
-        NAMESPACE AASDK::
-        DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/aasdk
-        COMPONENT libraries
+        FILE        aasdkTargets.cmake
+        NAMESPACE   AASDK::
+        DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/aasdk"
+        COMPONENT   libraries
 )
 
-# 4. Install the Config and Version files
+# ─── CMake package config ─────────────────────────────────────────────────────
 include(CMakePackageConfigHelpers)
+
+# PROJECT_VERSION is purely numeric — CMake can compare it correctly.
+# LIBRARY_BUILD_VERSION_STRING contains '+' and must never be used here.
 write_basic_package_version_file(
         "${CMAKE_CURRENT_BINARY_DIR}/aasdkConfigVersion.cmake"
-        VERSION ${LIBRARY_VERSION_STRING}
+        VERSION       "${PROJECT_VERSION}"
         COMPATIBILITY AnyNewerVersion
 )
 
-# You still need to provide this file
-configure_package_config_file(${CMAKE_CURRENT_SOURCE_DIR}/Config.cmake.in
+configure_package_config_file(
+        "${CMAKE_CURRENT_SOURCE_DIR}/Config.cmake.in"
         "${CMAKE_CURRENT_BINARY_DIR}/aasdkConfig.cmake"
-        INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/aasdk
+        INSTALL_DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/aasdk"
 )
 
 install(FILES
-        "${CMAKE_CURRENT_BINARY_DIR}/aasdkConfigVersion.cmake"
         "${CMAKE_CURRENT_BINARY_DIR}/aasdkConfig.cmake"
-        DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/aasdk
-        COMPONENT libraries
+        "${CMAKE_CURRENT_BINARY_DIR}/aasdkConfigVersion.cmake"
+        DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/aasdk"
+        COMPONENT   libraries
 )
 
-
-# --- Unit Testing (Modernized) ---
+# ─── Unit tests ───────────────────────────────────────────────────────────────
 if(AASDK_TEST)
-    message(STATUS "Configuring Unit Tests")
+    message(STATUS "Configuring unit tests")
 
-    add_executable(aasdk_ut ${tests_source_files})
+    if(_test_sources)
+        include(ExternalGtest)
 
-    # Add the include paths from ExternalGtest.cmake
-    target_include_directories(aasdk_ut PRIVATE
-            ${GTEST_INCLUDE_DIRS}
-            ${GMOCK_INCLUDE_DIRS}
-    )
-
-    # Link libraries to the test executable
-    target_link_libraries(aasdk_ut PRIVATE
-            aasdk
-            gmock   # Target from ExternalGtest.cmake
-            gtest   # Target from ExternalGtest.cmake
-    )
-
-    # Add test to CTest
-    include(CTest)
-    add_test(NAME aasdk_unit_test COMMAND aasdk_ut)
-
-    if(AASDK_CODE_COVERAGE)
-        include(CodeCoverage)
-        append_coverage_compiler_flags()
-        # This function is from your CodeCoverage.cmake module [cite: 30]
-        setup_target_for_coverage(
-                NAME aasdk_coverage
-                EXECUTABLE aasdk_ut
-                DEPENDENCIES aasdk_ut
+        add_executable(aasdk_ut ${_test_sources})
+        target_include_directories(aasdk_ut PRIVATE
+                ${GTEST_INCLUDE_DIRS}
+                ${GMOCK_INCLUDE_DIRS}
         )
+        target_link_libraries(aasdk_ut PRIVATE aasdk gmock gtest)
+
+        include(CTest)
+        add_test(NAME aasdk_unit_test COMMAND aasdk_ut)
+
+        if(AASDK_CODE_COVERAGE)
+            include(CodeCoverage)
+            append_coverage_compiler_flags()
+            setup_target_for_coverage(
+                    NAME         aasdk_coverage
+                    EXECUTABLE   aasdk_ut
+                    DEPENDENCIES aasdk_ut
+            )
+        endif()
+    else()
+        message(WARNING "AASDK_TEST is ON but no *.ut.cpp files were found")
     endif()
-endif(AASDK_TEST)
+endif()
 
-
-# --- CPack (Updated for Components) ---
-set(CPACK_GENERATOR "DEB")
-set(CPACK_DEBIAN_PACKAGE_MAINTAİNER "AASDK")
-set(CPACK_PACKAGE_VENDOR "AASDK")
-set(CPACK_PACKAGE_VERSION ${LIBRARY_VERSION_STRING})
-set(CPACK_DEBIAN_FILE_NAME DEB-DEFAULT)
-set(CPACK_DEBIAN_PACKAGE_DEPENDS "libusb-1.0-0, libboost-system-dev, libboost-log-dev, libssl-dev, libprotobuf-dev")
-
-# Use the component names defined in install()
-set(CPACK_COMPONENTS_ALL libraries headers)
-
-set(CPACK_COMPONENT_LIBRARIES_DISPLAY_NAME "Libraries")
-set(CPACK_COMPONENT_HEADERS_DISPLAY_NAME "C++ Headers")
-set(CPACK_COMPONENT_LIBRARIES_DESCRIPTION "AASDK shared/static libraries")
-set(CPACK_COMPONENT_HEADERS_DESCRIPTION "C/C++ header files for AASDK")
-set(CPACK_COMPONENT_HEADERS_DEPENDS libraries)
-
+# ─── CPack ────────────────────────────────────────────────────────────────────
+set(CPACK_GENERATOR                         "DEB")
+set(CPACK_PACKAGE_VENDOR                    "AASDK")
+# ASCII 'I' only — the original had a Turkish 'İ' which corrupts the .deb manifest
+set(CPACK_DEBIAN_PACKAGE_MAINTAINER         "AASDK")
+# Use numeric PROJECT_VERSION — not the display string with '+'
+set(CPACK_PACKAGE_VERSION                   "${PROJECT_VERSION}")
+set(CPACK_DEBIAN_FILE_NAME                  DEB-DEFAULT)
+set(CPACK_DEBIAN_PACKAGE_DEPENDS
+        "libusb-1.0-0, libboost-system-dev, libboost-log-dev, libssl-dev, libprotobuf-dev")
+set(CPACK_COMPONENTS_ALL                    libraries headers)
+set(CPACK_COMPONENT_LIBRARIES_DISPLAY_NAME  "Libraries")
+set(CPACK_COMPONENT_HEADERS_DISPLAY_NAME    "C++ Headers")
+set(CPACK_COMPONENT_LIBRARIES_DESCRIPTION   "AASDK shared/static libraries")
+set(CPACK_COMPONENT_HEADERS_DESCRIPTION     "C/C++ header files for AASDK")
+set(CPACK_COMPONENT_HEADERS_DEPENDS         libraries)
 include(CPack)
