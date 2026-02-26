@@ -90,17 +90,50 @@ find_package(Boost REQUIRED COMPONENTS system log)
 # OpenSSL
 find_package(OpenSSL REQUIRED)
 
-# libusb — try modern config mode first, fall back to pkg-config.
-# The target name varies by platform so we normalise it into LIBUSB_TARGET.
+# ─── libusb discovery (three-tier: config → pkg-config → manual) ─────────────
+# Yocto's libusb1 recipe does not install CMake config files, and pkg-config
+# is a native tool unavailable in the cross sysroot. The manual fallback using
+# find_library/find_path always works because Yocto stages headers and libs
+# into the recipe sysroot at known FHS paths.
 find_package(libusb-1.0 QUIET CONFIG)
 if(libusb-1.0_FOUND OR TARGET libusb-1.0::libusb-1.0)
     set(LIBUSB_TARGET libusb-1.0::libusb-1.0)
-    message(STATUS "libusb-1.0 found via config mode")
+    message(STATUS "libusb-1.0      : found via config mode")
 else()
-    find_package(PkgConfig REQUIRED)
-    pkg_check_modules(libusb REQUIRED IMPORTED_TARGET libusb-1.0)
-    set(LIBUSB_TARGET PkgConfig::libusb)
-    message(STATUS "libusb-1.0 found via pkg-config")
+    # Try pkg-config (works on desktop Linux/Mac, not in Yocto cross sysroot)
+    find_package(PkgConfig QUIET)
+    if(PKG_CONFIG_FOUND)
+        pkg_check_modules(libusb QUIET IMPORTED_TARGET libusb-1.0)
+    endif()
+
+    if(TARGET PkgConfig::libusb)
+        set(LIBUSB_TARGET PkgConfig::libusb)
+        message(STATUS "libusb-1.0      : found via pkg-config")
+    else()
+        # Manual fallback — safe for Yocto cross sysroot, Windows (vcpkg), Mac
+        find_path(LIBUSB_INCLUDE_DIR
+                NAMES libusb.h
+                PATH_SUFFIXES libusb-1.0
+        )
+        find_library(LIBUSB_LIBRARY
+                NAMES usb-1.0 usb
+        )
+
+        if(NOT LIBUSB_INCLUDE_DIR OR NOT LIBUSB_LIBRARY)
+            message(FATAL_ERROR
+                    "libusb-1.0 not found. Tried config mode, pkg-config, and "
+                    "find_library. Ensure libusb1 is in DEPENDS in your .bb recipe.")
+        endif()
+
+        # Wrap in an imported target so the rest of the file stays clean
+        add_library(libusb-1.0::libusb-1.0 UNKNOWN IMPORTED)
+        set_target_properties(libusb-1.0::libusb-1.0 PROPERTIES
+                IMPORTED_LOCATION             "${LIBUSB_LIBRARY}"
+                INTERFACE_INCLUDE_DIRECTORIES "${LIBUSB_INCLUDE_DIR}"
+        )
+        set(LIBUSB_TARGET libusb-1.0::libusb-1.0)
+        message(STATUS "libusb-1.0      : found via find_library (${LIBUSB_LIBRARY})")
+    endif()
 endif()
 
 # Winsock (Windows only)

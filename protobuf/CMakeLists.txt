@@ -79,7 +79,12 @@ if(NOT COMMAND protobuf_generate_cpp)
 endif()
 
 # ─── Proto sources ───────────────────────────────────────────────────────────
-set(PROTOBUF_GENERATE_CPP_APPEND_PATH OFF)
+# Generated headers go into their own subdirectory, preserving source structure.
+# e.g. ${SOURCE}/service/bluetooth/X.proto → ${PROTO_BINARY_DIR}/service/bluetooth/X.pb.h
+# Install: ${PROTO_BINARY_DIR}/ → include/aap_protobuf/
+# Result:  usr/include/aap_protobuf/service/bluetooth/X.pb.h  ✓
+# Include: -Iusr/include → #include <aap_protobuf/service/bluetooth/X.pb.h> resolves ✓
+set(PROTO_BINARY_DIR "${CMAKE_CURRENT_BINARY_DIR}/proto_gen")
 
 file(GLOB_RECURSE source_proto_files
         CONFIGURE_DEPENDS
@@ -90,7 +95,15 @@ if(NOT source_proto_files)
     message(FATAL_ERROR "No .proto files found under ${CMAKE_CURRENT_SOURCE_DIR}")
 endif()
 
-protobuf_generate_cpp(PROTO_SRCS PROTO_HDRS ${source_proto_files})
+# protobuf_generate() preserves directory structure via IMPORT_DIRS.
+# protobuf_generate_cpp() always flattens — do not use it here.
+protobuf_generate(
+        LANGUAGE       cpp
+        OUT_VAR        PROTO_SRCS
+        PROTOS         ${source_proto_files}
+        IMPORT_DIRS    "${CMAKE_CURRENT_SOURCE_DIR}"
+        PROTOC_OUT_DIR "${PROTO_BINARY_DIR}"
+)
 
 # ─── Library target ──────────────────────────────────────────────────────────
 option(BUILD_SHARED_LIBS "Build shared libraries" ON)
@@ -106,13 +119,14 @@ else()
 endif()
 
 # All include paths go through the target — no bare include_directories()
+# BUILD_INTERFACE: -I<binary_dir> so #include <aap_protobuf/service/...> resolves
+#                  from the proto_gen/ subdir during the build itself
+# INSTALL_INTERFACE: -I<prefix>/include so consumers resolve the same path post-install
 target_include_directories(aap_protobuf
         PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/aap_protobuf>
         $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
 )
-
 # Link using the imported target — relocatable and sysroot-safe.
 target_link_libraries(aap_protobuf
         PUBLIC ${PROTOBUF_TARGET}
@@ -136,7 +150,9 @@ install(TARGETS aap_protobuf
         INCLUDES DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"
 )
 
-install(DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/"
+# Install only the generated headers, preserving structure, no CMakeFiles junk.
+# proto_gen/service/bluetooth/X.pb.h → include/aap_protobuf/service/bluetooth/X.pb.h
+install(DIRECTORY "${PROTO_BINARY_DIR}/"
         DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/aap_protobuf"
         FILES_MATCHING PATTERN "*.pb.h"
 )
