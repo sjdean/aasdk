@@ -124,7 +124,7 @@ endif()
 # INSTALL_INTERFACE: -I<prefix>/include so consumers resolve the same path post-install
 target_include_directories(aap_protobuf
         PUBLIC
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
+        $<BUILD_INTERFACE:${PROTO_BINARY_DIR}>
         $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
 )
 # Link using the imported target — relocatable and sysroot-safe.
@@ -153,7 +153,7 @@ install(TARGETS aap_protobuf
 # Install only the generated headers, preserving structure, no CMakeFiles junk.
 # proto_gen/service/bluetooth/X.pb.h → include/aap_protobuf/service/bluetooth/X.pb.h
 install(DIRECTORY "${PROTO_BINARY_DIR}/"
-        DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/aap_protobuf"
+        DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"
         FILES_MATCHING PATTERN "*.pb.h"
 )
 

@@ -185,6 +185,7 @@ target_include_directories(aasdk
         PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
         $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
+        $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/aap_protobuf>  # ← ADD THIS
         PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/include_ut
 )
