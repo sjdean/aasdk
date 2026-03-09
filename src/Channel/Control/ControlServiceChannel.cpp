@@ -16,9 +16,9 @@
 // along with aasdk. If not, see <http://www.gnu.org/licenses/>.
 
 #include <boost/endian/conversion.hpp>
-#include <aasdk/Version.hpp>
 #include <aasdk/IO/PromiseLink.hpp>
 #include <aasdk/Channel/Control/ControlServiceChannel.hpp>
+#include <aap_protobuf/channel/control/GalConstants.pb.h>
 #include <aasdk/Channel/Control/IControlServiceChannelEventHandler.hpp>
 #include <aasdk/Common/Log.hpp>
 
@@ -43,8 +43,8 @@ namespace aasdk {
                 aap_protobuf::service::control::message::ControlMessageType::MESSAGE_VERSION_REQUEST).getData());
 
         common::Data versionBuffer(4, 0);
-        reinterpret_cast<uint16_t &>(versionBuffer[0]) = boost::endian::native_to_big(AASDK_MAJOR);
-        reinterpret_cast<uint16_t &>(versionBuffer[2]) = boost::endian::native_to_big(AASDK_MINOR);
+        reinterpret_cast<uint16_t &>(versionBuffer[0]) = boost::endian::native_to_big(static_cast<uint16_t>(aap_protobuf::channel::control::PROTOCOL_MAJOR_VERSION));
+        reinterpret_cast<uint16_t &>(versionBuffer[2]) = boost::endian::native_to_big(static_cast<uint16_t>(aap_protobuf::channel::control::PROTOCOL_MINOR_VERSION));
         message->insertPayload(versionBuffer);
         this->send(std::move(message), std::move(promise));
       }
