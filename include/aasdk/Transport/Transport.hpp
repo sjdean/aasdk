@@ -19,6 +19,7 @@
 
 #include <list>
 #include <queue>
+#include <QtGlobal>
 #include <boost/asio.hpp>
 #include <aasdk/Transport/ITransport.hpp>
 #include <aasdk/Transport/DataSink.hpp>
@@ -27,7 +28,8 @@
 namespace aasdk {
   namespace transport {
 
-    class Transport : public ITransport, public std::enable_shared_from_this<Transport>, boost::noncopyable {
+    class Transport : public ITransport, public std::enable_shared_from_this<Transport> {
+      Q_DISABLE_COPY(Transport)
     public:
       Transport(boost::asio::io_service &ioService);
 

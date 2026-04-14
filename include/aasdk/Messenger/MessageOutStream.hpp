@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include <QtGlobal>
 #include <aasdk/Common/Data.hpp>
 #include <aasdk/Transport/ITransport.hpp>
 #include <aasdk/Messenger/ICryptor.hpp>
@@ -29,7 +30,8 @@ namespace aasdk {
   namespace messenger {
 
     class MessageOutStream
-        : public IMessageOutStream, public std::enable_shared_from_this<MessageOutStream>, boost::noncopyable {
+        : public IMessageOutStream, public std::enable_shared_from_this<MessageOutStream> {
+      Q_DISABLE_COPY(MessageOutStream)
     public:
       MessageOutStream(boost::asio::io_service &ioService, transport::ITransport::Pointer transport,
                        ICryptor::Pointer cryptor);

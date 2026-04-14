@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include <QtGlobal>
 #include <aasdk/USB/IUSBWrapper.hpp>
 #include <aasdk/USB/IAccessoryModeQueryFactory.hpp>
 #include <aasdk/USB/IAccessoryModeQueryChain.hpp>
@@ -28,8 +29,8 @@ namespace aasdk::usb {
 
   class AccessoryModeQueryChain
       : public IAccessoryModeQueryChain,
-        public std::enable_shared_from_this<AccessoryModeQueryChain>,
-        boost::noncopyable {
+        public std::enable_shared_from_this<AccessoryModeQueryChain> {
+    Q_DISABLE_COPY(AccessoryModeQueryChain)
   public:
     AccessoryModeQueryChain(IUSBWrapper &usbWrapper,
                             boost::asio::io_service &ioService,

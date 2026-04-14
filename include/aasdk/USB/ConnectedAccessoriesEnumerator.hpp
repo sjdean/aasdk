@@ -18,6 +18,7 @@
 #pragma once
 
 #include <boost/asio.hpp>
+#include <QtGlobal>
 #include <aasdk/USB/IUSBWrapper.hpp>
 #include <aasdk/USB/IAccessoryModeQueryChainFactory.hpp>
 #include <aasdk/USB/IConnectedAccessoriesEnumerator.hpp>
@@ -27,6 +28,7 @@ namespace aasdk::usb {
 
   class ConnectedAccessoriesEnumerator
       : public IConnectedAccessoriesEnumerator, public std::enable_shared_from_this<ConnectedAccessoriesEnumerator> {
+    Q_DISABLE_COPY(ConnectedAccessoriesEnumerator)
   public:
     ConnectedAccessoriesEnumerator(IUSBWrapper &usbWrapper, boost::asio::io_service &ioService,
                                    IAccessoryModeQueryChainFactory &queryChainFactory);

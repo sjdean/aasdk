@@ -84,8 +84,11 @@ endif()
 # ${PROTOBUF_LIBRARIES} is what caused the original Yocto path bake-in error.
 find_package(aap_protobuf REQUIRED CONFIG)
 
-# Boost
-find_package(Boost REQUIRED COMPONENTS system log)
+# Qt6
+find_package(Qt6 REQUIRED COMPONENTS Core)
+
+# Boost (system only — log removed in Stage 1.1)
+find_package(Boost REQUIRED COMPONENTS system)
 
 # OpenSSL
 find_package(OpenSSL REQUIRED)
@@ -176,8 +179,7 @@ target_compile_options(aasdk PRIVATE
 )
 
 target_compile_definitions(aasdk PRIVATE
-        BOOST_ALL_DYN_LINK
-        $<$<CONFIG:Release>:NDEBUG>    # Disables Boost debug logging in Release
+        $<$<CONFIG:Release>:NDEBUG>
 )
 
 # ─── Include directories (target-scoped only) ─────────────────────────────────
@@ -201,7 +203,7 @@ target_link_libraries(aasdk
         PRIVATE
         ${LIBUSB_TARGET}
         Boost::system
-        Boost::log
+        Qt6::Core
         OpenSSL::SSL
         OpenSSL::Crypto
         ${PLATFORM_LINK_LIBS}
@@ -300,7 +302,7 @@ set(CPACK_DEBIAN_PACKAGE_MAINTAINER         "AASDK")
 set(CPACK_PACKAGE_VERSION                   "${PROJECT_VERSION}")
 set(CPACK_DEBIAN_FILE_NAME                  DEB-DEFAULT)
 set(CPACK_DEBIAN_PACKAGE_DEPENDS
-        "libusb-1.0-0, libboost-system-dev, libboost-log-dev, libssl-dev, libprotobuf-dev")
+        "libusb-1.0-0, libboost-system-dev, libssl-dev, libprotobuf-dev")
 set(CPACK_COMPONENTS_ALL                    libraries headers)
 set(CPACK_COMPONENT_LIBRARIES_DISPLAY_NAME  "Libraries")
 set(CPACK_COMPONENT_HEADERS_DISPLAY_NAME    "C++ Headers")

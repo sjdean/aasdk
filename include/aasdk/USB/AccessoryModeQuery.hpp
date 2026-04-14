@@ -20,6 +20,7 @@
 #include <boost/asio.hpp>
 #include <libusb.h>
 #include <list>
+#include <QtGlobal>
 #include <aasdk/USB/IUSBEndpoint.hpp>
 #include <aasdk/USB/IUSBWrapper.hpp>
 #include <aasdk/USB/IAccessoryModeQuery.hpp>
@@ -27,7 +28,8 @@
 
 namespace aasdk::usb {
 
-  class AccessoryModeQuery : public IAccessoryModeQuery, boost::noncopyable {
+  class AccessoryModeQuery : public IAccessoryModeQuery {
+    Q_DISABLE_COPY(AccessoryModeQuery)
   public:
     AccessoryModeQuery(boost::asio::io_service &ioService, IUSBEndpoint::Pointer usbEndpoint);
 

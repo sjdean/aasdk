@@ -19,6 +19,7 @@
 
 #include <unordered_map>
 #include <memory>
+#include <QtGlobal>
 #include <boost/asio.hpp>
 #include <aasdk/USB/IUSBWrapper.hpp>
 #include <aasdk/USB/IUSBEndpoint.hpp>
@@ -27,8 +28,8 @@
 namespace aasdk::usb {
 
   class USBEndpoint : public IUSBEndpoint,
-                      public std::enable_shared_from_this<USBEndpoint>,
-                      boost::noncopyable {
+                      public std::enable_shared_from_this<USBEndpoint> {
+    Q_DISABLE_COPY(USBEndpoint)
   public:
     USBEndpoint(IUSBWrapper &usbWrapper, boost::asio::io_service &ioService, DeviceHandle handle,
                 uint8_t endpointAddress = 0x00);

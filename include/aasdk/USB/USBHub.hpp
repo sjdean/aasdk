@@ -19,6 +19,7 @@
 
 #include <boost/asio.hpp>
 #include <list>
+#include <QtGlobal>
 #include <aasdk/USB/IUSBHub.hpp>
 #include <aasdk/USB/IAccessoryModeQueryChainFactory.hpp>
 
@@ -27,7 +28,8 @@ namespace aasdk::usb {
 
   class IUSBWrapper;
 
-  class USBHub : public IUSBHub, public std::enable_shared_from_this<USBHub>, boost::noncopyable {
+  class USBHub : public IUSBHub, public std::enable_shared_from_this<USBHub> {
+    Q_DISABLE_COPY(USBHub)
   public:
     USBHub(IUSBWrapper &usbWrapper, boost::asio::io_service &ioService,
            IAccessoryModeQueryChainFactory &queryChainFactory);

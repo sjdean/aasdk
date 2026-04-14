@@ -15,17 +15,6 @@
 // You should have received a copy of the GNU General Public License
 // along with aasdk. If not, see <http://www.gnu.org/licenses/>.
 
-#pragma once
+#include <aasdk/Common/Log.hpp>
 
-#include <QLoggingCategory>
-
-Q_DECLARE_LOGGING_CATEGORY(lcAasdk)
-
-// Map Boost-style severity names (lowercase) to Qt logging macros so that
-// existing AASDK_LOG(debug/info/warning/error) call sites need no changes.
-#define AASDK_LOG_debug    qCDebug
-#define AASDK_LOG_info     qCInfo
-#define AASDK_LOG_warning  qCWarning
-#define AASDK_LOG_error    qCCritical
-
-#define AASDK_LOG(severity) AASDK_LOG_##severity(lcAasdk)
+Q_LOGGING_CATEGORY(lcAasdk, "aasdk")
