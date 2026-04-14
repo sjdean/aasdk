@@ -25,6 +25,7 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+set(CMAKE_AUTOMOC ON)
 
 # ─── Module path ─────────────────────────────────────────────────────────────
 list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake_modules/")
@@ -88,7 +89,7 @@ find_package(aap_protobuf REQUIRED CONFIG)
 find_package(Qt6 REQUIRED COMPONENTS Core Network)
 
 # Boost (system only — log removed in Stage 1.1)
-find_package(Boost REQUIRED COMPONENTS system)
+# Removed find_package(Boost REQUIRED COMPONENTS system)
 
 # OpenSSL
 find_package(OpenSSL REQUIRED)
@@ -202,7 +203,6 @@ target_link_libraries(aasdk
         AAPProto::aap_protobuf
         PRIVATE
         ${LIBUSB_TARGET}
-        Boost::system
         Qt6::Core
         Qt6::Network
         OpenSSL::SSL
