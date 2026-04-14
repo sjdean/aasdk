@@ -85,7 +85,7 @@ endif()
 find_package(aap_protobuf REQUIRED CONFIG)
 
 # Qt6
-find_package(Qt6 REQUIRED COMPONENTS Core)
+find_package(Qt6 REQUIRED COMPONENTS Core Network)
 
 # Boost (system only — log removed in Stage 1.1)
 find_package(Boost REQUIRED COMPONENTS system)
@@ -204,6 +204,7 @@ target_link_libraries(aasdk
         ${LIBUSB_TARGET}
         Boost::system
         Qt6::Core
+        Qt6::Network
         OpenSSL::SSL
         OpenSSL::Crypto
         ${PLATFORM_LINK_LIBS}
