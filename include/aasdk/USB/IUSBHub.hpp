@@ -21,7 +21,7 @@
 #include <functional>
 #include <aasdk/USB/IUSBWrapper.hpp>
 #include <aasdk/Error/Error.hpp>
-#include <aasdk/IO/Promise.hpp>
+#include <aasdk/IO/QtPromise.hpp>
 
 
 namespace aasdk::usb {
@@ -29,7 +29,7 @@ namespace aasdk::usb {
   class IUSBHub {
   public:
     typedef std::shared_ptr<IUSBHub> Pointer;
-    typedef io::Promise<DeviceHandle> Promise;
+    typedef io::QtPromise<DeviceHandle> Promise;
 
     IUSBHub() = default;
 

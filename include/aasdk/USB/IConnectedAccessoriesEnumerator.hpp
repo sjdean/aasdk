@@ -18,7 +18,7 @@
 #pragma once
 
 #include <memory>
-#include <aasdk/IO/Promise.hpp>
+#include <aasdk/IO/QtPromise.hpp>
 
 
 namespace aasdk::usb {
@@ -26,7 +26,7 @@ namespace aasdk::usb {
   class IConnectedAccessoriesEnumerator {
   public:
     typedef std::shared_ptr<IConnectedAccessoriesEnumerator> Pointer;
-    typedef io::Promise<bool> Promise;
+    typedef io::QtPromise<bool> Promise;
 
     virtual ~IConnectedAccessoriesEnumerator() = default;
 

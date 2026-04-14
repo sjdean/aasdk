@@ -20,7 +20,7 @@
 #include <memory>
 #include <boost/asio.hpp>
 #include <libusb.h>
-#include <aasdk/IO/Promise.hpp>
+#include <aasdk/IO/QtPromise.hpp>
 #include <aasdk/USB/IUSBEndpoint.hpp>
 
 
@@ -29,7 +29,7 @@ namespace aasdk::usb {
   class IAccessoryModeQuery {
   public:
     typedef std::shared_ptr<IAccessoryModeQuery> Pointer;
-    typedef io::Promise<IUSBEndpoint::Pointer> Promise;
+    typedef io::QtPromise<IUSBEndpoint::Pointer> Promise;
 
     IAccessoryModeQuery() = default;
 

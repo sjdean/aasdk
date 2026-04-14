@@ -15,7 +15,6 @@
 // You should have received a copy of the GNU General Public License
 // along with aasdk. If not, see <http://www.gnu.org/licenses/>.
 
-#include "aasdk/IO/PromiseLink.hpp"
 #include "aasdk/Channel/Channel.hpp"
 
 namespace aasdk::channel {
@@ -37,7 +36,10 @@ namespace aasdk::channel {
     auto sendPromise = messenger::SendPromise::defer(strand_.context());
 #endif
 
-    io::PromiseLink<>::forward(*sendPromise, std::move(promise));
+    sendPromise->then(
+        [promise]() { if (promise) promise->resolve(); },
+        [promise](const error::Error& e) { if (promise) promise->reject(e); }
+    );
     messenger_->enqueueSend(std::move(message), std::move(sendPromise));
   }
 

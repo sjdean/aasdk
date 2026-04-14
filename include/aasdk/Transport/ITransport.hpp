@@ -19,7 +19,7 @@
 
 #include <memory>
 #include <aasdk/Common/Data.hpp>
-#include <aasdk/IO/Promise.hpp>
+#include <aasdk/IO/QtPromise.hpp>
 
 
 namespace aasdk {
@@ -28,8 +28,8 @@ namespace aasdk {
     class ITransport {
     public:
       typedef std::shared_ptr<ITransport> Pointer;
-      typedef io::Promise<common::Data> ReceivePromise;
-      typedef io::Promise<void> SendPromise;
+      typedef io::QtPromise<common::Data> ReceivePromise;
+      typedef io::QtPromise<void> SendPromise;
 
       ITransport() = default;
 

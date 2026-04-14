@@ -20,7 +20,7 @@
 #include <memory>
 #include <aasdk/USB/USBWrapper.hpp>
 #include <aasdk/Common/Data.hpp>
-#include <aasdk/IO/Promise.hpp>
+#include <aasdk/IO/QtPromise.hpp>
 
 
 namespace aasdk::usb {
@@ -28,7 +28,7 @@ namespace aasdk::usb {
   class IUSBEndpoint {
   public:
     typedef std::shared_ptr<IUSBEndpoint> Pointer;
-    typedef io::Promise<size_t> Promise;
+    typedef io::QtPromise<size_t> Promise;
 
     IUSBEndpoint() = default;
 

@@ -24,6 +24,7 @@
 #include <functional>
 #include <exception>
 #include <aasdk/Error/Error.hpp>
+#include <aasdk/IO/IOContextWrapper.hpp>
 
 namespace aasdk {
 namespace io {
@@ -41,7 +42,25 @@ public:
         return std::make_shared<QtPromise>(context);
     }
 
+    static Pointer defer(boost::asio::io_service &ioService) {
+        return std::make_shared<QtPromise>(ioService);
+    }
+
+    static Pointer defer(boost::asio::io_service::strand &strand) {
+        return std::make_shared<QtPromise>(strand);
+    }
+
     explicit QtPromise(QObject* context) : context_(context) {
+        promise_.start();
+    }
+
+    QtPromise(boost::asio::io_service &ioService)
+        : context_(nullptr), ioContextWrapper_(std::make_shared<IOContextWrapper>(ioService)) {
+        promise_.start();
+    }
+
+    QtPromise(boost::asio::io_service::strand &strand)
+        : context_(nullptr), ioContextWrapper_(std::make_shared<IOContextWrapper>(strand)) {
         promise_.start();
     }
 
@@ -60,6 +79,24 @@ public:
                     rejectHandler(e);
                 });
             }
+        } else if (ioContextWrapper_) {
+            auto wrapper = ioContextWrapper_;
+            auto fut2 = fut.then([wrapper, resolveHandler](ResolveArgumentType val) {
+                if (resolveHandler && wrapper->isActive()) {
+                    wrapper->post([val = std::move(val), resolveHandler]() mutable {
+                        resolveHandler(std::move(val));
+                    });
+                }
+            });
+            if (rejectHandler) {
+                fut2.onFailed([wrapper, rejectHandler](const ErrorArgumentType& e) {
+                    if (wrapper->isActive()) {
+                        wrapper->post([e, rejectHandler]() mutable {
+                            rejectHandler(e);
+                        });
+                    }
+                });
+            }
         } else {
             auto fut2 = fut.then([resolveHandler](ResolveArgumentType val) {
                 if (resolveHandler) resolveHandler(std::move(val));
@@ -75,16 +112,19 @@ public:
     void resolve(ResolveArgumentType argument) {
         promise_.addResult(std::move(argument));
         promise_.finish();
+        if (ioContextWrapper_) ioContextWrapper_->reset();
     }
 
     void reject(ErrorArgumentType error) {
         promise_.setException(std::make_exception_ptr(error));
         promise_.finish();
+        if (ioContextWrapper_) ioContextWrapper_->reset();
     }
 
 private:
     QPromise<ResolveArgumentType> promise_;
     QObject* context_;
+    std::shared_ptr<IOContextWrapper> ioContextWrapper_;
 };
 
 // Void resolution specialisation
@@ -100,7 +140,25 @@ public:
         return std::make_shared<QtPromise>(context);
     }
 
+    static Pointer defer(boost::asio::io_service &ioService) {
+        return std::make_shared<QtPromise>(ioService);
+    }
+
+    static Pointer defer(boost::asio::io_service::strand &strand) {
+        return std::make_shared<QtPromise>(strand);
+    }
+
     explicit QtPromise(QObject* context) : context_(context) {
+        promise_.start();
+    }
+
+    QtPromise(boost::asio::io_service &ioService)
+        : context_(nullptr), ioContextWrapper_(std::make_shared<IOContextWrapper>(ioService)) {
+        promise_.start();
+    }
+
+    QtPromise(boost::asio::io_service::strand &strand)
+        : context_(nullptr), ioContextWrapper_(std::make_shared<IOContextWrapper>(strand)) {
         promise_.start();
     }
 
@@ -119,6 +177,24 @@ public:
                     rejectHandler(e);
                 });
             }
+        } else if (ioContextWrapper_) {
+            auto wrapper = ioContextWrapper_;
+            auto fut2 = fut.then([wrapper, resolveHandler]() {
+                if (resolveHandler && wrapper->isActive()) {
+                    wrapper->post([resolveHandler]() mutable {
+                        resolveHandler();
+                    });
+                }
+            });
+            if (rejectHandler) {
+                fut2.onFailed([wrapper, rejectHandler](const ErrorArgumentType& e) {
+                    if (wrapper->isActive()) {
+                        wrapper->post([e, rejectHandler]() mutable {
+                            rejectHandler(e);
+                        });
+                    }
+                });
+            }
         } else {
             auto fut2 = fut.then([resolveHandler]() {
                 if (resolveHandler) resolveHandler();
@@ -133,16 +209,19 @@ public:
 
     void resolve() {
         promise_.finish();
+        if (ioContextWrapper_) ioContextWrapper_->reset();
     }
 
     void reject(ErrorArgumentType error) {
         promise_.setException(std::make_exception_ptr(error));
         promise_.finish();
+        if (ioContextWrapper_) ioContextWrapper_->reset();
     }
 
 private:
     QPromise<void> promise_;
     QObject* context_;
+    std::shared_ptr<IOContextWrapper> ioContextWrapper_;
 };
 
 // Void resolution, Void error specialisation
@@ -157,7 +236,25 @@ public:
         return std::make_shared<QtPromise>(context);
     }
 
+    static Pointer defer(boost::asio::io_service &ioService) {
+        return std::make_shared<QtPromise>(ioService);
+    }
+
+    static Pointer defer(boost::asio::io_service::strand &strand) {
+        return std::make_shared<QtPromise>(strand);
+    }
+
     explicit QtPromise(QObject* context) : context_(context) {
+        promise_.start();
+    }
+
+    QtPromise(boost::asio::io_service &ioService)
+        : context_(nullptr), ioContextWrapper_(std::make_shared<IOContextWrapper>(ioService)) {
+        promise_.start();
+    }
+
+    QtPromise(boost::asio::io_service::strand &strand)
+        : context_(nullptr), ioContextWrapper_(std::make_shared<IOContextWrapper>(strand)) {
         promise_.start();
     }
 
@@ -177,6 +274,24 @@ public:
                     rejectHandler();
                 });
             }
+        } else if (ioContextWrapper_) {
+            auto wrapper = ioContextWrapper_;
+            auto fut2 = fut.then([wrapper, resolveHandler]() {
+                if (resolveHandler && wrapper->isActive()) {
+                    wrapper->post([resolveHandler]() mutable {
+                        resolveHandler();
+                    });
+                }
+            });
+            if (rejectHandler) {
+                fut2.onFailed([wrapper, rejectHandler](const std::exception&) {
+                    if (wrapper->isActive()) {
+                        wrapper->post([rejectHandler]() mutable {
+                            rejectHandler();
+                        });
+                    }
+                });
+            }
         } else {
             auto fut2 = fut.then([resolveHandler]() {
                 if (resolveHandler) resolveHandler();
@@ -191,16 +306,19 @@ public:
 
     void resolve() {
         promise_.finish();
+        if (ioContextWrapper_) ioContextWrapper_->reset();
     }
 
     void reject() {
         promise_.setException(std::make_exception_ptr(std::runtime_error("Promise rejected")));
         promise_.finish();
+        if (ioContextWrapper_) ioContextWrapper_->reset();
     }
 
 private:
     QPromise<void> promise_;
     QObject* context_;
+    std::shared_ptr<IOContextWrapper> ioContextWrapper_;
 };
 
 // T resolution, Void error specialisation
@@ -216,7 +334,25 @@ public:
         return std::make_shared<QtPromise>(context);
     }
 
+    static Pointer defer(boost::asio::io_service &ioService) {
+        return std::make_shared<QtPromise>(ioService);
+    }
+
+    static Pointer defer(boost::asio::io_service::strand &strand) {
+        return std::make_shared<QtPromise>(strand);
+    }
+
     explicit QtPromise(QObject* context) : context_(context) {
+        promise_.start();
+    }
+
+    QtPromise(boost::asio::io_service &ioService)
+        : context_(nullptr), ioContextWrapper_(std::make_shared<IOContextWrapper>(ioService)) {
+        promise_.start();
+    }
+
+    QtPromise(boost::asio::io_service::strand &strand)
+        : context_(nullptr), ioContextWrapper_(std::make_shared<IOContextWrapper>(strand)) {
         promise_.start();
     }
 
@@ -235,6 +371,24 @@ public:
                     rejectHandler();
                 });
             }
+        } else if (ioContextWrapper_) {
+            auto wrapper = ioContextWrapper_;
+            auto fut2 = fut.then([wrapper, resolveHandler](ResolveArgumentType val) {
+                if (resolveHandler && wrapper->isActive()) {
+                    wrapper->post([val = std::move(val), resolveHandler]() mutable {
+                        resolveHandler(std::move(val));
+                    });
+                }
+            });
+            if (rejectHandler) {
+                fut2.onFailed([wrapper, rejectHandler](const std::exception&) {
+                    if (wrapper->isActive()) {
+                        wrapper->post([rejectHandler]() mutable {
+                            rejectHandler();
+                        });
+                    }
+                });
+            }
         } else {
             auto fut2 = fut.then([resolveHandler](ResolveArgumentType val) {
                 if (resolveHandler) resolveHandler(std::move(val));
@@ -250,16 +404,19 @@ public:
     void resolve(ResolveArgumentType argument) {
         promise_.addResult(std::move(argument));
         promise_.finish();
+        if (ioContextWrapper_) ioContextWrapper_->reset();
     }
 
     void reject() {
         promise_.setException(std::make_exception_ptr(std::runtime_error("Promise rejected")));
         promise_.finish();
+        if (ioContextWrapper_) ioContextWrapper_->reset();
     }
 
 private:
     QPromise<ResolveArgumentType> promise_;
     QObject* context_;
+    std::shared_ptr<IOContextWrapper> ioContextWrapper_;
 };
 
 } // namespace io

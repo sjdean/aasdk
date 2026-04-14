@@ -19,7 +19,7 @@
 
 #include <memory>
 #include <aasdk/Common/Data.hpp>
-#include <aasdk/IO/Promise.hpp>
+#include <aasdk/IO/QtPromise.hpp>
 
 
 namespace aasdk {
@@ -28,7 +28,7 @@ namespace aasdk {
     class ITCPEndpoint {
     public:
       typedef std::shared_ptr<ITCPEndpoint> Pointer;
-      typedef io::Promise<size_t> Promise;
+      typedef io::QtPromise<size_t> Promise;
       typedef std::shared_ptr<boost::asio::ip::tcp::socket> SocketPointer;
 
       virtual ~ITCPEndpoint() = default;

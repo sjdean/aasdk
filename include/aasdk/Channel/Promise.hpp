@@ -18,13 +18,13 @@
 #pragma once
 
 #include <aasdk/Messenger/Message.hpp>
-#include <aasdk/IO/Promise.hpp>
+#include <aasdk/IO/QtPromise.hpp>
 
 
 namespace aasdk {
   namespace channel {
 
-    typedef io::Promise<void> SendPromise;
+    typedef io::QtPromise<void> SendPromise;
 
   }
 }

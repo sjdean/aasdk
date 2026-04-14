@@ -16,7 +16,6 @@
 // along with aasdk. If not, see <http://www.gnu.org/licenses/>.
 
 #include <boost/endian/conversion.hpp>
-#include <aasdk/IO/PromiseLink.hpp>
 #include <aasdk/Channel/Control/ControlServiceChannel.hpp>
 #include <aap_protobuf/channel/control/GalConstants.pb.h>
 #include <aasdk/Channel/Control/IControlServiceChannelEventHandler.hpp>

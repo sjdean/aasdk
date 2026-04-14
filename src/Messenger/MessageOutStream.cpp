@@ -16,7 +16,6 @@
 // along with aasdk. If not, see <http://www.gnu.org/licenses/>.
 
 #include <boost/endian/conversion.hpp>
-#include <aasdk/IO/PromiseLink.hpp>
 #include <aasdk/Messenger/MessageOutStream.hpp>
 
 
@@ -50,7 +49,11 @@ namespace aasdk {
             auto data(this->compoundFrame(FrameType::BULK, common::DataConstBuffer(message_->getPayload())));
 
             auto transportPromise = transport::ITransport::SendPromise::defer(strand_);
-            io::PromiseLink<>::forward(*transportPromise, std::move(promise_));
+            transportPromise->then(
+                [p = promise_]() { if (p) p->resolve(); },
+                [p = promise_](const error::Error& e) { if (p) p->reject(e); }
+            );
+            promise_.reset();
             transport_->send(std::move(data), std::move(transportPromise));
           }
           catch (const error::Error &e) {
@@ -77,7 +80,11 @@ namespace aasdk {
 
         if (frameType == FrameType::LAST) {
           this->reset();
-          io::PromiseLink<>::forward(*transportPromise, std::move(promise_));
+          transportPromise->then(
+              [p = promise_]() { if (p) p->resolve(); },
+              [p = promise_](const error::Error& e) { if (p) p->reject(e); }
+          );
+          promise_.reset();
         } else {
           transportPromise->then([this, self = this->shared_from_this(), size]() mutable {
                                    offset_ += size;
