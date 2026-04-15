@@ -303,7 +303,7 @@ set(CPACK_DEBIAN_PACKAGE_MAINTAINER         "AASDK")
 set(CPACK_PACKAGE_VERSION                   "${PROJECT_VERSION}")
 set(CPACK_DEBIAN_FILE_NAME                  DEB-DEFAULT)
 set(CPACK_DEBIAN_PACKAGE_DEPENDS
-        "libusb-1.0-0, libboost-system-dev, libssl-dev, libprotobuf-dev")
+        "libusb-1.0-0, libssl-dev, libprotobuf-dev")
 set(CPACK_COMPONENTS_ALL                    libraries headers)
 set(CPACK_COMPONENT_LIBRARIES_DISPLAY_NAME  "Libraries")
 set(CPACK_COMPONENT_HEADERS_DISPLAY_NAME    "C++ Headers")
