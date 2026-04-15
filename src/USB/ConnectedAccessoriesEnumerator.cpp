@@ -22,14 +22,19 @@ namespace aasdk {
   namespace usb {
 
     ConnectedAccessoriesEnumerator::ConnectedAccessoriesEnumerator(IUSBWrapper &usbWrapper,
-                                                                   boost::asio::io_service &ioService,
                                                                    IAccessoryModeQueryChainFactory &queryChainFactory)
-        : usbWrapper_(usbWrapper), strand_(ioService), queryChainFactory_(queryChainFactory) {
+        : usbWrapper_(usbWrapper), queryChainFactory_(queryChainFactory) {
+      moveToThread(&workerThread_);
+      workerThread_.start();
+    }
 
+    ConnectedAccessoriesEnumerator::~ConnectedAccessoriesEnumerator() {
+      workerThread_.quit();
+      workerThread_.wait();
     }
 
     void ConnectedAccessoriesEnumerator::enumerate(Promise::Pointer promise) {
-      strand_.dispatch([this, self = this->shared_from_this(), promise = std::move(promise)]() mutable {
+      QMetaObject::invokeMethod(this, [this, self = this->shared_from_this(), promise = std::move(promise)]() mutable {
         if (promise_ != nullptr) {
           promise->reject(error::Error(error::ErrorCode::OPERATION_IN_PROGRESS));
         } else {
@@ -46,15 +51,15 @@ namespace aasdk {
             this->queryNextDevice();
           }
         }
-      });
+      }, Qt::QueuedConnection);
     }
 
     void ConnectedAccessoriesEnumerator::cancel() {
-      strand_.dispatch([this, self = this->shared_from_this()]() mutable {
+      QMetaObject::invokeMethod(this, [this, self = this->shared_from_this()]() mutable {
         if (queryChain_ != nullptr) {
           queryChain_->cancel();
         }
-      });
+      }, Qt::QueuedConnection);
     }
 
     void ConnectedAccessoriesEnumerator::queryNextDevice() {
@@ -62,7 +67,7 @@ namespace aasdk {
 
       if (deviceHandle != nullptr) {
         queryChain_ = queryChainFactory_.create();
-        auto queryChainPromise = IAccessoryModeQueryChain::Promise::defer(strand_);
+        auto queryChainPromise = IAccessoryModeQueryChain::Promise::defer(this);
 
         queryChainPromise->then([this, self = this->shared_from_this()](DeviceHandle) mutable {
                                   promise_->resolve(true);

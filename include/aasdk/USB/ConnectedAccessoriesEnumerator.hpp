@@ -17,7 +17,8 @@
 
 #pragma once
 
-#include <boost/asio.hpp>
+#include <QObject>
+#include <QThread>
 #include <QtGlobal>
 #include <aasdk/USB/IUSBWrapper.hpp>
 #include <aasdk/USB/IAccessoryModeQueryChainFactory.hpp>
@@ -27,11 +28,14 @@
 namespace aasdk::usb {
 
   class ConnectedAccessoriesEnumerator
-      : public IConnectedAccessoriesEnumerator, public std::enable_shared_from_this<ConnectedAccessoriesEnumerator> {
+      : public QObject,
+        public IConnectedAccessoriesEnumerator,
+        public std::enable_shared_from_this<ConnectedAccessoriesEnumerator> {
+    Q_OBJECT
     Q_DISABLE_COPY(ConnectedAccessoriesEnumerator)
   public:
-    ConnectedAccessoriesEnumerator(IUSBWrapper &usbWrapper, boost::asio::io_service &ioService,
-                                   IAccessoryModeQueryChainFactory &queryChainFactory);
+    ConnectedAccessoriesEnumerator(IUSBWrapper &usbWrapper, IAccessoryModeQueryChainFactory &queryChainFactory);
+    ~ConnectedAccessoriesEnumerator() override;
 
     void enumerate(Promise::Pointer promise) override;
 
@@ -47,12 +51,12 @@ namespace aasdk::usb {
     void reset();
 
     IUSBWrapper &usbWrapper_;
-    boost::asio::io_service::strand strand_;
     IAccessoryModeQueryChainFactory &queryChainFactory_;
     IAccessoryModeQueryChain::Pointer queryChain_;
     Promise::Pointer promise_;
     DeviceListHandle deviceListHandle_;
     DeviceList::iterator actualDeviceIter_;
+    QThread workerThread_;
   };
 
 }

@@ -19,6 +19,8 @@
 
 #include <boost/asio.hpp>
 #include <list>
+#include <QObject>
+#include <QThread>
 #include <QtGlobal>
 #include <aasdk/Messenger/IMessenger.hpp>
 #include <aasdk/Messenger/IMessageInStream.hpp>
@@ -30,11 +32,13 @@
 namespace aasdk {
   namespace messenger {
 
-    class Messenger : public IMessenger, public std::enable_shared_from_this<Messenger> {
+    class Messenger : public QObject, public IMessenger, public std::enable_shared_from_this<Messenger> {
+      Q_OBJECT
       Q_DISABLE_COPY(Messenger)
     public:
       Messenger(boost::asio::io_service &ioService, IMessageInStream::Pointer messageInStream,
                 IMessageOutStream::Pointer messageOutStream);
+      ~Messenger() override;
 
       void enqueueReceive(ChannelId channelId, ReceivePromise::Pointer promise) override;
 
@@ -56,8 +60,6 @@ namespace aasdk {
 
       void rejectSendPromiseQueue(const error::Error &e);
 
-      boost::asio::io_service::strand receiveStrand_;
-      boost::asio::io_service::strand sendStrand_;
       IMessageInStream::Pointer messageInStream_;
       IMessageOutStream::Pointer messageOutStream_;
 
@@ -65,6 +67,7 @@ namespace aasdk {
       ChannelReceiveMessageQueue channelReceiveMessageQueue_;
       ChannelSendQueue channelSendPromiseQueue_;
 
+      QThread workerThread_;
     };
 
   }

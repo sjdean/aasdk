@@ -25,6 +25,6 @@ namespace aasdk::channel::mediasink::video::channel {
 
   class VideoChannel : public VideoMediaSinkService {
   public:
-    VideoChannel(boost::asio::io_service::strand &strand, messenger::IMessenger::Pointer messenger);
+    VideoChannel(messenger::IMessenger::Pointer messenger);
   };
 }

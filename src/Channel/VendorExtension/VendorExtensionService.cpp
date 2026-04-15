@@ -25,16 +25,15 @@
 
 namespace aasdk::channel::vendorextension {
 
-  VendorExtensionService::VendorExtensionService(boost::asio::io_service::strand &strand,
-                                                 messenger::IMessenger::Pointer messenger)
-      : Channel(strand, std::move(messenger), messenger::ChannelId::VENDOR_EXTENSION) {
+  VendorExtensionService::VendorExtensionService(messenger::IMessenger::Pointer messenger)
+      : Channel(std::move(messenger), messenger::ChannelId::VENDOR_EXTENSION) {
 
   }
 
   void VendorExtensionService::receive(IVendorExtensionServiceEventHandler::Pointer eventHandler) {
 
     AASDK_LOG(debug) << "[VendorExtensionService] receive()";
-    auto receivePromise = messenger::ReceivePromise::defer(strand_);
+    auto receivePromise = messenger::ReceivePromise::defer(messengerContext_);
     receivePromise->then(
         std::bind(&VendorExtensionService::messageHandler, this->shared_from_this(), std::placeholders::_1,
                   eventHandler),

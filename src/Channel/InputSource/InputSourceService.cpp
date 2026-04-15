@@ -23,15 +23,14 @@
 
 namespace aasdk::channel::inputsource {
 
-  InputSourceService::InputSourceService(boost::asio::io_service::strand &strand,
-                                         messenger::IMessenger::Pointer messenger)
-      : Channel(strand, std::move(messenger), messenger::ChannelId::INPUT_SOURCE) {
+  InputSourceService::InputSourceService(messenger::IMessenger::Pointer messenger)
+      : Channel(std::move(messenger), messenger::ChannelId::INPUT_SOURCE) {
 
   }
 
   void InputSourceService::receive(IInputSourceServiceEventHandler::Pointer eventHandler) {
     AASDK_LOG(debug) << "[InputSourceService] receive()";
-    auto receivePromise = messenger::ReceivePromise::defer(strand_);
+    auto receivePromise = messenger::ReceivePromise::defer(messengerContext_);
     receivePromise->then(
         std::bind(&InputSourceService::messageHandler, this->shared_from_this(), std::placeholders::_1, eventHandler),
         std::bind(&IInputSourceServiceEventHandler::onChannelError, eventHandler, std::placeholders::_1));

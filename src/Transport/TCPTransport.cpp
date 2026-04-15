@@ -27,7 +27,7 @@ namespace aasdk {
     }
 
     void TCPTransport::enqueueReceive(common::DataBuffer buffer) {
-      auto receivePromise = tcp::ITCPEndpoint::Promise::defer(receiveStrand_);
+      auto receivePromise = tcp::ITCPEndpoint::Promise::defer(this);
       receivePromise->then([this, self = this->shared_from_this()](auto bytesTransferred) {
                              this->receiveHandler(bytesTransferred);
                            },
@@ -39,7 +39,7 @@ namespace aasdk {
     }
 
     void TCPTransport::enqueueSend(SendQueue::iterator queueElement) {
-      auto sendPromise = tcp::ITCPEndpoint::Promise::defer(sendStrand_);
+      auto sendPromise = tcp::ITCPEndpoint::Promise::defer(this);
 
       sendPromise->then([this, self = this->shared_from_this(), queueElement](auto) {
                           this->sendHandler(queueElement, error::Error());

@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include <boost/asio.hpp>
+#include <QObject>
 #include "aasdk/Messenger/IMessenger.hpp"
 #include "aasdk/Channel/Promise.hpp"
 #include "aasdk/Channel/IChannel.hpp"
@@ -27,8 +27,7 @@ namespace aasdk {
   namespace channel {
     class Channel : public virtual IChannel {
     public:
-      Channel(boost::asio::io_service::strand &strand,
-              messenger::IMessenger::Pointer messenger,
+      Channel(messenger::IMessenger::Pointer messenger,
               messenger::ChannelId channelId);
 
       virtual ~Channel() = default;
@@ -38,7 +37,10 @@ namespace aasdk {
       void send(messenger::Message::Pointer message, SendPromise::Pointer promise) override;
 
     protected:
-      boost::asio::io_service::strand &strand_;
+      // QObject* cast of messenger_ — valid for the lifetime of this Channel since both
+      // are owned by the same session via shared_ptr. Used as QtPromise context so
+      // promise continuations run on Messenger's worker thread.
+      QObject* messengerContext_;
       messenger::IMessenger::Pointer messenger_;
       messenger::ChannelId channelId_;
     };

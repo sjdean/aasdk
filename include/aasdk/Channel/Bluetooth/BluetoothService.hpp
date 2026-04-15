@@ -25,7 +25,7 @@ namespace aasdk::channel::bluetooth {
   class BluetoothService
       : public IBluetoothService, public Channel, public std::enable_shared_from_this<BluetoothService> {
   public:
-    BluetoothService(boost::asio::io_service::strand &strand, messenger::IMessenger::Pointer messenger);
+    BluetoothService(messenger::IMessenger::Pointer messenger);
 
     // Senders and Receivers
 

@@ -17,8 +17,9 @@
 
 #pragma once
 
-#include <boost/asio.hpp>
 #include <list>
+#include <QObject>
+#include <QThread>
 #include <QtGlobal>
 #include <aasdk/USB/IUSBHub.hpp>
 #include <aasdk/USB/IAccessoryModeQueryChainFactory.hpp>
@@ -28,11 +29,12 @@ namespace aasdk::usb {
 
   class IUSBWrapper;
 
-  class USBHub : public IUSBHub, public std::enable_shared_from_this<USBHub> {
+  class USBHub : public QObject, public IUSBHub, public std::enable_shared_from_this<USBHub> {
+    Q_OBJECT
     Q_DISABLE_COPY(USBHub)
   public:
-    USBHub(IUSBWrapper &usbWrapper, boost::asio::io_service &ioService,
-           IAccessoryModeQueryChainFactory &queryChainFactory);
+    USBHub(IUSBWrapper &usbWrapper, IAccessoryModeQueryChainFactory &queryChainFactory);
+    ~USBHub() override;
 
     void start(Promise::Pointer promise) override;
 
@@ -47,15 +49,15 @@ namespace aasdk::usb {
     bool isAOAPDevice(const libusb_device_descriptor &deviceDescriptor) const;
 
     static int hotplugEventsHandler(libusb_context *usbContext, libusb_device *device, libusb_hotplug_event event,
-                                    void *uerData);
+                                    void *userData);
 
     IUSBWrapper &usbWrapper_;
-    boost::asio::io_service::strand strand_;
     IAccessoryModeQueryChainFactory &queryChainFactory_;
     Promise::Pointer hotplugPromise_;
     Pointer self_;
     HotplugCallbackHandle hotplugHandle_;
     QueryChainQueue queryChainQueue_;
+    QThread workerThread_;
 
     static constexpr uint16_t cGoogleVendorId = 0x18D1;
     static constexpr uint16_t cAOAPId = 0x2D00;

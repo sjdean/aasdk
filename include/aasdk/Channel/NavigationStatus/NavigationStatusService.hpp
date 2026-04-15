@@ -27,7 +27,7 @@ namespace aasdk::channel::navigationstatus {
   class NavigationStatusService
       : public INavigationStatusService, public Channel, public std::enable_shared_from_this<NavigationStatusService> {
   public:
-    NavigationStatusService(boost::asio::io_service::strand &strand, messenger::IMessenger::Pointer messenger);
+    NavigationStatusService(messenger::IMessenger::Pointer messenger);
 
     // Senders and Receivers
 

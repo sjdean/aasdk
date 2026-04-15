@@ -26,15 +26,14 @@
 
 namespace aasdk::channel::mediaplaybackstatus {
 
-  MediaPlaybackStatusService::MediaPlaybackStatusService(boost::asio::io_service::strand &strand,
-                                                         messenger::IMessenger::Pointer messenger)
-      : Channel(strand, std::move(messenger), messenger::ChannelId::MEDIA_PLAYBACK_STATUS) {
+  MediaPlaybackStatusService::MediaPlaybackStatusService(messenger::IMessenger::Pointer messenger)
+      : Channel(std::move(messenger), messenger::ChannelId::MEDIA_PLAYBACK_STATUS) {
 
   }
 
   void MediaPlaybackStatusService::receive(IMediaPlaybackStatusServiceEventHandler::Pointer eventHandler) {
     AASDK_LOG(debug) << "[MediaPlaybackStatusService] receive()";
-    auto receivePromise = messenger::ReceivePromise::defer(strand_);
+    auto receivePromise = messenger::ReceivePromise::defer(messengerContext_);
     receivePromise->then(
         std::bind(&MediaPlaybackStatusService::messageHandler, this->shared_from_this(), std::placeholders::_1,
                   eventHandler),

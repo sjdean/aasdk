@@ -26,16 +26,15 @@
 
 namespace aasdk::channel::genericnotification {
 
-  GenericNotificationService::GenericNotificationService(boost::asio::io_service::strand &strand,
-                                                         messenger::IMessenger::Pointer messenger)
-      : Channel(strand, std::move(messenger), messenger::ChannelId::GENERIC_NOTIFICATION) {
+  GenericNotificationService::GenericNotificationService(messenger::IMessenger::Pointer messenger)
+      : Channel(std::move(messenger), messenger::ChannelId::GENERIC_NOTIFICATION) {
 
   }
 
   void GenericNotificationService::receive(IGenericNotificationServiceEventHandler::Pointer eventHandler) {
 
     AASDK_LOG(debug) << "[GenericNotificationService] Receive";
-    auto receivePromise = messenger::ReceivePromise::defer(strand_);
+    auto receivePromise = messenger::ReceivePromise::defer(messengerContext_);
     receivePromise->then(
         std::bind(&GenericNotificationService::messageHandler, this->shared_from_this(), std::placeholders::_1,
                   eventHandler),

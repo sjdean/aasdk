@@ -26,9 +26,8 @@ namespace aasdk {
   namespace channel {
     namespace control {
 
-      ControlServiceChannel::ControlServiceChannel(boost::asio::io_service::strand &strand,
-                                                   messenger::IMessenger::Pointer messenger)
-          : Channel(strand, messenger, messenger::ChannelId::CONTROL) {
+      ControlServiceChannel::ControlServiceChannel(messenger::IMessenger::Pointer messenger)
+          : Channel(messenger, messenger::ChannelId::CONTROL) {
 
       }
 
@@ -174,7 +173,7 @@ namespace aasdk {
 
       void ControlServiceChannel::receive(IControlServiceChannelEventHandler::Pointer eventHandler) {
         AASDK_LOG(debug) << "[ControlServiceChannel] receive()";
-        auto receivePromise = messenger::ReceivePromise::defer(strand_);
+        auto receivePromise = messenger::ReceivePromise::defer(messengerContext_);
         receivePromise->then(
             std::bind(&ControlServiceChannel::messageHandler, this->shared_from_this(), std::placeholders::_1,
                       eventHandler),

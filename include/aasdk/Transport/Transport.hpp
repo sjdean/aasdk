@@ -19,6 +19,8 @@
 
 #include <list>
 #include <queue>
+#include <QObject>
+#include <QThread>
 #include <QtGlobal>
 #include <boost/asio.hpp>
 #include <aasdk/Transport/ITransport.hpp>
@@ -28,10 +30,12 @@
 namespace aasdk {
   namespace transport {
 
-    class Transport : public ITransport, public std::enable_shared_from_this<Transport> {
+    class Transport : public QObject, public ITransport, public std::enable_shared_from_this<Transport> {
+      Q_OBJECT
       Q_DISABLE_COPY(Transport)
     public:
       Transport(boost::asio::io_service &ioService);
+      ~Transport() override;
 
       void receive(size_t size, ReceivePromise::Pointer promise) override;
 
@@ -54,12 +58,11 @@ namespace aasdk {
       virtual void enqueueSend(SendQueue::iterator queueElement) = 0;
 
       DataSink receivedDataSink_;
-
-      boost::asio::io_service::strand receiveStrand_;
       ReceiveQueue receiveQueue_;
-
-      boost::asio::io_service::strand sendStrand_;
       SendQueue sendQueue_;
+
+    private:
+      QThread workerThread_;
     };
 
   }

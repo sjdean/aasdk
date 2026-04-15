@@ -17,7 +17,6 @@
 
 #pragma once
 
-#include <boost/asio.hpp>
 #include <aasdk/Messenger/IMessenger.hpp>
 #include "aasdk/Channel/Channel.hpp"
 #include <aasdk/Channel/Control/IControlServiceChannel.hpp>
@@ -28,7 +27,7 @@ namespace aasdk::channel::control {
   class ControlServiceChannel
       : public IControlServiceChannel, public Channel, public std::enable_shared_from_this<ControlServiceChannel> {
   public:
-    ControlServiceChannel(boost::asio::io_service::strand &strand, messenger::IMessenger::Pointer messenger);
+    ControlServiceChannel(messenger::IMessenger::Pointer messenger);
 
     // Senders and Receivers
 

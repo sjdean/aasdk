@@ -25,7 +25,7 @@ namespace aasdk {
         : Transport(ioService), aoapDevice_(std::move(aoapDevice)) {}
 
     void USBTransport::enqueueReceive(common::DataBuffer buffer) {
-      auto usbEndpointPromise = usb::IUSBEndpoint::Promise::defer(receiveStrand_);
+      auto usbEndpointPromise = usb::IUSBEndpoint::Promise::defer(this);
       usbEndpointPromise->then([this, self = this->shared_from_this()](auto bytesTransferred) {
                                  this->receiveHandler(bytesTransferred);
                                },
@@ -41,7 +41,7 @@ namespace aasdk {
     }
 
     void USBTransport::doSend(SendQueue::iterator queueElement, common::Data::size_type offset) {
-      auto usbEndpointPromise = usb::IUSBEndpoint::Promise::defer(sendStrand_);
+      auto usbEndpointPromise = usb::IUSBEndpoint::Promise::defer(this);
       usbEndpointPromise->then(
           [this, self = this->shared_from_this(), queueElement, offset](size_t bytesTransferred) mutable {
             this->sendHandler(queueElement, offset, bytesTransferred);

@@ -15,6 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with aasdk. If not, see <http://www.gnu.org/licenses/>.
 
+#include <QMutexLocker>
 #include <aasdk/USB/USBEndpoint.hpp>
 #include <aasdk/USB/IUSBWrapper.hpp>
 #include <aasdk/Error/Error.hpp>
@@ -23,9 +24,8 @@
 namespace aasdk {
   namespace usb {
 
-    USBEndpoint::USBEndpoint(IUSBWrapper &usbWrapper, boost::asio::io_service &ioService, DeviceHandle handle,
-                             uint8_t endpointAddress)
-        : usbWrapper_(usbWrapper), strand_(ioService), handle_(std::move(handle)), endpointAddress_(endpointAddress) {
+    USBEndpoint::USBEndpoint(IUSBWrapper &usbWrapper, DeviceHandle handle, uint8_t endpointAddress)
+        : usbWrapper_(usbWrapper), handle_(std::move(handle)), endpointAddress_(endpointAddress) {
     }
 
     void USBEndpoint::controlTransfer(common::DataBuffer buffer, uint32_t timeout, Promise::Pointer promise) {
@@ -79,22 +79,22 @@ namespace aasdk {
     }
 
     void USBEndpoint::transfer(libusb_transfer *transfer, Promise::Pointer promise) {
-      strand_.dispatch([this, self = this->shared_from_this(), transfer, promise = std::move(promise)]() mutable {
-        auto submitResult = usbWrapper_.submitTransfer(transfer);
-
+      libusb_error submitResult;
+      {
+        QMutexLocker locker(&mutex_);
+        submitResult = static_cast<libusb_error>(usbWrapper_.submitTransfer(transfer));
         if (submitResult == libusb_error::LIBUSB_SUCCESS) {
-          // guarantee that endpoint will live until all transfers are finished
           if (self_ == nullptr) {
-            self_ = std::move(self);
+            self_ = shared_from_this();
           }
-
           transfers_.insert(std::make_pair(transfer, std::move(promise)));
-        } else {
-          AASDK_LOG(debug) << "[USBEndpoint] USB Failure " << submitResult;
-          promise->reject(error::Error(error::ErrorCode::USB_TRANSFER, submitResult));
-          usbWrapper_.freeTransfer(transfer);
         }
-      });
+      }
+      if (submitResult != libusb_error::LIBUSB_SUCCESS) {
+        AASDK_LOG(debug) << "[USBEndpoint] USB Failure " << submitResult;
+        promise->reject(error::Error(error::ErrorCode::USB_TRANSFER, submitResult));
+        usbWrapper_.freeTransfer(transfer);
+      }
     }
 
     uint8_t USBEndpoint::getAddress() {
@@ -102,11 +102,10 @@ namespace aasdk {
     }
 
     void USBEndpoint::cancelTransfers() {
-      strand_.dispatch([this, self = this->shared_from_this()]() mutable {
-        for (const auto &transfer: transfers_) {
-          usbWrapper_.cancelTransfer(transfer.first);
-        }
-      });
+      QMutexLocker locker(&mutex_);
+      for (const auto &t: transfers_) {
+        usbWrapper_.cancelTransfer(t.first);
+      }
     }
 
     DeviceHandle USBEndpoint::getDeviceHandle() const {
@@ -117,33 +116,39 @@ namespace aasdk {
       AASDK_LOG(debug) << "[USBEndpoint] transferHandler()";
       auto self = reinterpret_cast<USBEndpoint *>(transfer->user_data)->shared_from_this();
 
-      self->strand_.dispatch([self, transfer]() mutable {
+      Promise::Pointer promise;
+      bool shouldReleaseSelf = false;
+
+      {
+        QMutexLocker locker(&self->mutex_);
         if (self->transfers_.count(transfer) == 0) {
           AASDK_LOG(debug) << "[USBEndpoint] No more transfers.";
           return;
         }
-
-        auto promise(std::move(self->transfers_.at(transfer)));
-
-        if (transfer->status == LIBUSB_TRANSFER_COMPLETED) {
-          AASDK_LOG(debug) << "[Transport] Transfer Complete.";
-          promise->resolve(transfer->actual_length);
-        } else {
-          AASDK_LOG(debug) << "[Transport] Transfer Cancelled.";
-          auto error = transfer->status ==
-              LIBUSB_TRANSFER_CANCELLED ? error::Error(error::ErrorCode::OPERATION_ABORTED)
-                                                                     : error::Error(error::ErrorCode::USB_TRANSFER,
-                                                                                    transfer->status);
-          promise->reject(error);
-        }
-
+        promise = std::move(self->transfers_.at(transfer));
         self->usbWrapper_.freeTransfer(transfer);
         self->transfers_.erase(transfer);
-
         if (self->transfers_.empty()) {
-          self->self_.reset();
+          shouldReleaseSelf = true;
         }
-      });
+      }
+
+      // Resolve/reject outside the lock to avoid holding the mutex during promise callbacks
+      if (transfer->status == LIBUSB_TRANSFER_COMPLETED) {
+        AASDK_LOG(debug) << "[Transport] Transfer Complete.";
+        promise->resolve(transfer->actual_length);
+      } else {
+        AASDK_LOG(debug) << "[Transport] Transfer Cancelled.";
+        auto error = transfer->status == LIBUSB_TRANSFER_CANCELLED
+            ? error::Error(error::ErrorCode::OPERATION_ABORTED)
+            : error::Error(error::ErrorCode::USB_TRANSFER, transfer->status);
+        promise->reject(error);
+      }
+
+      if (shouldReleaseSelf) {
+        QMutexLocker locker(&self->mutex_);
+        self->self_.reset();
+      }
     }
 
   }

@@ -23,14 +23,13 @@ namespace aasdk {
   namespace usb {
 
     AccessoryModeQueryChainFactory::AccessoryModeQueryChainFactory(IUSBWrapper &usbWrapper,
-                                                                   boost::asio::io_service &ioService,
                                                                    IAccessoryModeQueryFactory &queryFactory)
-        : usbWrapper_(usbWrapper), ioService_(ioService), queryFactory_(queryFactory) {
+        : usbWrapper_(usbWrapper), queryFactory_(queryFactory) {
 
     }
 
     IAccessoryModeQueryChain::Pointer AccessoryModeQueryChainFactory::create() {
-      return std::make_shared<AccessoryModeQueryChain>(usbWrapper_, ioService_, queryFactory_);
+      return std::make_shared<AccessoryModeQueryChain>(usbWrapper_, queryFactory_);
     }
 
   }

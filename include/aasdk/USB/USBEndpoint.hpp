@@ -20,7 +20,7 @@
 #include <unordered_map>
 #include <memory>
 #include <QtGlobal>
-#include <boost/asio.hpp>
+#include <QMutex>
 #include <aasdk/USB/IUSBWrapper.hpp>
 #include <aasdk/USB/IUSBEndpoint.hpp>
 
@@ -31,8 +31,7 @@ namespace aasdk::usb {
                       public std::enable_shared_from_this<USBEndpoint> {
     Q_DISABLE_COPY(USBEndpoint)
   public:
-    USBEndpoint(IUSBWrapper &usbWrapper, boost::asio::io_service &ioService, DeviceHandle handle,
-                uint8_t endpointAddress = 0x00);
+    USBEndpoint(IUSBWrapper &usbWrapper, DeviceHandle handle, uint8_t endpointAddress = 0x00);
 
     void controlTransfer(common::DataBuffer buffer, uint32_t timeout, Promise::Pointer promise) override;
 
@@ -56,9 +55,9 @@ namespace aasdk::usb {
     static void transferHandler(libusb_transfer *transfer);
 
     IUSBWrapper &usbWrapper_;
-    boost::asio::io_service::strand strand_;
     DeviceHandle handle_;
     uint8_t endpointAddress_;
+    mutable QMutex mutex_;
     Transfers transfers_;
     std::shared_ptr<USBEndpoint> self_;
   };

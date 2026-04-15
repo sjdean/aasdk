@@ -17,7 +17,8 @@
 
 #pragma once
 
-#include <map>
+#include <QObject>
+#include <QHash>
 #include <QtGlobal>
 #include <aasdk/Transport/ITransport.hpp>
 #include <aasdk/Messenger/IMessageInStream.hpp>
@@ -31,7 +32,8 @@ namespace aasdk {
   namespace messenger {
 
     class MessageInStream
-        : public IMessageInStream, public std::enable_shared_from_this<MessageInStream> {
+        : public QObject, public IMessageInStream, public std::enable_shared_from_this<MessageInStream> {
+      Q_OBJECT
       Q_DISABLE_COPY(MessageInStream)
     public:
       MessageInStream(boost::asio::io_service &ioService, transport::ITransport::Pointer transport,
@@ -48,16 +50,14 @@ namespace aasdk {
 
       void receiveFramePayloadHandler(const common::DataConstBuffer &buffer);
 
-      boost::asio::io_service::strand strand_;
       transport::ITransport::Pointer transport_;
       ICryptor::Pointer cryptor_;
 
       FrameType thisFrameType_;
       ReceivePromise::Pointer promise_;
-      ReceivePromise::Pointer interleavedPromise_;
       Message::Pointer message_;
 
-      std::map<messenger::ChannelId, Message::Pointer> messageBuffer_;
+      QHash<ChannelId, Message::Pointer> messageBuffer_;
 
       int frameSize_;
       bool isValidFrame_;

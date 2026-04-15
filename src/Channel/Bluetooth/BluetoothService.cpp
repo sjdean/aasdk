@@ -22,16 +22,15 @@
 
 namespace aasdk::channel::bluetooth {
 
-  BluetoothService::BluetoothService(boost::asio::io_service::strand &strand,
-                                     messenger::IMessenger::Pointer messenger)
-      : Channel(strand, std::move(messenger), messenger::ChannelId::BLUETOOTH) {
+  BluetoothService::BluetoothService(messenger::IMessenger::Pointer messenger)
+      : Channel(std::move(messenger), messenger::ChannelId::BLUETOOTH) {
 
   }
 
   void BluetoothService::receive(IBluetoothServiceEventHandler::Pointer eventHandler) {
     AASDK_LOG(debug) << "[BluetoothService] receive()";
 
-    auto receivePromise = messenger::ReceivePromise::defer(strand_);
+    auto receivePromise = messenger::ReceivePromise::defer(messengerContext_);
     receivePromise->then(
         std::bind(&BluetoothService::messageHandler, this->shared_from_this(), std::placeholders::_1,
                   eventHandler),

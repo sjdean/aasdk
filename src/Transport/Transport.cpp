@@ -22,12 +22,21 @@
 namespace aasdk {
   namespace transport {
 
-    Transport::Transport(boost::asio::io_service &ioService)
-        : receiveStrand_(ioService), sendStrand_(ioService) {}
+    Transport::Transport(boost::asio::io_service &)
+    {
+        moveToThread(&workerThread_);
+        workerThread_.start();
+    }
+
+    Transport::~Transport()
+    {
+        workerThread_.quit();
+        workerThread_.wait();
+    }
 
     void Transport::receive(size_t size, ReceivePromise::Pointer promise) {
       AASDK_LOG(debug) << "[Transport] receive()";
-      receiveStrand_.dispatch([this, self = this->shared_from_this(), size, promise = std::move(promise)]() mutable {
+      QMetaObject::invokeMethod(this, [this, self = this->shared_from_this(), size, promise = std::move(promise)]() mutable {
         receiveQueue_.emplace_back(std::make_pair(size, std::move(promise)));
 
         if (receiveQueue_.size() == 1) {
@@ -41,7 +50,7 @@ namespace aasdk {
             this->rejectReceivePromises(e);
           }
         }
-      });
+      }, Qt::QueuedConnection);
     }
 
     void Transport::receiveHandler(size_t bytesTransferred) {
@@ -84,14 +93,13 @@ namespace aasdk {
     }
 
     void Transport::send(common::Data data, SendPromise::Pointer promise) {
-      sendStrand_.dispatch(
-          [this, self = this->shared_from_this(), data = std::move(data), promise = std::move(promise)]() mutable {
-            sendQueue_.emplace_back(std::make_pair(std::move(data), std::move(promise)));
+      QMetaObject::invokeMethod(this, [this, self = this->shared_from_this(), data = std::move(data), promise = std::move(promise)]() mutable {
+        sendQueue_.emplace_back(std::make_pair(std::move(data), std::move(promise)));
 
-            if (sendQueue_.size() == 1) {
-              this->enqueueSend(sendQueue_.begin());
-            }
-          });
+        if (sendQueue_.size() == 1) {
+          this->enqueueSend(sendQueue_.begin());
+        }
+      }, Qt::QueuedConnection);
     }
 
   }

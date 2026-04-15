@@ -18,10 +18,11 @@
 #include "aasdk/Channel/Channel.hpp"
 
 namespace aasdk::channel {
-  Channel::Channel(boost::asio::io_service::strand &strand,
-                   messenger::IMessenger::Pointer messenger,
+  Channel::Channel(messenger::IMessenger::Pointer messenger,
                    messenger::ChannelId channelId)
-      : strand_(strand), messenger_(std::move(messenger)), channelId_(channelId) {
+      : messengerContext_(dynamic_cast<QObject*>(messenger.get())),
+        messenger_(std::move(messenger)),
+        channelId_(channelId) {
 
   }
 
@@ -30,12 +31,7 @@ namespace aasdk::channel {
   }
 
   void Channel::send(messenger::Message::Pointer message, SendPromise::Pointer promise) {
-#if BOOST_VERSION < 106600
-    auto sendPromise = messenger::SendPromise::defer(strand_.get_io_service());
-#else
-    auto sendPromise = messenger::SendPromise::defer(strand_.context());
-#endif
-
+    auto sendPromise = messenger::SendPromise::defer(messengerContext_);
     sendPromise->then(
         [promise]() { if (promise) promise->resolve(); },
         [promise](const error::Error& e) { if (promise) promise->reject(e); }

@@ -24,21 +24,26 @@ namespace aasdk {
   namespace usb {
 
     AccessoryModeQueryChain::AccessoryModeQueryChain(IUSBWrapper &usbWrapper,
-                                                     boost::asio::io_service &ioService,
                                                      IAccessoryModeQueryFactory &queryFactory)
-        : usbWrapper_(usbWrapper), strand_(ioService), queryFactory_(queryFactory) {
+        : usbWrapper_(usbWrapper), queryFactory_(queryFactory) {
+      moveToThread(&workerThread_);
+      workerThread_.start();
+    }
 
+    AccessoryModeQueryChain::~AccessoryModeQueryChain() {
+      workerThread_.quit();
+      workerThread_.wait();
     }
 
     void AccessoryModeQueryChain::start(DeviceHandle handle, Promise::Pointer promise) {
-      strand_.dispatch(
+      QMetaObject::invokeMethod(this,
           [this, self = this->shared_from_this(), handle = std::move(handle), promise = std::move(promise)]() mutable {
             if (promise_ != nullptr) {
               promise->reject(error::Error(error::ErrorCode::OPERATION_IN_PROGRESS));
             } else {
               promise_ = std::move(promise);
 
-              auto queryPromise = IAccessoryModeQuery::Promise::defer(strand_);
+              auto queryPromise = IAccessoryModeQuery::Promise::defer(this);
               queryPromise->then([this, self = this->shared_from_this()](IUSBEndpoint::Pointer usbEndpoint) mutable {
                                    this->protocolVersionQueryHandler(std::move(usbEndpoint));
                                  },
@@ -47,26 +52,20 @@ namespace aasdk {
                                    promise_.reset();
                                  });
 
-#if BOOST_VERSION < 106600
               this->startQuery(AccessoryModeQueryType::PROTOCOL_VERSION,
-                               std::make_shared<USBEndpoint>(usbWrapper_, strand_.get_io_service(), std::move(handle)),
+                               std::make_shared<USBEndpoint>(usbWrapper_, std::move(handle)),
                                std::move(queryPromise));
-#else
-              this->startQuery(AccessoryModeQueryType::PROTOCOL_VERSION,
-                               std::make_shared<USBEndpoint>(usbWrapper_, strand_.context(), std::move(handle)),
-                               std::move(queryPromise));
-#endif
             }
-          });
+          }, Qt::QueuedConnection);
     }
 
     void AccessoryModeQueryChain::cancel() {
-      strand_.dispatch([this, self = this->shared_from_this()]() {
+      QMetaObject::invokeMethod(this, [this, self = this->shared_from_this()]() {
         if (activeQuery_ != nullptr) {
           activeQuery_->cancel();
           activeQuery_.reset();
         }
-      });
+      }, Qt::QueuedConnection);
     }
 
     void AccessoryModeQueryChain::startQuery(AccessoryModeQueryType queryType, IUSBEndpoint::Pointer usbEndpoint,
@@ -76,7 +75,7 @@ namespace aasdk {
     }
 
     void AccessoryModeQueryChain::protocolVersionQueryHandler(IUSBEndpoint::Pointer usbEndpoint) {
-      auto queryPromise = IAccessoryModeQuery::Promise::defer(strand_);
+      auto queryPromise = IAccessoryModeQuery::Promise::defer(this);
       queryPromise->then([this, self = this->shared_from_this()](IUSBEndpoint::Pointer usbEndpoint) mutable {
                            this->manufacturerQueryHandler(std::move(usbEndpoint));
                          },
@@ -91,7 +90,7 @@ namespace aasdk {
     }
 
     void AccessoryModeQueryChain::manufacturerQueryHandler(IUSBEndpoint::Pointer usbEndpoint) {
-      auto queryPromise = IAccessoryModeQuery::Promise::defer(strand_);
+      auto queryPromise = IAccessoryModeQuery::Promise::defer(this);
       queryPromise->then([this, self = this->shared_from_this()](IUSBEndpoint::Pointer usbEndpoint) mutable {
                            this->modelQueryHandler(std::move(usbEndpoint));
                          },
@@ -106,7 +105,7 @@ namespace aasdk {
     }
 
     void AccessoryModeQueryChain::modelQueryHandler(IUSBEndpoint::Pointer usbEndpoint) {
-      auto queryPromise = IAccessoryModeQuery::Promise::defer(strand_);
+      auto queryPromise = IAccessoryModeQuery::Promise::defer(this);
       queryPromise->then([this, self = this->shared_from_this()](IUSBEndpoint::Pointer usbEndpoint) mutable {
                            this->descriptionQueryHandler(std::move(usbEndpoint));
                          },
@@ -121,7 +120,7 @@ namespace aasdk {
     }
 
     void AccessoryModeQueryChain::descriptionQueryHandler(IUSBEndpoint::Pointer usbEndpoint) {
-      auto queryPromise = IAccessoryModeQuery::Promise::defer(strand_);
+      auto queryPromise = IAccessoryModeQuery::Promise::defer(this);
       queryPromise->then([this, self = this->shared_from_this()](IUSBEndpoint::Pointer usbEndpoint) mutable {
                            this->versionQueryHandler(std::move(usbEndpoint));
                          },
@@ -136,7 +135,7 @@ namespace aasdk {
     }
 
     void AccessoryModeQueryChain::versionQueryHandler(IUSBEndpoint::Pointer usbEndpoint) {
-      auto queryPromise = IAccessoryModeQuery::Promise::defer(strand_);
+      auto queryPromise = IAccessoryModeQuery::Promise::defer(this);
       queryPromise->then([this, self = this->shared_from_this()](IUSBEndpoint::Pointer usbEndpoint) mutable {
                            this->uriQueryHandler(std::move(usbEndpoint));
                          },
@@ -151,7 +150,7 @@ namespace aasdk {
     }
 
     void AccessoryModeQueryChain::uriQueryHandler(IUSBEndpoint::Pointer usbEndpoint) {
-      auto queryPromise = IAccessoryModeQuery::Promise::defer(strand_);
+      auto queryPromise = IAccessoryModeQuery::Promise::defer(this);
       queryPromise->then([this, self = this->shared_from_this()](IUSBEndpoint::Pointer usbEndpoint) mutable {
                            this->serialQueryHandler(std::move(usbEndpoint));
                          },
@@ -166,7 +165,7 @@ namespace aasdk {
     }
 
     void AccessoryModeQueryChain::serialQueryHandler(IUSBEndpoint::Pointer usbEndpoint) {
-      auto queryPromise = IAccessoryModeQuery::Promise::defer(strand_);
+      auto queryPromise = IAccessoryModeQuery::Promise::defer(this);
       queryPromise->then([this, self = this->shared_from_this()](IUSBEndpoint::Pointer usbEndpoint) mutable {
                            this->startQueryHandler(std::move(usbEndpoint));
                          },

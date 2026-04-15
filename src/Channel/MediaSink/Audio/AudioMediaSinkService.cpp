@@ -28,16 +28,15 @@
  */
 namespace aasdk::channel::mediasink::audio {
 
-  AudioMediaSinkService::AudioMediaSinkService(boost::asio::io_service::strand &strand,
-                                               messenger::IMessenger::Pointer messenger,
+  AudioMediaSinkService::AudioMediaSinkService(messenger::IMessenger::Pointer messenger,
                                                messenger::ChannelId channelId)
-      : Channel(strand, std::move(messenger), channelId) {
+      : Channel(std::move(messenger), channelId) {
 
   }
 
   void AudioMediaSinkService::receive(IAudioMediaSinkServiceEventHandler::Pointer eventHandler) {
     AASDK_LOG(debug) << "[AudioMediaSinkService] receive()";
-    auto receivePromise = messenger::ReceivePromise::defer(strand_);
+    auto receivePromise = messenger::ReceivePromise::defer(messengerContext_);
     receivePromise->then(
         std::bind(&AudioMediaSinkService::messageHandler, this->shared_from_this(), std::placeholders::_1,
                   eventHandler),

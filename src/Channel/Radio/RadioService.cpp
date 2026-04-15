@@ -26,16 +26,15 @@
 
 namespace aasdk::channel::radio {
 
-  RadioService::RadioService(boost::asio::io_service::strand &strand,
-                             messenger::IMessenger::Pointer messenger)
-      : Channel(strand, std::move(messenger), messenger::ChannelId::RADIO) {
+  RadioService::RadioService(messenger::IMessenger::Pointer messenger)
+      : Channel(std::move(messenger), messenger::ChannelId::RADIO) {
 
   }
 
   void RadioService::receive(IRadioServiceEventHandler::Pointer eventHandler) {
 
     AASDK_LOG(debug) << "[RadioService] receive()";
-    auto receivePromise = messenger::ReceivePromise::defer(strand_);
+    auto receivePromise = messenger::ReceivePromise::defer(messengerContext_);
     receivePromise->then(
         std::bind(&RadioService::messageHandler, this->shared_from_this(), std::placeholders::_1,
                   eventHandler),

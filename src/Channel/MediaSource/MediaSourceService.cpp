@@ -24,16 +24,15 @@
 
 namespace aasdk::channel::mediasource {
 
-  MediaSourceService::MediaSourceService(boost::asio::io_service::strand &strand,
-                                         messenger::IMessenger::Pointer messenger,
+  MediaSourceService::MediaSourceService(messenger::IMessenger::Pointer messenger,
                                          messenger::ChannelId channelId)
-      : Channel(strand, std::move(messenger), channelId) {
+      : Channel(std::move(messenger), channelId) {
 
   }
 
   void MediaSourceService::receive(IMediaSourceServiceEventHandler::Pointer eventHandler) {
     AASDK_LOG(debug) << "[MediaSourceService] receive()";
-    auto receivePromise = messenger::ReceivePromise::defer(strand_);
+    auto receivePromise = messenger::ReceivePromise::defer(messengerContext_);
     receivePromise->then(
         std::bind(&MediaSourceService::messageHandler, this->shared_from_this(), std::placeholders::_1, eventHandler),
         std::bind(&IMediaSourceServiceEventHandler::onChannelError, eventHandler, std::placeholders::_1));

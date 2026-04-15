@@ -20,18 +20,30 @@
 
 namespace aasdk::messenger {
 
-  Messenger::Messenger(boost::asio::io_service &ioService, IMessageInStream::Pointer messageInStream,
+  Messenger::Messenger(boost::asio::io_service &, IMessageInStream::Pointer messageInStream,
                        IMessageOutStream::Pointer messageOutStream)
-      : receiveStrand_(ioService), sendStrand_(ioService), messageInStream_(std::move(messageInStream)),
-        messageOutStream_(std::move(messageOutStream)) {
+      : messageInStream_(std::move(messageInStream)), messageOutStream_(std::move(messageOutStream)) {
+    // Move streams to our worker thread so their QMetaObject::invokeMethod
+    // calls are dispatched to the same thread as Messenger itself.
+    if (auto* qobj = dynamic_cast<QObject*>(messageInStream_.get()))
+        qobj->moveToThread(&workerThread_);
+    if (auto* qobj = dynamic_cast<QObject*>(messageOutStream_.get()))
+        qobj->moveToThread(&workerThread_);
+    moveToThread(&workerThread_);
+    workerThread_.start();
+  }
 
+  Messenger::~Messenger()
+  {
+      workerThread_.quit();
+      workerThread_.wait();
   }
 
   void Messenger::enqueueReceive(ChannelId channelId, ReceivePromise::Pointer promise) {
     AASDK_LOG(debug) << "[Messenger::enqueueReceive] Called on channel " << channelIdToString(channelId);
 
     // enqueueReceive is called from the service channel.
-    receiveStrand_.dispatch([this, self = this->shared_from_this(), channelId, promise = std::move(promise)]() mutable {
+    QMetaObject::invokeMethod(this, [this, self = this->shared_from_this(), channelId, promise = std::move(promise)]() mutable {
       //If there's any messages on the service, resolve. The service will call enqueueReceive again.
       if (!channelReceiveMessageQueue_.empty(channelId)) {
         AASDK_LOG(debug) << "[Messenger::enqueueReceive] Message queue not empty, resolving message first.";
@@ -42,25 +54,25 @@ namespace aasdk::messenger {
 
         if (channelReceivePromiseQueue_.size() == 1) {
           AASDK_LOG(debug) << "[Messenger::enqueueReceive] Processing promise.";
-          auto inStreamPromise = ReceivePromise::defer(receiveStrand_);
+          auto inStreamPromise = ReceivePromise::defer(this);
           inStreamPromise->then(
               std::bind(&Messenger::inStreamMessageHandler, this->shared_from_this(), std::placeholders::_1),
               std::bind(&Messenger::rejectReceivePromiseQueue, this->shared_from_this(), std::placeholders::_1));
           messageInStream_->startReceive(std::move(inStreamPromise));
         }
       }
-    });
+    }, Qt::QueuedConnection);
   }
 
   void Messenger::enqueueSend(Message::Pointer message, SendPromise::Pointer promise) {
-    sendStrand_.dispatch(
+    QMetaObject::invokeMethod(this,
         [this, self = this->shared_from_this(), message = std::move(message), promise = std::move(promise)]() mutable {
           channelSendPromiseQueue_.emplace_back(std::make_pair(std::move(message), std::move(promise)));
 
           if (channelSendPromiseQueue_.size() == 1) {
             this->doSend();
           }
-        });
+        }, Qt::QueuedConnection);
   }
 
   void Messenger::inStreamMessageHandler(Message::Pointer message) {
@@ -80,7 +92,7 @@ namespace aasdk::messenger {
 
     if (!channelReceivePromiseQueue_.empty()) {
       AASDK_LOG(debug) << "[Messenger::inStreamMessageHandler] Initiate queue for receiving.";
-      auto inStreamPromise = ReceivePromise::defer(receiveStrand_);
+      auto inStreamPromise = ReceivePromise::defer(this);
       inStreamPromise->then(
           std::bind(&Messenger::inStreamMessageHandler, this->shared_from_this(), std::placeholders::_1),
           std::bind(&Messenger::rejectReceivePromiseQueue, this->shared_from_this(), std::placeholders::_1));
@@ -90,7 +102,7 @@ namespace aasdk::messenger {
 
   void Messenger::doSend() {
     auto queueElementIter = channelSendPromiseQueue_.begin();
-    auto outStreamPromise = SendPromise::defer(sendStrand_);
+    auto outStreamPromise = SendPromise::defer(this);
     outStreamPromise->then(std::bind(&Messenger::outStreamMessageHandler, this->shared_from_this(), queueElementIter),
                            std::bind(&Messenger::rejectSendPromiseQueue, this->shared_from_this(),
                                      std::placeholders::_1));
@@ -122,9 +134,9 @@ namespace aasdk::messenger {
   }
 
   void Messenger::stop() {
-    receiveStrand_.dispatch([this, self = this->shared_from_this()]() {
+    QMetaObject::invokeMethod(this, [this, self = this->shared_from_this()]() {
       channelReceiveMessageQueue_.clear();
-    });
+    }, Qt::QueuedConnection);
   }
 
 }

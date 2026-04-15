@@ -25,13 +25,19 @@
 namespace aasdk {
   namespace usb {
 
-    USBHub::USBHub(IUSBWrapper &usbWrapper, boost::asio::io_service &ioService,
-                   IAccessoryModeQueryChainFactory &queryChainFactory)
-        : usbWrapper_(usbWrapper), strand_(ioService), queryChainFactory_(queryChainFactory) {
+    USBHub::USBHub(IUSBWrapper &usbWrapper, IAccessoryModeQueryChainFactory &queryChainFactory)
+        : usbWrapper_(usbWrapper), queryChainFactory_(queryChainFactory) {
+      moveToThread(&workerThread_);
+      workerThread_.start();
+    }
+
+    USBHub::~USBHub() {
+      workerThread_.quit();
+      workerThread_.wait();
     }
 
     void USBHub::start(Promise::Pointer promise) {
-      strand_.dispatch([this, self = this->shared_from_this(), promise = std::move(promise)]() {
+      QMetaObject::invokeMethod(this, [this, self = this->shared_from_this(), promise = std::move(promise)]() mutable {
         if (hotplugPromise_ != nullptr) {
           hotplugPromise_->reject(error::Error(error::ErrorCode::OPERATION_ABORTED));
           hotplugPromise_.reset();
@@ -48,11 +54,11 @@ namespace aasdk {
                                                                reinterpret_cast<libusb_hotplug_callback_fn>(&USBHub::hotplugEventsHandler),
                                                                reinterpret_cast<void *>(this));
         }
-      });
+      }, Qt::QueuedConnection);
     }
 
     void USBHub::cancel() {
-      strand_.dispatch([this, self = this->shared_from_this()]() mutable {
+      QMetaObject::invokeMethod(this, [this, self = this->shared_from_this()]() mutable {
         if (hotplugPromise_ != nullptr) {
           hotplugPromise_->reject(error::Error(error::ErrorCode::OPERATION_ABORTED));
           hotplugPromise_.reset();
@@ -65,14 +71,16 @@ namespace aasdk {
           hotplugHandle_.reset();
           self_.reset();
         }
-      });
+      }, Qt::QueuedConnection);
     }
 
     int USBHub::hotplugEventsHandler(libusb_context *usbContext, libusb_device *device, libusb_hotplug_event event,
                                      void *userData) {
       if (event == LIBUSB_HOTPLUG_EVENT_DEVICE_ARRIVED) {
         auto self = reinterpret_cast<USBHub *>(userData)->shared_from_this();
-        self->strand_.dispatch(std::bind(&USBHub::handleDevice, self, device));
+        QMetaObject::invokeMethod(self.get(), [self, device]() mutable {
+          self->handleDevice(device);
+        }, Qt::QueuedConnection);
       }
 
       return 0;
@@ -111,7 +119,7 @@ namespace aasdk {
         queryChainQueue_.emplace_back(queryChainFactory_.create());
 
         auto queueElementIter = std::prev(queryChainQueue_.end());
-        auto queryChainPromise = IAccessoryModeQueryChain::Promise::defer(strand_);
+        auto queryChainPromise = IAccessoryModeQueryChain::Promise::defer(this);
         queryChainPromise->then([this, self = this->shared_from_this(), queueElementIter](DeviceHandle handle) mutable {
                                   queryChainQueue_.erase(queueElementIter);
                                 },

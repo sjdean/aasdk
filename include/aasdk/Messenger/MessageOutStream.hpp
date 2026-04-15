@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include <QObject>
 #include <QtGlobal>
 #include <aasdk/Common/Data.hpp>
 #include <aasdk/Transport/ITransport.hpp>
@@ -30,7 +31,8 @@ namespace aasdk {
   namespace messenger {
 
     class MessageOutStream
-        : public IMessageOutStream, public std::enable_shared_from_this<MessageOutStream> {
+        : public QObject, public IMessageOutStream, public std::enable_shared_from_this<MessageOutStream> {
+      Q_OBJECT
       Q_DISABLE_COPY(MessageOutStream)
     public:
       MessageOutStream(boost::asio::io_service &ioService, transport::ITransport::Pointer transport,
@@ -53,7 +55,6 @@ namespace aasdk {
 
       void reset();
 
-      boost::asio::io_service::strand strand_;
       transport::ITransport::Pointer transport_;
       ICryptor::Pointer cryptor_;
       Message::Pointer message_;

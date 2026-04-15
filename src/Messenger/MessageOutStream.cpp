@@ -22,15 +22,15 @@
 namespace aasdk {
   namespace messenger {
 
-    MessageOutStream::MessageOutStream(boost::asio::io_service &ioService, transport::ITransport::Pointer transport,
+    MessageOutStream::MessageOutStream(boost::asio::io_service &, transport::ITransport::Pointer transport,
                                        ICryptor::Pointer cryptor)
-        : strand_(ioService), transport_(std::move(transport)), cryptor_(std::move(cryptor)), offset_(0),
+        : transport_(std::move(transport)), cryptor_(std::move(cryptor)), offset_(0),
           remainingSize_(0) {
 
     }
 
     void MessageOutStream::stream(Message::Pointer message, SendPromise::Pointer promise) {
-      strand_.dispatch([this, self = this->shared_from_this(), message = std::move(message), promise = std::move(
+      QMetaObject::invokeMethod(this, [this, self = this->shared_from_this(), message = std::move(message), promise = std::move(
           promise)]() mutable {
         if (promise_ != nullptr) {
           promise->reject(error::Error(error::ErrorCode::OPERATION_IN_PROGRESS));
@@ -48,7 +48,7 @@ namespace aasdk {
           try {
             auto data(this->compoundFrame(FrameType::BULK, common::DataConstBuffer(message_->getPayload())));
 
-            auto transportPromise = transport::ITransport::SendPromise::defer(strand_);
+            auto transportPromise = transport::ITransport::SendPromise::defer(this);
             transportPromise->then(
                 [p = promise_]() { if (p) p->resolve(); },
                 [p = promise_](const error::Error& e) { if (p) p->reject(e); }
@@ -63,7 +63,7 @@ namespace aasdk {
 
           this->reset();
         }
-      });
+      }, Qt::QueuedConnection);
     }
 
     void MessageOutStream::streamSplittedMessage() {
@@ -76,7 +76,7 @@ namespace aasdk {
             offset_ == 0 ? FrameType::FIRST : (remainingSize_ - size > 0 ? FrameType::MIDDLE : FrameType::LAST);
         auto data(this->compoundFrame(frameType, common::DataConstBuffer(ptr, size)));
 
-        auto transportPromise = transport::ITransport::SendPromise::defer(strand_);
+        auto transportPromise = transport::ITransport::SendPromise::defer(this);
 
         if (frameType == FrameType::LAST) {
           this->reset();

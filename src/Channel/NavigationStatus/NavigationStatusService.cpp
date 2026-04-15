@@ -26,16 +26,15 @@
 
 namespace aasdk::channel::navigationstatus {
 
-  NavigationStatusService::NavigationStatusService(boost::asio::io_service::strand &strand,
-                                                   messenger::IMessenger::Pointer messenger)
-      : Channel(strand, std::move(messenger), messenger::ChannelId::NAVIGATION_STATUS) {
+  NavigationStatusService::NavigationStatusService(messenger::IMessenger::Pointer messenger)
+      : Channel(std::move(messenger), messenger::ChannelId::NAVIGATION_STATUS) {
 
   }
 
   void NavigationStatusService::receive(INavigationStatusServiceEventHandler::Pointer eventHandler) {
     AASDK_LOG(debug) << "[NavigationStatusService] receive()";
 
-    auto receivePromise = messenger::ReceivePromise::defer(strand_);
+    auto receivePromise = messenger::ReceivePromise::defer(messengerContext_);
     receivePromise->then(
         std::bind(&NavigationStatusService::messageHandler, this->shared_from_this(), std::placeholders::_1,
                   eventHandler),

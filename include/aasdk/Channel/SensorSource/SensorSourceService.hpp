@@ -24,7 +24,7 @@ namespace aasdk::channel::sensorsource {
 
   class SensorSourceService : public ISensorSourceService, public Channel, public std::enable_shared_from_this<SensorSourceService> {
   public:
-    SensorSourceService(boost::asio::io_service::strand &strand, messenger::IMessenger::Pointer messenger);
+    SensorSourceService(messenger::IMessenger::Pointer messenger);
 
     // Senders and Receivers
 

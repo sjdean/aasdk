@@ -25,6 +25,6 @@ namespace aasdk::channel::mediasink::audio::channel {
 
   class GuidanceAudioChannel : public AudioMediaSinkService {
   public:
-    GuidanceAudioChannel(boost::asio::io_service::strand &strand, messenger::IMessenger::Pointer messenger);
+    GuidanceAudioChannel(messenger::IMessenger::Pointer messenger);
   };
 }

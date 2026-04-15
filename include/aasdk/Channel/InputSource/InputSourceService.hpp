@@ -25,7 +25,7 @@ namespace aasdk::channel::inputsource {
   class InputSourceService
       : public IInputSourceService, public Channel, public std::enable_shared_from_this<InputSourceService> {
   public:
-    InputSourceService(boost::asio::io_service::strand &strand, messenger::IMessenger::Pointer messenger);
+    InputSourceService(messenger::IMessenger::Pointer messenger);
 
     // Senders and Receivers
 

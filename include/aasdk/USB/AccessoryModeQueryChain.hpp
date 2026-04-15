@@ -17,6 +17,8 @@
 
 #pragma once
 
+#include <QObject>
+#include <QThread>
 #include <QtGlobal>
 #include <aasdk/USB/IUSBWrapper.hpp>
 #include <aasdk/USB/IAccessoryModeQueryFactory.hpp>
@@ -28,13 +30,14 @@ namespace aasdk::usb {
   class IAccessoryModeQueryFactory;
 
   class AccessoryModeQueryChain
-      : public IAccessoryModeQueryChain,
+      : public QObject,
+        public IAccessoryModeQueryChain,
         public std::enable_shared_from_this<AccessoryModeQueryChain> {
+    Q_OBJECT
     Q_DISABLE_COPY(AccessoryModeQueryChain)
   public:
-    AccessoryModeQueryChain(IUSBWrapper &usbWrapper,
-                            boost::asio::io_service &ioService,
-                            IAccessoryModeQueryFactory &queryFactory);
+    AccessoryModeQueryChain(IUSBWrapper &usbWrapper, IAccessoryModeQueryFactory &queryFactory);
+    ~AccessoryModeQueryChain() override;
 
     void start(DeviceHandle handle, Promise::Pointer promise) override;
 
@@ -63,11 +66,11 @@ namespace aasdk::usb {
     void startQueryHandler(IUSBEndpoint::Pointer usbEndpoint);
 
     IUSBWrapper &usbWrapper_;
-    boost::asio::io_service::strand strand_;
     IAccessoryModeQueryFactory &queryFactory_;
     DeviceHandle handle_;
     Promise::Pointer promise_;
     IAccessoryModeQuery::Pointer activeQuery_;
+    QThread workerThread_;
   };
 
 }

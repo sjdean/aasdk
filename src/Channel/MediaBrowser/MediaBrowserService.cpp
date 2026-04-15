@@ -27,16 +27,15 @@
 
 namespace aasdk::channel::mediabrowser {
 
-  MediaBrowserService::MediaBrowserService(boost::asio::io_service::strand &strand,
-                                           messenger::IMessenger::Pointer messenger)
-      : Channel(strand, std::move(messenger), messenger::ChannelId::MEDIA_BROWSER) {
+  MediaBrowserService::MediaBrowserService(messenger::IMessenger::Pointer messenger)
+      : Channel(std::move(messenger), messenger::ChannelId::MEDIA_BROWSER) {
 
   }
 
   void MediaBrowserService::receive(IMediaBrowserServiceEventHandler::Pointer eventHandler) {
 
     AASDK_LOG(debug) << "[MediaBrowserService] receive()";
-    auto receivePromise = messenger::ReceivePromise::defer(strand_);
+    auto receivePromise = messenger::ReceivePromise::defer(messengerContext_);
     receivePromise->then(
         std::bind(&MediaBrowserService::messageHandler, this->shared_from_this(), std::placeholders::_1,
                   eventHandler),

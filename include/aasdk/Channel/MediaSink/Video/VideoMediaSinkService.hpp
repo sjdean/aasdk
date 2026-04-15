@@ -27,7 +27,7 @@ namespace aasdk::channel::mediasink::video {
   class VideoMediaSinkService
       : public IVideoMediaSinkService, public Channel, public std::enable_shared_from_this<VideoMediaSinkService> {
   public:
-    VideoMediaSinkService(boost::asio::io_service::strand &strand, messenger::IMessenger::Pointer messenger,
+    VideoMediaSinkService(messenger::IMessenger::Pointer messenger,
                           messenger::ChannelId channelId);
 
     // Senders and Receivers

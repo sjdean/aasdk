@@ -23,18 +23,18 @@
 
 namespace aasdk::messenger {
 
-  MessageInStream::MessageInStream(boost::asio::io_service &ioService, transport::ITransport::Pointer transport,
+  MessageInStream::MessageInStream(boost::asio::io_service &, transport::ITransport::Pointer transport,
                                    ICryptor::Pointer cryptor)
-      : strand_(ioService), transport_(std::move(transport)), cryptor_(std::move(cryptor)) {
+      : transport_(std::move(transport)), cryptor_(std::move(cryptor)) {
 
   }
 
   void MessageInStream::startReceive(ReceivePromise::Pointer promise) {
     AASDK_LOG(debug) << "[MessageInStream] startReceiveCalled()";
-    strand_.dispatch([this, self = this->shared_from_this(), promise = std::move(promise)]() mutable {
+    QMetaObject::invokeMethod(this, [this, self = this->shared_from_this(), promise = std::move(promise)]() mutable {
       if (promise_ == nullptr) {
         promise_ = std::move(promise);
-        auto transportPromise = transport::ITransport::ReceivePromise::defer(strand_);
+        auto transportPromise = transport::ITransport::ReceivePromise::defer(this);
         transportPromise->then(
             [this, self = this->shared_from_this()](common::Data data) mutable {
               this->receiveFrameHeaderHandler(common::DataConstBuffer(data));
@@ -51,7 +51,7 @@ namespace aasdk::messenger {
         AASDK_LOG(debug) << "[MessageInStream] Already Handling Promise";
         promise->reject(error::Error(error::ErrorCode::OPERATION_IN_PROGRESS));
       }
-    });
+    }, Qt::QueuedConnection);
   }
 
   void MessageInStream::receiveFrameHeaderHandler(const common::DataConstBuffer &buffer) {
@@ -93,7 +93,7 @@ namespace aasdk::messenger {
     const size_t frameSize = FrameSize::getSizeOf(
         frameHeader.getType() == FrameType::FIRST ? FrameSizeType::EXTENDED : FrameSizeType::SHORT);
 
-    auto transportPromise = transport::ITransport::ReceivePromise::defer(strand_);
+    auto transportPromise = transport::ITransport::ReceivePromise::defer(this);
     transportPromise->then(
         [this, self = this->shared_from_this()](common::Data data) mutable {
           this->receiveFrameSizeHandler(common::DataConstBuffer(data));
@@ -109,7 +109,7 @@ namespace aasdk::messenger {
   }
 
   void MessageInStream::receiveFrameSizeHandler(const common::DataConstBuffer &buffer) {
-    auto transportPromise = transport::ITransport::ReceivePromise::defer(strand_);
+    auto transportPromise = transport::ITransport::ReceivePromise::defer(this);
     transportPromise->then(
         [this, self = this->shared_from_this()](common::Data data) mutable {
           this->receiveFramePayloadHandler(common::DataConstBuffer(data));
@@ -158,7 +158,7 @@ namespace aasdk::messenger {
 
     // If the main promise isn't resolved, then carry on retrieving frame headers.
     if (!isResolved) {
-      auto transportPromise = transport::ITransport::ReceivePromise::defer(strand_);
+      auto transportPromise = transport::ITransport::ReceivePromise::defer(this);
       transportPromise->then(
           [this, self = this->shared_from_this()](common::Data data) mutable {
             this->receiveFrameHeaderHandler(common::DataConstBuffer(data));

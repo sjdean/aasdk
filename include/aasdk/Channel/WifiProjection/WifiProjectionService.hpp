@@ -27,7 +27,7 @@ namespace aasdk::channel::wifiprojection {
   class WifiProjectionService
       : public IWifiProjectionService, public Channel, public std::enable_shared_from_this<WifiProjectionService> {
   public:
-    WifiProjectionService(boost::asio::io_service::strand &strand, messenger::IMessenger::Pointer messenger);
+    WifiProjectionService(messenger::IMessenger::Pointer messenger);
 
     // Senders and Receivers
 

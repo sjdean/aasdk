@@ -27,7 +27,7 @@ namespace aasdk::channel::phonestatus {
   class PhoneStatusService
       : public IPhoneStatusService, public Channel, public std::enable_shared_from_this<PhoneStatusService> {
   public:
-    PhoneStatusService(boost::asio::io_service::strand &strand, messenger::IMessenger::Pointer messenger);
+    PhoneStatusService(messenger::IMessenger::Pointer messenger);
 
     // Senders and Receivers
 
