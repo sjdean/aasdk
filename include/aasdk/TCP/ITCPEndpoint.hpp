@@ -29,7 +29,6 @@ namespace aasdk {
     public:
       typedef std::shared_ptr<ITCPEndpoint> Pointer;
       typedef io::QtPromise<size_t> Promise;
-      typedef std::shared_ptr<boost::asio::ip::tcp::socket> SocketPointer;
 
       virtual ~ITCPEndpoint() = default;
 
