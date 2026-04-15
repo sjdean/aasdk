@@ -25,14 +25,13 @@ namespace aasdk::usb {
 
   class AccessoryModeQueryFactory : public IAccessoryModeQueryFactory {
   public:
-    AccessoryModeQueryFactory(usb::IUSBWrapper &usbWrapper, boost::asio::io_service &ioService);
+    AccessoryModeQueryFactory(usb::IUSBWrapper &usbWrapper);
 
     IAccessoryModeQuery::Pointer
     createQuery(AccessoryModeQueryType queryType, IUSBEndpoint::Pointer usbEndpoint) override;
 
   private:
     usb::IUSBWrapper &usbWrapper_;
-    boost::asio::io_service &ioService_;
   };
 
 }

@@ -23,12 +23,11 @@
 namespace aasdk {
   namespace usb {
 
-    AccessoryModeSendStringQuery::AccessoryModeSendStringQuery(boost::asio::io_service &ioService,
-                                                               IUSBWrapper &usbWrapper,
+    AccessoryModeSendStringQuery::AccessoryModeSendStringQuery(IUSBWrapper &usbWrapper,
                                                                IUSBEndpoint::Pointer usbEndpoint,
                                                                AccessoryModeSendStringType sendStringType,
                                                                const std::string &queryValue)
-        : AccessoryModeQuery(ioService, std::move(usbEndpoint)), sendStringType_(std::move(sendStringType)) {
+        : AccessoryModeQuery(std::move(usbEndpoint)), sendStringType_(std::move(sendStringType)) {
       data_.resize(8);
       data_.insert(data_.end(), queryValue.begin(), queryValue.end());
       data_.push_back('\0');
@@ -38,13 +37,13 @@ namespace aasdk {
     }
 
     void AccessoryModeSendStringQuery::start(Promise::Pointer promise) {
-      strand_.dispatch([this, self = this->shared_from_this(), promise = std::move(promise)]() mutable {
+      QMetaObject::invokeMethod(this, [this, self = this->shared_from_this(), promise = std::move(promise)]() mutable {
         if (promise_ != nullptr) {
           promise->reject(error::Error(error::ErrorCode::OPERATION_IN_PROGRESS));
         } else {
           promise_ = std::move(promise);
 
-          auto usbEndpointPromise = IUSBEndpoint::Promise::defer(strand_);
+          auto usbEndpointPromise = IUSBEndpoint::Promise::defer(this);
           usbEndpointPromise->then([this, self = this->shared_from_this()](size_t bytesTransferred) mutable {
                                      promise_->resolve(usbEndpoint_);
                                      promise_.reset();
@@ -56,7 +55,7 @@ namespace aasdk {
 
           usbEndpoint_->controlTransfer(common::DataBuffer(data_), cTransferTimeoutMs, std::move(usbEndpointPromise));
         }
-      });
+      }, Qt::QueuedConnection);
     }
 
   }

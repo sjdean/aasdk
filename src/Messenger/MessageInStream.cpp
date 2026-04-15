@@ -23,7 +23,7 @@
 
 namespace aasdk::messenger {
 
-  MessageInStream::MessageInStream(boost::asio::io_service &, transport::ITransport::Pointer transport,
+  MessageInStream::MessageInStream(transport::ITransport::Pointer transport,
                                    ICryptor::Pointer cryptor)
       : transport_(std::move(transport)), cryptor_(std::move(cryptor)) {
 

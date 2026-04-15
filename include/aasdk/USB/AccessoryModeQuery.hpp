@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include <QObject>
 #include <boost/asio.hpp>
 #include <libusb.h>
 #include <list>
@@ -28,15 +29,17 @@
 
 namespace aasdk::usb {
 
-  class AccessoryModeQuery : public IAccessoryModeQuery {
+  class AccessoryModeQuery : public QObject, public IAccessoryModeQuery, public std::enable_shared_from_this<AccessoryModeQuery> {
+    Q_OBJECT
     Q_DISABLE_COPY(AccessoryModeQuery)
   public:
-    AccessoryModeQuery(boost::asio::io_service &ioService, IUSBEndpoint::Pointer usbEndpoint);
+    AccessoryModeQuery(IUSBEndpoint::Pointer usbEndpoint);
 
     void cancel() override;
 
   protected:
-    boost::asio::io_service::strand strand_;
+    using std::enable_shared_from_this<AccessoryModeQuery>::shared_from_this;
+
     IUSBEndpoint::Pointer usbEndpoint_;
     common::Data data_;
     Promise::Pointer promise_;

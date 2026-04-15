@@ -35,7 +35,7 @@ namespace aasdk {
       Q_OBJECT
       Q_DISABLE_COPY(MessageOutStream)
     public:
-      MessageOutStream(boost::asio::io_service &ioService, transport::ITransport::Pointer transport,
+      MessageOutStream(transport::ITransport::Pointer transport,
                        ICryptor::Pointer cryptor);
 
       void stream(Message::Pointer message, SendPromise::Pointer promise) override;

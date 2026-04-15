@@ -36,7 +36,7 @@ namespace aasdk {
       Q_OBJECT
       Q_DISABLE_COPY(MessageInStream)
     public:
-      MessageInStream(boost::asio::io_service &ioService, transport::ITransport::Pointer transport,
+      MessageInStream(transport::ITransport::Pointer transport,
                       ICryptor::Pointer cryptor);
 
       void startReceive(ReceivePromise::Pointer promise) override;

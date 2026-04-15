@@ -22,10 +22,10 @@
 namespace aasdk {
   namespace transport {
 
-    Transport::Transport(boost::asio::io_service &)
-    {
-        moveToThread(&workerThread_);
-        workerThread_.start();
+    Transport::Transport() {
+      this->moveToThread(&workerThread_);
+      workerThread_.start();
+    }
     }
 
     Transport::~Transport()

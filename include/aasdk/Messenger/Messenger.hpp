@@ -36,7 +36,7 @@ namespace aasdk {
       Q_OBJECT
       Q_DISABLE_COPY(Messenger)
     public:
-      Messenger(boost::asio::io_service &ioService, IMessageInStream::Pointer messageInStream,
+      Messenger(IMessageInStream::Pointer messageInStream,
                 IMessageOutStream::Pointer messageOutStream);
       ~Messenger() override;
 

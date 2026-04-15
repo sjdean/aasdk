@@ -20,7 +20,7 @@
 
 namespace aasdk::messenger {
 
-  Messenger::Messenger(boost::asio::io_service &, IMessageInStream::Pointer messageInStream,
+  Messenger::Messenger(IMessageInStream::Pointer messageInStream,
                        IMessageOutStream::Pointer messageOutStream)
       : messageInStream_(std::move(messageInStream)), messageOutStream_(std::move(messageOutStream)) {
     // Move streams to our worker thread so their QMetaObject::invokeMethod

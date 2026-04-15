@@ -21,8 +21,8 @@
 namespace aasdk {
   namespace transport {
 
-    TCPTransport::TCPTransport(boost::asio::io_service &ioService, tcp::ITCPEndpoint::Pointer tcpEndpoint)
-        : Transport(ioService), tcpEndpoint_(std::move(tcpEndpoint)) {
+    TCPTransport::TCPTransport(tcp::ITCPEndpoint::Pointer tcpEndpoint)
+        : Transport(), tcpEndpoint_(std::move(tcpEndpoint)) {
 
     }
 

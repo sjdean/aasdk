@@ -34,7 +34,7 @@ namespace aasdk {
       Q_OBJECT
       Q_DISABLE_COPY(Transport)
     public:
-      Transport(boost::asio::io_service &ioService);
+      Transport();
       ~Transport() override;
 
       void receive(size_t size, ReceivePromise::Pointer promise) override;

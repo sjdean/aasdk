@@ -27,7 +27,7 @@ namespace aasdk::usb {
   class AccessoryModeSendStringQuery
       : public AccessoryModeQuery, public std::enable_shared_from_this<AccessoryModeSendStringQuery> {
   public:
-    AccessoryModeSendStringQuery(boost::asio::io_service &ioService, IUSBWrapper &usbWrapper,
+    AccessoryModeSendStringQuery(IUSBWrapper &usbWrapper,
                                  IUSBEndpoint::Pointer usbEndpoint,
                                  AccessoryModeSendStringType sendStringType, const std::string &queryValue);
 

@@ -21,8 +21,8 @@
 namespace aasdk {
   namespace transport {
 
-    USBTransport::USBTransport(boost::asio::io_service &ioService, usb::IAOAPDevice::Pointer aoapDevice)
-        : Transport(ioService), aoapDevice_(std::move(aoapDevice)) {}
+    USBTransport::USBTransport(usb::IAOAPDevice::Pointer aoapDevice)
+        : Transport(), aoapDevice_(std::move(aoapDevice)) {}
 
     void USBTransport::enqueueReceive(common::DataBuffer buffer) {
       auto usbEndpointPromise = usb::IUSBEndpoint::Promise::defer(this);
